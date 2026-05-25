@@ -1,32 +1,128 @@
 ---
 name: study-os-synthesize
-description: Create final StudyOS synthesis only after batches have inventories, digests, learning cores, outputs, and validation results.
+description: Create final StudyOS course synthesis only after batch artifacts and validation reports exist, using learning cores and validated outputs as the basis.
 ---
 
 # StudyOS Synthesize
 
-Use this skill only for final course-level synthesis after batch work already exists.
+Use this skill only when the user asks for final course-level synthesis or final review materials after batch processing and validation.
+
+## Scope
+
+Synthesis is the final stage of v1. It may work across batches, but only from existing StudyOS artifacts. It should not replace batch processing or validation.
+
+Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
+
+## May Read
+
+- `PROJECT_BRIEF.md` when working in the core repo.
+- Installed subject configuration:
+  - `subject.yaml`
+  - `workflow.yaml`
+  - `output-standards.yaml`
+- Inventory and batch plan:
+  - `working/inventory/course_inventory.md`
+  - `working/inventory/batch_plan.md`
+- Batch artifacts:
+  - `working/digests/`
+  - `working/learning-cores/`
+  - `working/visual-notes/`
+- Validated outputs:
+  - `outputs/master-notes/`
+  - `outputs/formula-sheets/`
+  - `outputs/flashcards/`
+  - `outputs/exam-questions/`
+  - `outputs/cheat-sheets/`
+  - `outputs/study-plan/`
+- Review files:
+  - `review/validation-report.md`
+  - `review/source-coverage.md`
+  - `review/formula_validation_report.md`
+  - `review/weak-points.md`
+  - `review/unresolved-questions.md`
+
+Raw `inputs/` may be read only to resolve a citation or inspect a validation gap. Prefer learning cores and validated outputs as the synthesis basis.
+
+## May Write
+
+- `outputs/final-review-pack/`
+- `outputs/master-notes/` only for explicitly requested course-level consolidated notes.
+- `outputs/cheat-sheets/` only for explicitly requested course-level cheat sheets.
+- `outputs/study-plan/` only for explicitly requested course-level plans.
+- `review/` synthesis gap notes when final synthesis is blocked or incomplete.
+- `study-os/state/studyos.sqlite` synthesis status when applicable.
+
+## Must Not Write
+
+- Never modify files inside `inputs/`.
+- Do not rewrite batch digests, learning cores, or batch outputs unless the user explicitly asks for fixes.
+- Do not invent missing material for unprocessed or unvalidated batches.
+- Do not ignore unresolved questions or validation findings.
 
 ## Preconditions
 
-- Inventory and batch plan exist.
-- Relevant batches have source digests.
-- Relevant batches have learning cores.
-- Requested outputs have been validated or validation gaps are known.
+Before synthesizing, confirm:
+
+- `working/inventory/batch_plan.md` exists,
+- relevant batches have digests,
+- relevant batches have learning cores,
+- relevant outputs exist,
+- validation reports exist or validation gaps are explicitly known,
+- weak points and unresolved questions have been reviewed.
+
+If preconditions are missing, stop and report what must be processed or validated first.
+
+## Synthesis Inputs
+
+Use this priority order:
+
+1. validated learning cores,
+2. validated batch outputs,
+3. validation reports and weak-point notes,
+4. source digests,
+5. raw inputs only for targeted clarification.
+
+Do not base final course materials directly on raw sources when learning cores are available.
+
+## Output Types
+
+Possible final v1 artifacts:
+
+- final review pack,
+- course-level master notes,
+- course-level formula sheet,
+- course-level exam question set,
+- course-level cheat sheet,
+- study plan.
+
+Only create the output types requested by the user or configured workflow.
+
+## Required Final Output Qualities
+
+Final synthesis must:
+
+- preserve source references,
+- mark unresolved questions clearly,
+- carry forward weak points,
+- integrate repeated concepts across batches,
+- avoid duplicate explanations where one consolidated explanation is clearer,
+- include exam-useful tasks when exercises or validation reports indicate them,
+- avoid vague summaries unsupported by batch artifacts.
 
 ## Workflow
 
-1. Review existing batch plans, learning cores, outputs, validation notes, weak points, and unresolved questions.
-2. Identify which batches are ready for synthesis and which remain blocked.
-3. Create final synthesis artifacts only from learning cores, validated outputs, and recorded validation findings.
-4. Preserve source references and unresolved-question markers.
-5. Place final artifacts in the appropriate `outputs/` location.
-6. Report remaining gaps instead of inventing missing material.
+1. Identify requested final artifact type and course scope.
+2. Check preconditions for all included batches.
+3. Read learning cores, validated outputs, and review files.
+4. Build a synthesis outline before writing final artifacts.
+5. Create requested final artifacts under the appropriate `outputs/` folder.
+6. Include source references and unresolved-question markers.
+7. Write review notes for any blocked or incomplete sections.
+8. Report created files and remaining gaps.
 
-## Guardrails
+## Quality Bar
 
-- This is the only skill that may work across the whole course, and only after batch artifacts exist.
-- Treat `inputs/` as read-only.
-- Do not base final outputs directly on raw inputs when learning cores are available.
-- Do not skip validation findings.
-- Use lazy visual analysis only when existing notes show that a visual source matters.
+- Final artifacts are course-level, not just concatenated batch files.
+- Validation findings influence the synthesis.
+- Gaps remain visible instead of being smoothed over.
+- `inputs/` remains read-only.
