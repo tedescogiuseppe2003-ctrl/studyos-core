@@ -66,6 +66,8 @@ Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian expor
 
 Use all relevant sources assigned to the batch. Do not rely only on slides when notes, exercises, readings, or transcripts are assigned.
 
+For each batch, explicitly check every assigned source file. The digest must include a `Source coverage` section listing every assigned source and what was extracted from it. If a source contributes nothing, explain why.
+
 For every assigned source:
 
 - include it in the source digest or explicitly state why it has no usable content,
@@ -88,6 +90,7 @@ The digest must include:
 
 - batch name and scope,
 - complete source list,
+- source coverage,
 - key topics,
 - definitions,
 - formulas,
@@ -96,6 +99,17 @@ The digest must include:
 - weak points,
 - unresolved questions,
 - source references.
+
+The digest must include this required section:
+
+```markdown
+## Source coverage
+
+| Source | Used? | What was extracted | If not used, why |
+|---|---|---|---|
+```
+
+Every assigned source file must appear in that table. Use `yes`, `partial`, or `no` in `Used?`.
 
 Keep the digest faithful to sources. Do not add unsupported teaching material here.
 
