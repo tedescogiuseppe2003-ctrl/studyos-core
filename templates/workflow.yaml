@@ -1,2 +1,77 @@
-# StudyOS workflow template placeholder.
-# Implementation will be added in a later task.
+# StudyOS v1 workflow.
+
+workflow:
+  install:
+    skill: "study-os-install"
+    purpose: "Create the course workspace structure and initial state."
+    inputs:
+      - "templates/subject.yaml"
+    outputs:
+      - "inputs/"
+      - "working/"
+      - "outputs/"
+      - "review/"
+      - "study-os/"
+    checks:
+      - "required_directories_exist"
+      - "inputs_is_read_only_for_processing"
+
+  inventory:
+    skill: "study-os-inventory"
+    purpose: "Catalog raw course material and create a batch plan."
+    inputs:
+      - "inputs/"
+    outputs:
+      - "study-os/inventory.yaml"
+      - "study-os/batches.yaml"
+    checks:
+      - "all_sources_listed"
+      - "batches_are_small_enough_to_process"
+
+  process_batch:
+    skill: "study-os-process-batch"
+    purpose: "Turn one batch of sources into digests and learning cores."
+    inputs:
+      - "study-os/batches.yaml"
+      - "inputs/"
+    outputs:
+      - "working/digests/"
+      - "working/learning-cores/"
+      - "review/weak-points.md"
+      - "review/unresolved-questions.md"
+    checks:
+      - "digest_created_before_learning_core"
+      - "learning_core_has_source_references"
+      - "weak_points_recorded"
+      - "unresolved_questions_recorded"
+
+  validate:
+    skill: "study-os-validate"
+    purpose: "Check batch outputs before final synthesis."
+    inputs:
+      - "working/digests/"
+      - "working/learning-cores/"
+    outputs:
+      - "review/validation/"
+    checks:
+      - "citations_resolve_to_sources"
+      - "formulas_are_consistent"
+      - "claims_are_supported_by_learning_cores"
+      - "unresolved_questions_are_flagged"
+
+  synthesize:
+    skill: "study-os-synthesize"
+    purpose: "Create final course study outputs from validated learning cores."
+    inputs:
+      - "working/learning-cores/"
+      - "review/validation/"
+    outputs:
+      - "outputs/digest.md"
+      - "outputs/learning-core.md"
+      - "outputs/formula-sheet.md"
+      - "outputs/flashcards.md"
+      - "outputs/exam-questions.md"
+    checks:
+      - "final_outputs_are_based_on_learning_cores"
+      - "required_sections_match_output_standards"
+      - "source_references_are_present"

@@ -1,2 +1,57 @@
-# StudyOS model routing template placeholder.
-# Implementation will be added in a later task.
+# StudyOS v1 model routing tiers.
+
+tiers:
+  fast:
+    purpose: "Low-cost, low-risk extraction and formatting."
+    use_for:
+      - "inventory"
+      - "file classification"
+      - "simple metadata extraction"
+      - "format cleanup"
+    avoid_for:
+      - "concept synthesis"
+      - "validation"
+      - "exam question design"
+
+  balanced:
+    purpose: "Default course-material processing."
+    use_for:
+      - "source digests"
+      - "learning cores"
+      - "flashcards"
+      - "standard explanations"
+    avoid_for:
+      - "high-stakes audit"
+      - "ambiguous or mathematically dense material"
+
+  deep:
+    purpose: "Complex reasoning and synthesis."
+    use_for:
+      - "difficult concepts"
+      - "formula derivations"
+      - "exam questions"
+      - "final synthesis"
+    avoid_for:
+      - "bulk inventory"
+      - "mechanical formatting"
+
+  audit:
+    purpose: "Independent checks of correctness and traceability."
+    use_for:
+      - "citation validation"
+      - "formula validation"
+      - "coverage review"
+      - "unsupported claim detection"
+    avoid_for:
+      - "first-pass generation"
+      - "bulk summarization"
+
+defaults:
+  inventory: "fast"
+  digest: "balanced"
+  learning_core: "balanced"
+  flashcards: "balanced"
+  formula_sheet: "deep"
+  exam_questions: "deep"
+  validation: "audit"
+  synthesis: "deep"

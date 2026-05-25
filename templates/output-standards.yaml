@@ -1,2 +1,69 @@
-# StudyOS output standards template placeholder.
-# Implementation will be added in a later task.
+# StudyOS v1 output standards.
+
+outputs:
+  digest:
+    file: "outputs/digest.md"
+    required_sections:
+      - "Scope"
+      - "Source List"
+      - "Key Topics"
+      - "Important Details"
+      - "Definitions"
+      - "Formulas"
+      - "Examples"
+      - "Weak Points"
+      - "Unresolved Questions"
+      - "Source References"
+
+  learning_core:
+    file: "outputs/learning-core.md"
+    required_sections:
+      - "Learning Objectives"
+      - "Core Concepts"
+      - "Explanations"
+      - "Connections Between Topics"
+      - "Worked Examples"
+      - "Common Mistakes"
+      - "Exam-Relevant Points"
+      - "Weak Points"
+      - "Unresolved Questions"
+      - "Source References"
+
+  formula_sheet:
+    file: "outputs/formula-sheet.md"
+    required_sections:
+      - "Notation"
+      - "Formula Index"
+      - "Formulas"
+      - "Variable Definitions"
+      - "Assumptions"
+      - "When To Use"
+      - "Source References"
+
+  flashcards:
+    file: "outputs/flashcards.md"
+    required_sections:
+      - "Deck Scope"
+      - "Concept Cards"
+      - "Definition Cards"
+      - "Formula Cards"
+      - "Application Cards"
+      - "Weak Point Cards"
+      - "Source References"
+
+  exam_questions:
+    file: "outputs/exam-questions.md"
+    required_sections:
+      - "Exam Scope"
+      - "Question Set"
+      - "Answer Key"
+      - "Worked Solutions"
+      - "Grading Notes"
+      - "Common Pitfalls"
+      - "Source References"
+
+rules:
+  require_source_references: true
+  final_outputs_must_use_learning_cores: true
+  unresolved_questions_must_be_flagged: true
+  weak_points_must_be_carried_forward: true
