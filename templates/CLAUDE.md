@@ -7,6 +7,9 @@ You are working inside a StudyOS v1 course workspace.
 - Keep the implementation lean and course-focused.
 - Do not modify `inputs/`; treat raw course material as read-only.
 - Work batch by batch.
+- Treat batches as conceptual lectures, topics, or modules whenever possible.
+- Use exercises as supporting practice sources unless they are explicitly tutorial or conceptual batches.
+- Do not create separate master notes for an exercise file attached to a conceptual batch.
 - Produce source digests before learning cores.
 - Produce learning cores before final outputs.
 - Ensure final outputs are derived from learning cores.

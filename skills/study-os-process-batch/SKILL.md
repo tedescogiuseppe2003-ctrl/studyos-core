@@ -82,6 +82,25 @@ Special handling:
 - Readings provide deeper explanation and formal definitions.
 - Transcripts provide spoken clarifications and examples.
 
+## Batch Type Rules
+
+A batch should normally represent a conceptual lecture, topic, or module.
+
+Primary sources usually include slides, lecture notes, or core readings. Supporting sources usually include exercises, exams, transcripts, personal notes, and supplementary readings.
+
+When exercises are assigned to a conceptual batch:
+
+- integrate them into exam questions,
+- create practice tasks when useful,
+- update weak points with recurring mistakes or fragile skills,
+- do not create separate master notes for the exercise file.
+
+If a batch contains only exercises:
+
+- do not automatically create master notes,
+- create an exercise practice file instead, unless the batch is explicitly marked as a tutorial or conceptual batch,
+- flag the batch for review if its topic is unclear.
+
 ## Digest Requirements
 
 Create one batch digest in `working/digests/`.

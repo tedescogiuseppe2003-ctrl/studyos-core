@@ -31,6 +31,9 @@ INPUT_FOLDERS = (
     ("inputs/miscellaneous", "miscellaneous"),
 )
 
+PRIMARY_SOURCE_TYPES = {"slides", "notes"}
+CORE_READING_SOURCE_TYPES = {"readings"}
+
 LECTURE_PATTERNS = (
     re.compile(
         r"\b(?:lecture|lect|lec|lesson|class|session)\s*[-_ ]*0*(\d{1,3})(?=\D|$)",
@@ -335,6 +338,71 @@ def batch_sort_key(batch_key: tuple[str, str]) -> tuple[int, int, str]:
     return (0, int(lecture), topic.lower())
 
 
+def split_primary_and_supporting(
+    batch_sources: list[SourceFile],
+) -> tuple[list[SourceFile], list[SourceFile]]:
+    primary = [
+        source for source in batch_sources if source.file_type in PRIMARY_SOURCE_TYPES
+    ]
+
+    if not primary:
+        primary = [
+            source
+            for source in batch_sources
+            if source.file_type in CORE_READING_SOURCE_TYPES
+        ]
+
+    primary_paths = {source.path for source in primary}
+    supporting = [
+        source for source in batch_sources if source.path not in primary_paths
+    ]
+
+    return primary, supporting
+
+
+def source_list_lines(sources: list[SourceFile]) -> list[str]:
+    if not sources:
+        return ["  - None"]
+    return [
+        f"  - `{source.path}` ({source.file_type}, {source.status})"
+        for source in sources
+    ]
+
+
+def expected_output_lines(
+    primary_sources: list[SourceFile],
+    supporting_sources: list[SourceFile],
+) -> list[str]:
+    all_sources = [*primary_sources, *supporting_sources]
+    source_types = {source.file_type for source in all_sources}
+
+    if source_types == {"exercises"}:
+        return [
+            "  - Source digest covering exercise scope, task types, and source coverage.",
+            "  - Exercise practice file with worked prompts or practice tasks.",
+            "  - Weak-point updates for recurring mistakes or unclear skills.",
+            "  - No master notes unless this batch is later marked as a tutorial/conceptual batch.",
+            "  - Review flag if the exercise topic is unclear from metadata.",
+        ]
+
+    lines = [
+        "  - Source digest for the conceptual lecture/topic/module and all assigned supporting sources.",
+        "  - Learning core based on the digest, with source references.",
+        "  - Batch study outputs requested by the workflow or user.",
+    ]
+
+    if "exercises" in source_types:
+        lines.extend(
+            [
+                "  - Exercise-derived practice tasks integrated into exam questions.",
+                "  - Weak-point updates for exercise mistakes or fragile skills.",
+                "  - Do not create separate master notes for attached exercise files.",
+            ]
+        )
+
+    return lines
+
+
 def write_batch_plan(root: Path, sources: list[SourceFile]) -> None:
     target = root / BATCH_PLAN_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -348,7 +416,7 @@ def write_batch_plan(root: Path, sources: list[SourceFile]) -> None:
     lines = [
         "# Batch Plan",
         "",
-        "This plan groups sources by filename-derived lecture number and topic guess.",
+        "This plan groups sources by conceptual lecture, topic, or module when inferable from metadata. Primary sources usually define the batch; supporting sources should inform practice, exam questions, weak points, or context without creating separate master notes.",
         "",
     ]
 
@@ -358,19 +426,33 @@ def write_batch_plan(root: Path, sources: list[SourceFile]) -> None:
         for index, batch_key in enumerate(sorted(grouped, key=batch_sort_key), start=1):
             lecture, topic = batch_key
             batch_sources = sorted(grouped[batch_key], key=lambda item: item.path)
+            primary_sources, supporting_sources = split_primary_and_supporting(
+                batch_sources
+            )
+            source_types = {source.file_type for source in batch_sources}
+            is_exercise_only = source_types == {"exercises"}
+            title = (
+                f"Exercise Practice - {topic}"
+                if is_exercise_only
+                else topic
+            )
             lines.extend(
                 [
-                    f"## Batch {index}: {topic}",
+                    f"## Batch {index}: {title}",
                     "",
+                    f"- Title: {title}",
                     f"- Lecture: {lecture}",
-                    f"- Source files: {len(batch_sources)}",
-                    "",
+                    "- Primary sources:",
+                    *source_list_lines(primary_sources),
+                    "- Supporting sources:",
+                    *source_list_lines(supporting_sources),
+                    "- Expected outputs:",
+                    *expected_output_lines(primary_sources, supporting_sources),
+                    "- Status: planned",
+                    "- Difficulty: to review",
+                    "- Exam relevance: to review",
                 ]
             )
-            for source in batch_sources:
-                lines.append(
-                    f"- `{source.path}` ({source.file_type}, {source.status})"
-                )
             lines.append("")
 
     target.write_text("\n".join(lines), encoding="utf-8")
