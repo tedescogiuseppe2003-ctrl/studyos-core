@@ -18,6 +18,22 @@ SUBJECT_CONFIG_PATH = Path("subject.yaml")
 
 SKIP_ACTIONS = {"skip", "needs review"}
 IGNORED_FILENAMES = {".DS_Store", "Thumbs.db", "desktop.ini"}
+IGNORED_STUDYOS_FILENAMES = {
+    "AGENTS.md",
+    "CLAUDE.md",
+    "STUDYOS_GUIDE.md",
+    "model-routing.yaml",
+    "output-standards.yaml",
+    "subject.yaml",
+    "workflow.yaml",
+}
+IGNORED_STUDYOS_DIRECTORIES = {
+    "inputs",
+    "outputs",
+    "review",
+    "study-os",
+    "working",
+}
 APPROVED_DESTINATION_FOLDERS = (
     "inputs/slides",
     "inputs/readings",
@@ -291,7 +307,11 @@ def source_is_ignored(source_path: Path, raw_source_root: Path) -> bool:
         return True
 
     return any(
-        part.startswith(".") or part == "__pycache__" or part in IGNORED_FILENAMES
+        part.startswith(".")
+        or part == "__pycache__"
+        or part in IGNORED_FILENAMES
+        or part in IGNORED_STUDYOS_DIRECTORIES
+        or part in IGNORED_STUDYOS_FILENAMES
         for part in relative.parts
     )
 

@@ -24,6 +24,7 @@ INTENTIONALLY_NOT_TOUCHED = (
     "working/",
     "review/",
     "subject.yaml",
+    "STUDYOS_GUIDE.md (when already present)",
     ".git/",
 )
 
@@ -84,6 +85,15 @@ def validate_sources(source_root: Path) -> None:
     if missing_scripts:
         missing = ", ".join(str(path) for path in missing_scripts)
         raise FileNotFoundError(f"Missing required StudyOS scripts: {missing}")
+
+    required_templates = (
+        source_root / "templates/STUDYOS_GUIDE.md",
+        source_root / "templates/SKILLS_GUIDE.md",
+    )
+    missing_templates = [path for path in required_templates if not path.is_file()]
+    if missing_templates:
+        missing = ", ".join(str(path) for path in missing_templates)
+        raise FileNotFoundError(f"Missing required StudyOS templates: {missing}")
 
 
 def validate_target(target: Path) -> None:
@@ -185,14 +195,44 @@ def sync_skills(source_root: Path, target: Path) -> tuple[int, int, tuple[str, .
     return copied, folders_synced, tuple(synced_paths)
 
 
+def sync_guides(source_root: Path, target: Path) -> tuple[int, int, tuple[str, ...]]:
+    copied = 0
+    replaced = 0
+    synced_paths: list[str] = []
+    templates_source = source_root / "templates"
+
+    skills_guide_source = templates_source / "SKILLS_GUIDE.md"
+    if copy_file_replace(
+        skills_guide_source, target / "study-os/config/SKILLS_GUIDE.md"
+    ):
+        replaced += 1
+    copied += 1
+    synced_paths.append("study-os/config/SKILLS_GUIDE.md")
+
+    studyos_guide_destination = target / "STUDYOS_GUIDE.md"
+    if (
+        not studyos_guide_destination.exists()
+        and not studyos_guide_destination.is_symlink()
+    ):
+        studyos_guide_destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(templates_source / "STUDYOS_GUIDE.md", studyos_guide_destination)
+        copied += 1
+        synced_paths.append("STUDYOS_GUIDE.md")
+
+    return copied, replaced, tuple(synced_paths)
+
+
 def write_sync_log(
     target: Path,
     copied_scripts: int,
     replaced_scripts: int,
     copied_skill_files: int,
     synced_skill_folders: int,
+    copied_guides: int,
+    replaced_guides: int,
     copied_script_paths: tuple[str, ...],
     synced_skill_paths: tuple[str, ...],
+    synced_guide_paths: tuple[str, ...],
     removed_deprecated_paths: tuple[str, ...],
     warnings: tuple[str, ...] = (),
     errors: tuple[str, ...] = (),
@@ -209,6 +249,10 @@ def write_sync_log(
     )
     synced_skill_lines = (
         "\n".join(f"- `{relative_path}`" for relative_path in synced_skill_paths)
+        or "- None"
+    )
+    synced_guide_lines = (
+        "\n".join(f"- `{relative_path}`" for relative_path in synced_guide_paths)
         or "- None"
     )
     removed_deprecated_lines = (
@@ -230,6 +274,8 @@ def write_sync_log(
                 f"- Scripts replaced: {replaced_scripts}",
                 f"- Skill files copied: {copied_skill_files}",
                 f"- Skill folders synced: {synced_skill_folders}",
+                f"- Guide files copied: {copied_guides}",
+                f"- Guide files replaced: {replaced_guides}",
                 "",
                 "## Scripts Copied",
                 "",
@@ -238,6 +284,10 @@ def write_sync_log(
                 "## Skill Folders Synced",
                 "",
                 synced_skill_lines,
+                "",
+                "## Guides Synced",
+                "",
+                synced_guide_lines,
                 "",
                 "## Deprecated Paths Removed",
                 "",
@@ -279,14 +329,20 @@ def main() -> int:
             synced_skill_folders,
             synced_skill_paths,
         ) = sync_skills(source_root, target)
+        copied_guides, replaced_guides, synced_guide_paths = sync_guides(
+            source_root, target
+        )
         log_path = write_sync_log(
             target,
             copied_scripts,
             replaced_scripts,
             copied_skill_files,
             synced_skill_folders,
+            copied_guides,
+            replaced_guides,
             copied_script_paths,
             synced_skill_paths,
+            synced_guide_paths,
             removed_deprecated_paths,
         )
     except OSError as error:
@@ -304,6 +360,11 @@ def main() -> int:
     print("Synced skill folders:")
     for synced_skill_path in synced_skill_paths:
         print(f"  - {synced_skill_path}")
+    print(f"Guide files copied: {copied_guides}")
+    print(f"Guide files replaced: {replaced_guides}")
+    print("Synced guide files:")
+    for synced_guide_path in synced_guide_paths:
+        print(f"  - {synced_guide_path}")
     print("Deprecated paths removed:")
     for removed_path in removed_deprecated_paths:
         print(f"  - {removed_path}")

@@ -17,6 +17,30 @@ Process one batch at a time. The output order is mandatory:
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Preflight
+
+Before processing a batch, confirm:
+
+- `subject.yaml` exists;
+- `study-os/` exists;
+- `working/inventory/course_inventory.md` exists;
+- `working/inventory/batch_plan.md` exists;
+- the requested batch exists in `batch_plan.md`;
+- every assigned source for the requested batch exists under `inputs/`.
+
+If any preflight item is missing, stop and report:
+
+- what is missing;
+- why batch processing cannot continue;
+- which skill to run first.
+
+Use this guidance:
+
+- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
+- Missing or empty `inputs/`: run `study-os-import-sources` first.
+- Missing inventory or batch plan: run `study-os-inventory` first.
+- Missing assigned source files: repair the import plan or rerun import before processing.
+
 ## May Read
 
 - `PROJECT_BRIEF.md` when working in the core repo.

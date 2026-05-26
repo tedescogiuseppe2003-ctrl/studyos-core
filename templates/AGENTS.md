@@ -19,6 +19,14 @@ You are working inside a StudyOS v1 course workspace.
 - Validate outputs after each batch.
 - Use lazy visual analysis only when charts, tables, diagrams, or images carry important course content.
 
+## Installation Setup
+
+When installing StudyOS into a course folder, behave like a setup wizard. Ask only for missing essentials, fill `subject.yaml` automatically, initialize the database, and do not import or process course files during installation.
+
+Essential setup fields are subject name, raw source folder path, course level, course-material language, exam type, desired outputs, whether original files are read-only, and whether StudyOS should copy files into `inputs/`. Default to read-only originals and copying into `inputs/`.
+
+After installation, point the user to `STUDYOS_GUIDE.md` and continue only when the user chooses the next skill.
+
 ## v1 Scope
 
 - Do not add Graphify.

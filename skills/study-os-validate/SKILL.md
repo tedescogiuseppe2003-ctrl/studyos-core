@@ -13,6 +13,31 @@ Validate by batch, not across the full course, unless the user explicitly asks f
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Preflight
+
+Before validation, confirm:
+
+- `subject.yaml` exists;
+- `working/inventory/batch_plan.md` exists;
+- the batch to validate is identifiable;
+- the batch digest exists in `working/digests/`;
+- the batch learning core exists in `working/learning-cores/`;
+- expected batch outputs exist under `outputs/`, or the user explicitly asks to validate a partial run;
+- assigned sources for the batch still exist under `inputs/`.
+
+If any preflight item is missing, stop and report:
+
+- what is missing;
+- why validation cannot continue;
+- which skill to run first.
+
+Use this guidance:
+
+- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
+- Missing batch plan: run `study-os-inventory` first.
+- Missing digest, learning core, or outputs: run `study-os-process-batch` first.
+- Missing assigned source files: repair the import or inventory before validation.
+
 ## May Read
 
 - `PROJECT_BRIEF.md` when working in the core repo.

@@ -10,6 +10,7 @@ workflow:
       - "StudyOS core skills/"
     outputs:
       - "subject.yaml"
+      - "STUDYOS_GUIDE.md"
       - "AGENTS.md"
       - "CLAUDE.md"
       - "workflow.yaml"
@@ -22,10 +23,14 @@ workflow:
       - "study-os/"
       - ".agents/"
       - ".claude/"
+      - "study-os/config/SKILLS_GUIDE.md"
     checks:
+      - "agent_asked_only_missing_setup_questions"
+      - "subject_yaml_filled_from_setup_answers"
       - "raw_source_folder_is_external_and_read_only"
       - "required_workspace_directories_exist"
       - "inputs_is_empty_or_imported_copy_area"
+      - "course_material_is_not_imported_or_processed_during_install"
 
   import_sources_proposal:
     skill: "study-os-import-sources"

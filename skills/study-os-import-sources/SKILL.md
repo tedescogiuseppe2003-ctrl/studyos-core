@@ -18,6 +18,30 @@ Import intake files only. Do not process course material, generate study outputs
 
 Keep v1.1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Preflight
+
+Before doing any import work, confirm:
+
+- `subject.yaml` exists;
+- `subject.yaml` contains `raw_source.path`;
+- `raw_source.path` exists and is a directory;
+- `study-os/` exists;
+- `working/inventory/` exists or can be created.
+
+If any preflight item is missing, stop and report:
+
+- what is missing;
+- why import cannot continue;
+- which skill to run first.
+
+Use this guidance:
+
+- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
+- Missing or invalid `raw_source.path`: fill `subject.yaml` from setup answers before importing.
+- Missing `working/inventory/`: create it only if the StudyOS workspace is otherwise installed.
+
+In execute mode, also confirm `working/inventory/import_plan.md` exists. If it is missing, stop and tell the user to run `study-os-import-sources` in proposal mode first.
+
 ## Source Location
 
 Read the original raw source folder from:
@@ -35,6 +59,23 @@ Ignore system and hidden folders anywhere in the raw source tree, including:
 - `desktop.ini`
 
 Do not recursively scan ignored folders.
+
+If `raw_source.path` is the StudyOS workspace root because the user installed StudyOS into an existing course folder, also ignore StudyOS-managed paths:
+
+- `inputs/`
+- `working/`
+- `outputs/`
+- `review/`
+- `study-os/`
+- `.agents/`
+- `.claude/`
+- `subject.yaml`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `STUDYOS_GUIDE.md`
+- `workflow.yaml`
+- `output-standards.yaml`
+- `model-routing.yaml`
 
 ## Destination Folders
 

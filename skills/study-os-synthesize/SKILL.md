@@ -13,6 +13,31 @@ Synthesis is the final stage of v1. It may work across batches, but only from ex
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Preflight
+
+Before synthesis, confirm:
+
+- `subject.yaml` exists;
+- `working/inventory/batch_plan.md` exists;
+- included batches have digests in `working/digests/`;
+- included batches have learning cores in `working/learning-cores/`;
+- included batches have requested outputs under `outputs/`;
+- validation reports exist under `review/`;
+- unresolved questions and weak points have been reviewed.
+
+If any preflight item is missing, stop and report:
+
+- what is missing;
+- why synthesis cannot continue;
+- which skill to run first.
+
+Use this guidance:
+
+- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
+- Missing batch plan: run `study-os-inventory` first.
+- Missing digests, learning cores, or batch outputs: run `study-os-process-batch` or `study-os-process-course` first.
+- Missing validation reports: run `study-os-validate` first.
+
 ## May Read
 
 - `PROJECT_BRIEF.md` when working in the core repo.

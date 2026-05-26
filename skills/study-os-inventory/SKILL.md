@@ -13,6 +13,28 @@ Inventory is metadata-only. It prepares batches for later processing.
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Preflight
+
+Before inventory, confirm:
+
+- `subject.yaml` exists;
+- `study-os/` exists;
+- `inputs/` exists;
+- at least one approved `inputs/` subfolder contains course files, unless the user explicitly wants an empty inventory check;
+- `study-os/scripts/inventory.py` exists or the equivalent core script is available.
+
+If any preflight item is missing, stop and report:
+
+- what is missing;
+- why inventory cannot continue;
+- which skill to run first.
+
+Use this guidance:
+
+- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
+- Empty `inputs/` with a configured raw source folder: run `study-os-import-sources` first.
+- Missing inventory script: run the core repo sync or reinstall StudyOS before inventory.
+
 ## May Read
 
 - `PROJECT_BRIEF.md` when working in the core repo.

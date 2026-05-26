@@ -5,8 +5,11 @@ from __future__ import annotations
 
 import argparse
 import shutil
+import sqlite3
 import sys
 from pathlib import Path
+
+from init_db import init_db
 
 
 CORE_REPO_HINT = "~/Developer/studyos-core"
@@ -131,7 +134,30 @@ def copy_skill_without_overwrite(source: Path, destination: Path) -> tuple[int, 
 
 
 def copy_templates(source_root: Path, target: Path) -> tuple[int, int]:
-    return copy_tree_without_overwrite(source_root / "templates", target)
+    copied = 0
+    skipped = 0
+    templates_source = source_root / "templates"
+
+    for template_source in sorted(templates_source.iterdir()):
+        if template_source.name == "SKILLS_GUIDE.md":
+            destination = target / "study-os/config/SKILLS_GUIDE.md"
+        else:
+            destination = target / template_source.name
+
+        if template_source.is_dir():
+            copied_count, skipped_count = copy_tree_without_overwrite(
+                template_source, destination
+            )
+            copied += copied_count
+            skipped += skipped_count
+            continue
+
+        if copy_file_without_overwrite(template_source, destination):
+            copied += 1
+        else:
+            skipped += 1
+
+    return copied, skipped
 
 
 def copy_scripts(source_root: Path, target: Path) -> tuple[int, int]:
@@ -200,6 +226,20 @@ def validate_sources(source_root: Path) -> None:
         missing = ", ".join(str(path) for path in missing_scripts)
         raise FileNotFoundError(f"Missing required StudyOS scripts: {missing}")
 
+    required_templates = (
+        source_root / "templates/STUDYOS_GUIDE.md",
+        source_root / "templates/SKILLS_GUIDE.md",
+        source_root / "templates/subject.yaml",
+    )
+    missing_templates = [path for path in required_templates if not path.is_file()]
+    if missing_templates:
+        missing = ", ".join(str(path) for path in missing_templates)
+        raise FileNotFoundError(f"Missing required StudyOS templates: {missing}")
+
+
+def initialize_database(target: Path) -> Path:
+    return init_db(target / "study-os/state/studyos.sqlite")
+
 
 def main() -> int:
     args = parse_args()
@@ -212,8 +252,12 @@ def main() -> int:
         copied_templates, skipped_templates = copy_templates(source_root, target)
         copied_scripts, skipped_scripts = copy_scripts(source_root, target)
         copied_skills, skipped_skills = copy_skills(source_root, target)
+        db_path = initialize_database(target)
     except OSError as error:
         print(f"StudyOS installation failed: {error}", file=sys.stderr)
+        return 1
+    except sqlite3.Error as error:
+        print(f"StudyOS database initialization failed: {error}", file=sys.stderr)
         return 1
 
     copied_files = copied_templates + copied_scripts + copied_skills
@@ -223,6 +267,7 @@ def main() -> int:
     print(f"Directories created: {created_dirs}")
     print(f"Files copied: {copied_files}")
     print(f"Existing files preserved: {skipped_files}")
+    print(f"Database initialized: {db_path}")
     return 0
 
 

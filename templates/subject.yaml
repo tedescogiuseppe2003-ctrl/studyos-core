@@ -1,17 +1,11 @@
-# StudyOS course configuration template.
+# StudyOS course configuration.
+# The installing agent should fill this from the setup answers.
 
-course:
-  id: "course-id"
-  title: "Course Title"
-  term: "Term or semester"
-  language: "en"
-  level: "university"
-  exam_format:
-    - "written"
-  source_types:
-    - "slides"
-    - "notes"
-    - "readings"
+subject:
+  name: ""
+  level: ""
+  language: ""
+  exam_type: ""
 
 raw_source:
   path: ""
@@ -19,58 +13,42 @@ raw_source:
   copy_strategy: "copy_into_inputs"
 
 processing:
-  batch_size: "small"
-  source_directory: "inputs/"
-  working_directory: "working/"
-  output_directory: "outputs/"
-  review_directory: "review/"
-  required_order:
-    - "inventory"
-    - "digest"
-    - "learning_core"
-    - "final_outputs"
-    - "validation"
-  preserve_inputs: true
-  require_source_references: true
-  track_weak_points: true
-  track_unresolved_questions: true
+  mode: "manual_guided"
+  batch_strategy: "conceptual_batches"
+  process_incrementally: true
+  require_validation: true
+  allow_parallel_batches: false
+
+outputs:
+  master_notes: true
+  formula_sheets: true
+  flashcards: true
+  exam_questions: true
+  cheat_sheets: true
+  study_plan: true
+  final_review_pack: true
 
 multimodal:
   enabled: true
-  mode: "lazy"
-  analyze_when:
-    - "chart_or_graph_is_needed"
-    - "table_contains_testable_information"
-    - "diagram_explains_a_process"
-    - "image_contains_unique_course_content"
-  skip_when:
-    - "image_is_decorative"
-    - "visual_content_is_fully_explained_in_text"
+  visual_analysis: "lazy"
+  analyze_tables: true
+  analyze_charts: true
+  analyze_decorative_images: false
 
 validation:
-  validate_after_each_batch: true
-  citation_check: true
-  formula_check: true
-  unresolved_question_check: true
-  weak_point_check: true
-  require_learning_core_basis: true
+  deterministic_checks: true
+  llm_review: true
+  require_citations: true
+  require_formula_sources: true
+  detect_stale_outputs: true
+
+graphify:
+  enabled: false
 
 model_routing:
-  default_tier: "balanced"
-  tiers_file: "templates/model-routing.yaml"
-  use_fast_for:
-    - "inventory"
-    - "formatting"
-    - "simple_extraction"
-  use_balanced_for:
-    - "digest"
-    - "learning_core"
-    - "flashcards"
-  use_deep_for:
-    - "complex_explanation"
-    - "exam_questions"
-    - "final_synthesis"
-  use_audit_for:
-    - "validation"
-    - "citation_audit"
-    - "formula_audit"
+  inventory: "fast"
+  extraction: "balanced"
+  concept_building: "balanced"
+  formula_audit: "audit"
+  output_generation: "balanced"
+  validation: "audit"

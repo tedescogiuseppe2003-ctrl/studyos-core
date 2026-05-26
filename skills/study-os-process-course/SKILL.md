@@ -17,6 +17,32 @@ Process batches sequentially from the existing batch plan. For each batch, use t
 
 Keep v1.1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Preflight
+
+Before processing remaining batches, confirm:
+
+- `subject.yaml` exists;
+- `study-os/` exists;
+- `working/inventory/course_inventory.md` exists;
+- `working/inventory/batch_plan.md` exists;
+- `inputs/` contains the sources referenced by planned batches;
+- at least one batch has already been processed and validated, unless the user explicitly wants the course runner to start from the first planned batch;
+- validation reports exist for any batch being treated as complete.
+
+If any preflight item is missing, stop and report:
+
+- what is missing;
+- why course processing cannot continue;
+- which skill to run first.
+
+Use this guidance:
+
+- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
+- Missing or empty `inputs/`: run `study-os-import-sources` first.
+- Missing inventory or batch plan: run `study-os-inventory` first.
+- No tested processed batch: run `study-os-process-batch`, then `study-os-validate`, before processing the rest of the course.
+- Missing validation for completed batches: run `study-os-validate` first.
+
 ## May Read
 
 - `PROJECT_BRIEF.md` when working in the core repo.
