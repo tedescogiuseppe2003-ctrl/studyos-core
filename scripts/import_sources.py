@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Execute an approved StudyOS source import plan by copying into inputs/."""
+"""Plan or execute StudyOS source imports by copying into inputs/."""
 
 from __future__ import annotations
 
 import argparse
+import re
 import shutil
 import sys
 from dataclasses import dataclass
@@ -17,6 +18,15 @@ SUBJECT_CONFIG_PATH = Path("subject.yaml")
 
 SKIP_ACTIONS = {"skip", "needs review"}
 IGNORED_FILENAMES = {".DS_Store", "Thumbs.db", "desktop.ini"}
+APPROVED_DESTINATION_FOLDERS = (
+    "inputs/slides",
+    "inputs/readings",
+    "inputs/notes",
+    "inputs/exercises",
+    "inputs/exams",
+    "inputs/transcripts",
+    "inputs/miscellaneous",
+)
 
 
 class ImportPlanError(ValueError):
@@ -41,7 +51,13 @@ class LogRow:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Execute an approved StudyOS import plan by copying files into inputs/."
+        description="Create or execute a StudyOS import plan for raw course files."
+    )
+    parser.add_argument(
+        "--mode",
+        choices=("proposal", "execute"),
+        default="proposal",
+        help="proposal scans raw_source.path read-only; execute copies approved rows.",
     )
     parser.add_argument(
         "--root",
@@ -50,6 +66,14 @@ def parse_args() -> argparse.Namespace:
         help="Installed StudyOS workspace root. Defaults to the current directory.",
     )
     return parser.parse_args()
+
+
+def approved_destination_set(root: Path) -> set[Path]:
+    return {(root / folder).resolve() for folder in APPROVED_DESTINATION_FOLDERS}
+
+
+def markdown_escape(value: str) -> str:
+    return value.replace("\\", "\\\\").replace("|", "\\|").replace("\n", " ")
 
 
 def normalize_header(value: str) -> str:
@@ -272,6 +296,149 @@ def source_is_ignored(source_path: Path, raw_source_root: Path) -> bool:
     )
 
 
+def discover_raw_files(raw_source_root: Path) -> list[Path]:
+    discovered: list[Path] = []
+
+    def scan(folder: Path) -> None:
+        for path in sorted(folder.iterdir(), key=lambda item: item.name.lower()):
+            if source_is_ignored(path, raw_source_root):
+                continue
+            if path.is_symlink():
+                continue
+            if path.is_dir():
+                scan(path)
+            elif path.is_file():
+                discovered.append(path)
+
+    scan(raw_source_root)
+    return discovered
+
+
+def classify_file(path: Path) -> tuple[str, str, str]:
+    name = path.name.lower()
+    full = path.as_posix().lower()
+    suffix = path.suffix.lower()
+
+    rules = (
+        (
+            "inputs/exams",
+            ("exam", "midterm", "final", "quiz", "mock"),
+            "matched exam or assessment filename/folder signal",
+        ),
+        (
+            "inputs/exercises",
+            (
+                "exercise",
+                "exercises",
+                "problem",
+                "problems",
+                "assignment",
+                "homework",
+                "worksheet",
+                "tutorial",
+                "lab",
+                "solution",
+            ),
+            "matched exercise, tutorial, assignment, or solution filename/folder signal",
+        ),
+        (
+            "inputs/transcripts",
+            ("transcript", "caption", "subtitles", "subtitle"),
+            "matched transcript or caption filename/folder signal",
+        ),
+        (
+            "inputs/slides",
+            ("slide", "slides", "deck", "presentation", "lecture"),
+            "matched slide, deck, presentation, or lecture filename/folder signal",
+        ),
+        (
+            "inputs/readings",
+            ("reading", "readings", "article", "paper", "chapter", "book"),
+            "matched reading, article, paper, chapter, or book filename/folder signal",
+        ),
+        (
+            "inputs/notes",
+            ("note", "notes", "summary", "handout"),
+            "matched notes, summary, or handout filename/folder signal",
+        ),
+    )
+
+    for destination, keywords, reason in rules:
+        if any(keyword in full for keyword in keywords):
+            return destination, "high", reason
+
+    if suffix in {".ppt", ".pptx", ".key"}:
+        return "inputs/slides", "medium", "presentation file extension"
+    if suffix in {".srt", ".vtt"}:
+        return "inputs/transcripts", "medium", "subtitle/transcript file extension"
+    if suffix in {".pdf", ".doc", ".docx", ".md", ".txt"}:
+        if re.search(r"\b(?:l|lec|lecture)[-_ ]?\d{1,3}\b", name):
+            return "inputs/slides", "medium", "lecture-number filename signal"
+        return "inputs/miscellaneous", "low", "generic document file; needs review if classification matters"
+
+    return "inputs/miscellaneous", "low", "unrecognized file type; needs review"
+
+
+def write_import_plan(root: Path, raw_source_root: Path, files: list[Path]) -> Path:
+    rows: list[tuple[str, str, str, str, str, str]] = []
+    for path in files:
+        destination, confidence, reason = classify_file(path)
+        action = "copy" if confidence in {"high", "medium"} else "needs review"
+        rows.append(
+            (
+                path.relative_to(raw_source_root).as_posix(),
+                destination,
+                "",
+                confidence,
+                reason,
+                action,
+            )
+        )
+
+    copied = sum(1 for row in rows if row[5] == "copy")
+    needs_review = sum(1 for row in rows if row[5] == "needs review")
+    skipped = sum(1 for row in rows if row[5] == "skip")
+    generated_at = datetime.now(timezone.utc).date().isoformat()
+
+    lines = [
+        "# Import Plan",
+        "",
+        f"Generated: {generated_at}",
+        "Mode: proposal",
+        f"Raw source: {raw_source_root}",
+        "",
+        "## Summary",
+        "",
+        f"- Files scanned: {len(files)}",
+        f"- Proposed copies: {copied}",
+        f"- Needs review: {needs_review}",
+        f"- Skipped: {skipped}",
+        "",
+        "## Plan",
+        "",
+        markdown_table_row(
+            [
+                "Source path",
+                "Proposed destination folder",
+                "Proposed clean filename",
+                "Confidence",
+                "Reason",
+                "Action",
+            ]
+        ),
+        markdown_table_row(["---", "---", "---", "---", "---", "---"]),
+    ]
+
+    for row in rows:
+        lines.append(markdown_table_row(list(row)))
+
+    lines.append("")
+    target = root / PLAN_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("\n".join(lines), encoding="utf-8")
+    return target
+
+
 def resolve_destination_folder(root: Path, raw_path: str) -> Path:
     path = Path(raw_path)
     if not raw_path or path.is_absolute():
@@ -290,8 +457,8 @@ def resolve_destination_folder(root: Path, raw_path: str) -> Path:
     return resolved
 
 
-def destination_is_allowed(destination_folder: Path, inputs_root: Path) -> bool:
-    return destination_folder != inputs_root and is_under(destination_folder, inputs_root)
+def destination_is_allowed(destination_folder: Path, root: Path) -> bool:
+    return destination_folder in approved_destination_set(root)
 
 
 def destination_filename(source_path: Path, clean_filename: str) -> str:
@@ -342,13 +509,12 @@ def execute_copy(root: Path, raw_source_root: Path, row: PlanRow) -> LogRow:
     except ImportPlanError as error:
         return LogRow(row.source, "", "error", str(error))
 
-    inputs_root = (root / "inputs").resolve()
-    if not destination_is_allowed(destination_folder, inputs_root):
+    if not destination_is_allowed(destination_folder, root):
         return LogRow(
             row.source,
             "",
             "error",
-            "destination folder is not under inputs/",
+            "destination folder is not an approved inputs/ subfolder",
         )
 
     if source_path.is_symlink():
@@ -402,7 +568,7 @@ def execute_plan(root: Path, raw_source_root: Path, rows: list[PlanRow]) -> list
 
 
 def markdown_table_row(values: list[str]) -> str:
-    escaped = [value.replace("|", "\\|").replace("\n", " ") for value in values]
+    escaped = [markdown_escape(value) for value in values]
     return "| " + " | ".join(escaped) + " |"
 
 
@@ -453,8 +619,22 @@ def main() -> int:
 
     try:
         raw_source_root = read_raw_source_path(root)
+        if args.mode == "proposal":
+            files = discover_raw_files(raw_source_root)
+            plan = write_import_plan(root, raw_source_root, files)
+            proposed = sum(
+                1 for path in files if classify_file(path)[1] in {"high", "medium"}
+            )
+            print(f"Scanned: {len(files)}")
+            print(f"Proposed copies: {proposed}")
+            print(f"Wrote import plan: {plan}")
+            return 0
+
         rows = read_plan(root)
     except (OSError, ImportPlanError) as error:
+        if args.mode == "proposal":
+            print(f"StudyOS import proposal failed safely: {error}", file=sys.stderr)
+            return 1
         write_log(root, [], str(error))
         print(f"StudyOS import failed safely: {error}", file=sys.stderr)
         print(f"Wrote import log: {root / LOG_PATH}", file=sys.stderr)
