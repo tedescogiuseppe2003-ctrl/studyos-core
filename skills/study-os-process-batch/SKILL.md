@@ -64,29 +64,37 @@ Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian expor
 
 ## Required Source Use
 
-Use all relevant sources assigned to the batch. Do not rely only on slides when notes, exercises, readings, or transcripts are assigned.
+Check all sources assigned to the batch and use all relevant content. Do not rely only on slides when notes, exercises, readings, or transcripts are assigned.
 
-For each batch, explicitly check every assigned source file. The digest must include a `Source coverage` section listing every assigned source and what was extracted from it. If a source contributes nothing, explain why.
+For each batch, explicitly check every assigned source file. No assigned source may be silently ignored. The digest must include a `Source Coverage` table listing every assigned source, its role, whether it was used, what was extracted from it, and why it was not used if applicable.
 
 For every assigned source:
 
 - include it in the source digest or explicitly state why it has no usable content,
-- carry its important facts, examples, definitions, formulas, practice prompts, and warnings into the learning core,
+- carry its important facts, examples, definitions, formulas, practice prompts, and warnings into the learning core when they support the batch concept,
 - cite it in downstream outputs when its content is used.
 
 Special handling:
 
-- Slides often provide definitions and structure.
-- Notes often provide instructor emphasis, caveats, and likely exam warnings.
-- Exercises provide practice formats and exam-useful task types.
-- Readings provide deeper explanation and formal definitions.
-- Transcripts provide spoken clarifications and examples.
+- Primary sources define the conceptual core of the batch.
+- Supporting sources must still be used, but they must support the batch concept rather than become unrelated standalone outputs.
+- Slides often provide definitions, sequence, notation, and lecture structure.
+- Exercises contribute exam questions, practice tasks, weak points, recurring mistakes, and fragile skills.
+- Readings contribute theory, formal definitions, assumptions, limitations, and deeper explanations.
+- Notes contribute professor emphasis, doubts, traps, caveats, and likely exam warnings.
+- Transcripts contribute explanations, examples, emphasis, and spoken clarifications.
+- Exams contribute likely exam patterns, task formats, and recurring assessment angles.
+- Miscellaneous assigned sources must be checked and either mapped to the learning core or explained as unused.
 
 ## Batch Type Rules
 
 A batch should normally represent a conceptual lecture, topic, or module.
 
-Primary sources usually include slides, lecture notes, or core readings. Supporting sources usually include exercises, exams, transcripts, personal notes, and supplementary readings.
+Primary sources define the conceptual core. They usually include slides, lecture notes, core readings, or any source explicitly marked as the main lecture/topic/module material.
+
+Supporting sources must still be used, but only in service of the conceptual core. They usually include exercises, exams, transcripts, personal notes, and supplementary readings.
+
+Every downstream output must be based on the learning core. The learning core must be grounded in the conceptual core and supported by the assigned supporting sources.
 
 When exercises are assigned to a conceptual batch:
 
@@ -95,11 +103,16 @@ When exercises are assigned to a conceptual batch:
 - update weak points with recurring mistakes or fragile skills,
 - do not create separate master notes for the exercise file.
 
-If a batch contains only exercises:
+If a batch contains only exercises and is not explicitly marked as a tutorial or conceptual batch:
 
-- do not automatically create master notes,
-- create an exercise practice file instead, unless the batch is explicitly marked as a tutorial or conceptual batch,
-- flag the batch for review if its topic is unclear.
+- do not create normal master notes by default,
+- create or update `outputs/exam-questions/`,
+- create practice tasks,
+- update `review/weak-points.md`,
+- flag the batch for review in `review/unresolved-questions.md` or `working/validation/` as appropriate,
+- explain that the batch lacks a primary conceptual source.
+
+Only create master notes for an exercise-only batch when the batch plan explicitly marks it as tutorial, conceptual, or equivalent course instruction. Ordinary exercise-only batches must not produce standalone master notes.
 
 ## Digest Requirements
 
@@ -122,13 +135,13 @@ The digest must include:
 The digest must include this required section:
 
 ```markdown
-## Source coverage
+## Source Coverage
 
-| Source | Used? | What was extracted | If not used, why |
-|---|---|---|---|
+| Source | Role | Used? | What was extracted | If not used, why |
+|---|---|---|---|---|
 ```
 
-Every assigned source file must appear in that table. Use `yes`, `partial`, or `no` in `Used?`.
+Every assigned source file must appear in that table. Use `primary` or `supporting` in `Role`, with a short qualifier when useful, such as `supporting - exercises` or `primary - lecture slides`. Use `yes`, `partial`, or `no` in `Used?`.
 
 Keep the digest faithful to sources. Do not add unsupported teaching material here.
 
@@ -190,17 +203,22 @@ Use visual analysis only when a chart, table, diagram, equation image, or slide 
 
 1. Read the batch plan and identify the requested batch.
 2. List every assigned source file.
-3. Read all relevant assigned sources.
-4. Create or update the source digest.
-5. Create or update the learning core from the digest.
-6. Create requested outputs from the learning core.
-7. Update `review/weak-points.md` and `review/unresolved-questions.md`.
-8. Run deterministic validation scripts when available or tell the user exactly which validation remains.
-9. Report changed files and any unresolved issues.
+3. Classify the batch as conceptual, tutorial/conceptual exercise-only, or ordinary exercise-only.
+4. Identify primary sources and supporting sources.
+5. Read and check all assigned sources.
+6. Create or update the source digest, including the required `Source Coverage` table.
+7. Create or update the learning core from the digest.
+8. Create requested outputs from the learning core, applying the exercise-only restrictions above.
+9. Update `review/weak-points.md` and `review/unresolved-questions.md`.
+10. Run deterministic validation scripts when available or tell the user exactly which validation remains.
+11. Report changed files and any unresolved issues.
 
 ## Quality Bar
 
 - Digest before learning core; learning core before outputs.
-- All relevant assigned sources are represented.
+- All assigned sources are checked and represented in the digest.
+- If any assigned source is not used, the digest explains why.
+- Primary sources define the conceptual core; supporting sources support that core.
+- Ordinary exercise-only batches do not produce normal master notes by default.
 - Outputs are directly usable for studying, active recall, and exam preparation.
 - `inputs/` remains read-only.
