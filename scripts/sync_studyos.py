@@ -12,21 +12,6 @@ from pathlib import Path
 
 CORE_REPO_HINT = "~/Developer/studyos-core"
 
-COURSE_LOCAL_SCRIPTS = (
-    "init_db.py",
-    "inventory.py",
-    "sort_inputs.py",
-    "validate_outputs.py",
-    "validate_citations.py",
-    "validate_formulas.py",
-    "export_final_pack.py",
-)
-
-CORE_ONLY_SCRIPTS = (
-    "install_studyos.py",
-    "sync_studyos.py",
-)
-
 SKILL_DESTINATIONS = (
     "study-os/skills",
     ".agents/skills",
@@ -74,14 +59,8 @@ def validate_sources(source_root: Path) -> None:
             f"cd {CORE_REPO_HINT} && python3 scripts/sync_studyos.py <target-subject-folder>."
         )
 
-    missing_scripts = [
-        source_root / "scripts" / script_name
-        for script_name in COURSE_LOCAL_SCRIPTS
-        if not (source_root / "scripts" / script_name).is_file()
-    ]
-    if missing_scripts:
-        missing = ", ".join(str(path) for path in missing_scripts)
-        raise FileNotFoundError(f"Missing required StudyOS scripts: {missing}")
+    if not list((source_root / "scripts").glob("*.py")):
+        raise FileNotFoundError(f"No Python scripts found in {source_root / 'scripts'}")
 
 
 def validate_target(target: Path) -> None:
@@ -128,36 +107,29 @@ def copy_tree_replace(source: Path, destination: Path) -> int:
     return copied
 
 
-def sync_scripts(source_root: Path, target: Path) -> tuple[int, int, int]:
+def sync_scripts(source_root: Path, target: Path) -> tuple[int, int, tuple[str, ...]]:
     copied = 0
     replaced = 0
-    removed = 0
+    copied_paths: list[str] = []
     scripts_source = source_root / "scripts"
     scripts_destination = target / "study-os/scripts"
 
-    for script_name in COURSE_LOCAL_SCRIPTS:
+    for script_source in sorted(scripts_source.glob("*.py")):
         was_replaced = copy_file_replace(
-            scripts_source / script_name, scripts_destination / script_name
+            script_source, scripts_destination / script_source.name
         )
         copied += 1
+        copied_paths.append(f"study-os/scripts/{script_source.name}")
         if was_replaced:
             replaced += 1
 
-    for script_name in CORE_ONLY_SCRIPTS:
-        obsolete_script = scripts_destination / script_name
-        if obsolete_script.exists() or obsolete_script.is_symlink():
-            if obsolete_script.is_dir() and not obsolete_script.is_symlink():
-                shutil.rmtree(obsolete_script)
-            else:
-                obsolete_script.unlink()
-            removed += 1
-
-    return copied, replaced, removed
+    return copied, replaced, tuple(copied_paths)
 
 
-def sync_skills(source_root: Path, target: Path) -> tuple[int, int]:
+def sync_skills(source_root: Path, target: Path) -> tuple[int, int, tuple[str, ...]]:
     copied = 0
     folders_synced = 0
+    synced_paths: list[str] = []
     skills_source = source_root / "skills"
 
     for relative_destination in SKILL_DESTINATIONS:
@@ -167,17 +139,19 @@ def sync_skills(source_root: Path, target: Path) -> tuple[int, int]:
         ):
             copied += copy_tree_replace(skill_source, destination / skill_source.name)
             folders_synced += 1
+            synced_paths.append(f"{relative_destination}/{skill_source.name}")
 
-    return copied, folders_synced
+    return copied, folders_synced, tuple(synced_paths)
 
 
 def write_sync_log(
     target: Path,
     copied_scripts: int,
     replaced_scripts: int,
-    removed_scripts: int,
     copied_skill_files: int,
     synced_skill_folders: int,
+    copied_script_paths: tuple[str, ...],
+    synced_skill_paths: tuple[str, ...],
     warnings: tuple[str, ...] = (),
     errors: tuple[str, ...] = (),
 ) -> Path:
@@ -187,6 +161,14 @@ def write_sync_log(
 
     warning_lines = "\n".join(f"- {warning}" for warning in warnings) or "- None"
     error_lines = "\n".join(f"- {error}" for error in errors) or "- None"
+    copied_script_lines = (
+        "\n".join(f"- `{relative_path}`" for relative_path in copied_script_paths)
+        or "- None"
+    )
+    synced_skill_lines = (
+        "\n".join(f"- `{relative_path}`" for relative_path in synced_skill_paths)
+        or "- None"
+    )
     untouched_lines = "\n".join(
         f"- `{relative_path}`" for relative_path in INTENTIONALLY_NOT_TOUCHED
     )
@@ -200,9 +182,16 @@ def write_sync_log(
                 f"- Target folder: {target}",
                 f"- Scripts copied: {copied_scripts}",
                 f"- Scripts replaced: {replaced_scripts}",
-                f"- Obsolete core-only scripts removed: {removed_scripts}",
                 f"- Skill files copied: {copied_skill_files}",
                 f"- Skill folders synced: {synced_skill_folders}",
+                "",
+                "## Scripts Copied",
+                "",
+                copied_script_lines,
+                "",
+                "## Skill Folders Synced",
+                "",
+                synced_skill_lines,
                 "",
                 "## Files/Folders Intentionally Not Touched",
                 "",
@@ -231,17 +220,22 @@ def main() -> int:
     try:
         validate_sources(source_root)
         validate_target(target)
-        copied_scripts, replaced_scripts, removed_scripts = sync_scripts(
+        copied_scripts, replaced_scripts, copied_script_paths = sync_scripts(
             source_root, target
         )
-        copied_skill_files, synced_skill_folders = sync_skills(source_root, target)
+        (
+            copied_skill_files,
+            synced_skill_folders,
+            synced_skill_paths,
+        ) = sync_skills(source_root, target)
         log_path = write_sync_log(
             target,
             copied_scripts,
             replaced_scripts,
-            removed_scripts,
             copied_skill_files,
             synced_skill_folders,
+            copied_script_paths,
+            synced_skill_paths,
         )
     except OSError as error:
         print(f"StudyOS sync failed: {error}", file=sys.stderr)
@@ -250,9 +244,14 @@ def main() -> int:
     print(f"StudyOS synced at: {target}")
     print(f"Scripts copied: {copied_scripts}")
     print(f"Scripts replaced: {replaced_scripts}")
-    print(f"Obsolete core-only scripts removed: {removed_scripts}")
+    print("Copied scripts:")
+    for copied_script_path in copied_script_paths:
+        print(f"  - {copied_script_path}")
     print(f"Skill files copied: {copied_skill_files}")
     print(f"Skill folders synced: {synced_skill_folders}")
+    print("Synced skill folders:")
+    for synced_skill_path in synced_skill_paths:
+        print(f"  - {synced_skill_path}")
     print(f"Sync log: {log_path}")
     return 0
 
