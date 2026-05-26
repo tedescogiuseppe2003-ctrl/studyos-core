@@ -9,6 +9,18 @@ import sys
 from pathlib import Path
 
 
+CORE_REPO_HINT = "~/Developer/studyos-core"
+
+COURSE_LOCAL_SCRIPTS = (
+    "init_db.py",
+    "inventory.py",
+    "sort_inputs.py",
+    "validate_outputs.py",
+    "validate_citations.py",
+    "validate_formulas.py",
+    "export_final_pack.py",
+)
+
 SUBJECT_DIRECTORIES = (
     "unsorted",
     "inputs/slides",
@@ -124,7 +136,20 @@ def copy_templates(source_root: Path, target: Path) -> tuple[int, int]:
 
 
 def copy_scripts(source_root: Path, target: Path) -> tuple[int, int]:
-    return copy_tree_without_overwrite(source_root / "scripts", target / "study-os/scripts")
+    copied = 0
+    skipped = 0
+    scripts_source = source_root / "scripts"
+    scripts_destination = target / "study-os/scripts"
+
+    for script_name in COURSE_LOCAL_SCRIPTS:
+        if copy_file_without_overwrite(
+            scripts_source / script_name, scripts_destination / script_name
+        ):
+            copied += 1
+        else:
+            skipped += 1
+
+    return copied, skipped
 
 
 def copy_skills(source_root: Path, target: Path) -> tuple[int, int]:
@@ -161,7 +186,20 @@ def validate_sources(source_root: Path) -> None:
     missing_sources = [path for path in required_sources if not path.is_dir()]
     if missing_sources:
         missing = ", ".join(str(path) for path in missing_sources)
-        raise FileNotFoundError(f"Missing required source directories: {missing}")
+        raise FileNotFoundError(
+            "Missing required StudyOS core directories: "
+            f"{missing}. Run this installer from the core repo, for example: "
+            f"cd {CORE_REPO_HINT} && python3 scripts/install_studyos.py <target-subject-folder>."
+        )
+
+    missing_scripts = [
+        source_root / "scripts" / script_name
+        for script_name in COURSE_LOCAL_SCRIPTS
+        if not (source_root / "scripts" / script_name).is_file()
+    ]
+    if missing_scripts:
+        missing = ", ".join(str(path) for path in missing_scripts)
+        raise FileNotFoundError(f"Missing required StudyOS scripts: {missing}")
 
 
 def main() -> int:
