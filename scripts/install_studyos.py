@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 SUBJECT_DIRECTORIES = (
+    "unsorted",
     "inputs/slides",
     "inputs/readings",
     "inputs/notes",
