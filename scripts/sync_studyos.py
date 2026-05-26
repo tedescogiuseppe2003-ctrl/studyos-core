@@ -27,6 +27,23 @@ INTENTIONALLY_NOT_TOUCHED = (
     ".git/",
 )
 
+COURSE_LOCAL_SCRIPTS = (
+    "init_db.py",
+    "inventory.py",
+    "import_sources.py",
+    "validate_outputs.py",
+    "validate_citations.py",
+    "validate_formulas.py",
+    "export_final_pack.py",
+)
+
+DEPRECATED_RELATIVE_PATHS = (
+    "study-os/scripts/sort_inputs.py",
+    "study-os/skills/study-os-sort-inputs",
+    ".agents/skills/study-os-sort-inputs",
+    ".claude/skills/study-os-sort-inputs",
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -59,8 +76,14 @@ def validate_sources(source_root: Path) -> None:
             f"cd {CORE_REPO_HINT} && python3 scripts/sync_studyos.py <target-subject-folder>."
         )
 
-    if not list((source_root / "scripts").glob("*.py")):
-        raise FileNotFoundError(f"No Python scripts found in {source_root / 'scripts'}")
+    missing_scripts = [
+        source_root / "scripts" / script_name
+        for script_name in COURSE_LOCAL_SCRIPTS
+        if not (source_root / "scripts" / script_name).is_file()
+    ]
+    if missing_scripts:
+        missing = ", ".join(str(path) for path in missing_scripts)
+        raise FileNotFoundError(f"Missing required StudyOS scripts: {missing}")
 
 
 def validate_target(target: Path) -> None:
@@ -107,6 +130,23 @@ def copy_tree_replace(source: Path, destination: Path) -> int:
     return copied
 
 
+def remove_deprecated_paths(target: Path) -> tuple[str, ...]:
+    removed: list[str] = []
+
+    for relative_path in DEPRECATED_RELATIVE_PATHS:
+        path = target / relative_path
+        if not path.exists() and not path.is_symlink():
+            continue
+
+        if path.is_dir() and not path.is_symlink():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+        removed.append(relative_path)
+
+    return tuple(removed)
+
+
 def sync_scripts(source_root: Path, target: Path) -> tuple[int, int, tuple[str, ...]]:
     copied = 0
     replaced = 0
@@ -114,7 +154,8 @@ def sync_scripts(source_root: Path, target: Path) -> tuple[int, int, tuple[str, 
     scripts_source = source_root / "scripts"
     scripts_destination = target / "study-os/scripts"
 
-    for script_source in sorted(scripts_source.glob("*.py")):
+    for script_name in COURSE_LOCAL_SCRIPTS:
+        script_source = scripts_source / script_name
         was_replaced = copy_file_replace(
             script_source, scripts_destination / script_source.name
         )
@@ -152,6 +193,7 @@ def write_sync_log(
     synced_skill_folders: int,
     copied_script_paths: tuple[str, ...],
     synced_skill_paths: tuple[str, ...],
+    removed_deprecated_paths: tuple[str, ...],
     warnings: tuple[str, ...] = (),
     errors: tuple[str, ...] = (),
 ) -> Path:
@@ -167,6 +209,10 @@ def write_sync_log(
     )
     synced_skill_lines = (
         "\n".join(f"- `{relative_path}`" for relative_path in synced_skill_paths)
+        or "- None"
+    )
+    removed_deprecated_lines = (
+        "\n".join(f"- `{relative_path}`" for relative_path in removed_deprecated_paths)
         or "- None"
     )
     untouched_lines = "\n".join(
@@ -192,6 +238,10 @@ def write_sync_log(
                 "## Skill Folders Synced",
                 "",
                 synced_skill_lines,
+                "",
+                "## Deprecated Paths Removed",
+                "",
+                removed_deprecated_lines,
                 "",
                 "## Files/Folders Intentionally Not Touched",
                 "",
@@ -220,6 +270,7 @@ def main() -> int:
     try:
         validate_sources(source_root)
         validate_target(target)
+        removed_deprecated_paths = remove_deprecated_paths(target)
         copied_scripts, replaced_scripts, copied_script_paths = sync_scripts(
             source_root, target
         )
@@ -236,6 +287,7 @@ def main() -> int:
             synced_skill_folders,
             copied_script_paths,
             synced_skill_paths,
+            removed_deprecated_paths,
         )
     except OSError as error:
         print(f"StudyOS sync failed: {error}", file=sys.stderr)
@@ -252,6 +304,9 @@ def main() -> int:
     print("Synced skill folders:")
     for synced_skill_path in synced_skill_paths:
         print(f"  - {synced_skill_path}")
+    print("Deprecated paths removed:")
+    for removed_path in removed_deprecated_paths:
+        print(f"  - {removed_path}")
     print(f"Sync log: {log_path}")
     return 0
 

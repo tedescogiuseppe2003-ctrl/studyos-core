@@ -15,6 +15,8 @@ The installer creates the subject folder structure, copies templates, copies cou
 
 `install_studyos.py` is core-only and is not copied into installed subject folders.
 
+Set `raw_source.path` in `subject.yaml` to the original course folder. StudyOS treats that folder as read-only and imports approved files by copying them into `inputs/`.
+
 ## Sync An Existing Subject
 
 Run sync from the core repo:

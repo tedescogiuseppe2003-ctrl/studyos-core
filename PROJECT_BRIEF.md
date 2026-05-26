@@ -6,8 +6,9 @@ It turns raw university course material into structured study outputs through a 
 
 ## Target workflow
 
-raw course folder / unsorted/
-→ sort files into inputs/
+raw source folder
+→ import plan
+→ copy into inputs/
 → inventory
 → conceptual batch plan
 → process all batches sequentially
@@ -15,7 +16,7 @@ raw course folder / unsorted/
 → repair if needed
 → synthesize final outputs
 
-Raw files may initially exist directly in the course root or in unsorted/. Before inventory, files are sorted into inputs/ through a reviewed sorting plan. After sorting, inputs/ is read-only.
+The original subject folder is always read-only. StudyOS analyzes it in place and copies classified files into a separate StudyOS workspace under `inputs/` through a reviewed import plan. After import, `inputs/` is read-only for processing.
 
 ## Current v1 core
 
@@ -32,18 +33,20 @@ inputs/
 
 ## Planned v1.1 upgrades
 
-- study-os-sort-inputs
+- study-os-import-sources
 - improved conceptual batch planning
 - study-os-process-course
 
-v1.1 extends v1 without changing the core output model. It adds safe intake sorting, stronger conceptual batch planning, and a course-level runner that processes batches in order.
+v1.1 extends v1 without changing the core output model. It adds safe read-only source import, stronger conceptual batch planning, and a course-level runner that processes batches in order.
 
-### study-os-sort-inputs
+### study-os-import-sources
 
-- Detect raw files in the course root and unsorted/.
-- Create a sorting plan before moving files.
-- Sort approved files into inputs/ subfolders.
-- Leave inputs/ read-only after sorting.
+- Read the original raw source folder from `subject.yaml` under `raw_source.path`.
+- Scan the original source folder read-only.
+- Create an import plan before copying files.
+- Copy approved files into `inputs/` subfolders.
+- Never move, delete, rename, or modify original source files.
+- Leave `inputs/` read-only after import.
 
 ### Improved conceptual batch planning
 
@@ -63,9 +66,9 @@ v1.1 extends v1 without changing the core output model. It adds safe intake sort
 
 ## Main folders
 
-- raw course root: possible initial location for unsorted source files
-- unsorted/: optional intake area for raw source files before sorting
-- inputs/: sorted raw course material, read-only after sorting
+- original raw source folder: external course material folder, always read-only
+- StudyOS workspace: separate working folder containing StudyOS config, inputs, working files, outputs, and review artifacts
+- inputs/: imported raw course material copied from the original source, read-only after import
 - working/: intermediate digests and learning cores
 - outputs/: final study material
 - review/: weak points, validation, unresolved questions
@@ -73,8 +76,11 @@ v1.1 extends v1 without changing the core output model. It adds safe intake sort
 
 ## Rules
 
-- Sort raw files safely through a sorting plan before moving them into inputs/.
-- Never modify files in inputs/ after sorting.
+- Analyze the original raw source folder read-only.
+- Import raw files safely through an import plan before copying them into `inputs/`.
+- Never move, delete, rename, or modify files in the original raw source folder.
+- Never overwrite destination files during import.
+- Never modify files in `inputs/` after import.
 - Process material by conceptual batch, not all at once.
 - Batches should represent topics, lectures, or modules.
 - Use exercises, readings, transcripts, notes, and exams as supporting sources when they belong to a conceptual batch.
@@ -104,7 +110,7 @@ v1.1 extends v1 without changing the core output model. It adds safe intake sort
 
 ## v1.1 planned skills
 
-- study-os-sort-inputs
+- study-os-import-sources
 - study-os-inventory with improved conceptual batch planning
 - study-os-process-course
 

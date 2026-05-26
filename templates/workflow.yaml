@@ -16,6 +16,21 @@ workflow:
       - "required_directories_exist"
       - "inputs_is_read_only_for_processing"
 
+  import_sources:
+    skill: "study-os-import-sources"
+    purpose: "Create an import plan from the read-only raw source folder and copy approved files into inputs."
+    inputs:
+      - "subject.yaml raw_source.path"
+      - "working/inventory/import_plan.md"
+    outputs:
+      - "working/inventory/import_plan.md"
+      - "working/inventory/import_log.md"
+      - "inputs/"
+    checks:
+      - "raw_source_is_read_only"
+      - "only_approved_files_are_copied"
+      - "destination_files_are_not_overwritten"
+
   inventory:
     skill: "study-os-inventory"
     purpose: "Catalog raw course material and create a batch plan."

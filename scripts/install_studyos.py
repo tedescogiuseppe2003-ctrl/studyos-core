@@ -14,7 +14,7 @@ CORE_REPO_HINT = "~/Developer/studyos-core"
 COURSE_LOCAL_SCRIPTS = (
     "init_db.py",
     "inventory.py",
-    "sort_inputs.py",
+    "import_sources.py",
     "validate_outputs.py",
     "validate_citations.py",
     "validate_formulas.py",
@@ -22,7 +22,6 @@ COURSE_LOCAL_SCRIPTS = (
 )
 
 SUBJECT_DIRECTORIES = (
-    "unsorted",
     "inputs/slides",
     "inputs/readings",
     "inputs/notes",

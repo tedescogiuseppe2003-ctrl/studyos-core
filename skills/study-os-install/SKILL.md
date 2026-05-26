@@ -11,7 +11,7 @@ Use this skill when setting up StudyOS in a subject folder, repairing a partial 
 
 StudyOS v1 is a local folder pipeline:
 
-`inputs/` -> inventory -> batch plan -> `working/digests/` -> `working/learning-cores/` -> `outputs/` -> `review/validation` -> final synthesis
+raw source folder -> import plan -> copy into `inputs/` -> inventory -> batch plan -> `working/digests/` -> `working/learning-cores/` -> `outputs/` -> `review/validation` -> final synthesis
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
@@ -44,6 +44,7 @@ Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian expor
 ## Must Not Write
 
 - Never modify files inside `inputs/`.
+- Never modify the original raw source folder.
 - Never overwrite existing user-edited files unless the user explicitly asks for overwrite behavior.
 - Do not create digests, learning cores, study outputs, validation reports, final packs, or synthesis artifacts.
 

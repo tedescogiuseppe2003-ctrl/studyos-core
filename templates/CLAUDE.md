@@ -5,6 +5,7 @@ You are working inside a StudyOS v1 course workspace.
 ## Standing Rules
 
 - Keep the implementation lean and course-focused.
+- Treat `raw_source.path` as an external read-only source folder.
 - Do not modify `inputs/`; treat raw course material as read-only.
 - Work batch by batch.
 - Treat batches as conceptual lectures, topics, or modules whenever possible.
@@ -33,9 +34,10 @@ You are working inside a StudyOS v1 course workspace.
 Follow `templates/workflow.yaml`:
 
 1. `install`
-2. `inventory`
-3. `process_batch`
-4. `validate`
-5. `synthesize`
+2. `import_sources`
+3. `inventory`
+4. `process_batch`
+5. `validate`
+6. `synthesize`
 
 Prefer small, testable edits. Keep generated study material traceable to sources.

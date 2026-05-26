@@ -13,6 +13,11 @@ course:
     - "notes"
     - "readings"
 
+raw_source:
+  path: ""
+  mode: "read_only"
+  copy_strategy: "copy_into_inputs"
+
 processing:
   batch_size: "small"
   source_directory: "inputs/"
