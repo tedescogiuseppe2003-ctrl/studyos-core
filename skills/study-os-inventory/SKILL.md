@@ -57,9 +57,24 @@ For each source file, record:
 - SHA256 hash,
 - status such as `new`, `stale`, or unchanged existing status.
 
-## Batch Plan Rules
+## Batch planning rules
 
-- Group sources conservatively by lecture number and topic guess.
+Batches should represent conceptual topics, lectures, or modules, not individual files.
+
+Slides and lecture-topic notes usually define batches.
+
+Exercises, exams, readings, transcripts, and personal notes should usually be attached as supporting sources to the closest relevant conceptual batch.
+
+Do not create standalone exercise batches unless:
+
+- the exercise file is explicitly a tutorial/session;
+- the exercise contains new theoretical material;
+- no related conceptual batch can be identified.
+
+If a source cannot be confidently matched, place it under “Unassigned / needs review.”
+
+- Each planned batch should include title, primary sources, supporting sources, expected outputs, status, difficulty, and exam relevance.
+- Group sources conservatively by lecture number and topic guess when no stronger topic structure is available.
 - Keep batches small enough to process one at a time.
 - Do not merge unrelated lectures only because they share a broad topic word.
 - Include every discovered input file in the batch plan, even if lecture/topic is uncertain.
