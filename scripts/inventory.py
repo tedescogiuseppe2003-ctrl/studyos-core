@@ -7,7 +7,6 @@ import argparse
 import re
 import sqlite3
 import sys
-from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -31,8 +30,8 @@ INPUT_FOLDERS = (
     ("inputs/miscellaneous", "miscellaneous"),
 )
 
-PRIMARY_SOURCE_TYPES = {"slides", "notes"}
-CORE_READING_SOURCE_TYPES = {"readings"}
+SUPPORT_SOURCE_TYPES = {"notes", "exercises", "readings", "transcripts", "exams"}
+NON_SLIDE_BATCH_SOURCE_TYPES = {"notes", "readings", "transcripts"}
 
 LECTURE_PATTERNS = (
     re.compile(
@@ -45,6 +44,11 @@ LECTURE_PATTERNS = (
     ),
     re.compile(
         r"\b0*(\d{1,3})\s*[-_ ]+(?:lecture|lect|lec|lesson|class|session)(?=\D|$)",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:slide|slides|note|notes|exercise|exercises|reading|readings|"
+        r"transcript|transcripts)\s*[-_ ]*0*(\d{1,3})(?=\D|$)",
         re.IGNORECASE,
     ),
 )
@@ -76,6 +80,40 @@ TOPIC_STOPWORDS = {
     "transcripts",
     "misc",
     "miscellaneous",
+    "assignment",
+    "assignments",
+    "problem",
+    "problems",
+    "sheet",
+    "sheets",
+    "solution",
+    "solutions",
+    "practice",
+    "sample",
+    "final",
+    "midterm",
+    "quiz",
+    "homework",
+    "hw",
+}
+
+FORMULA_KEYWORDS = {
+    "algebra",
+    "calculus",
+    "derivative",
+    "equation",
+    "formula",
+    "formulas",
+    "math",
+    "mathematics",
+    "model",
+    "models",
+    "probability",
+    "proof",
+    "quantitative",
+    "regression",
+    "statistics",
+    "theorem",
 }
 
 
@@ -87,6 +125,16 @@ class SourceFile:
     lecture_number: str | None
     file_hash: str
     status: str
+
+
+@dataclass
+class BatchPlan:
+    title: str
+    primary_sources: list[SourceFile]
+    supporting_sources: list[SourceFile]
+    lecture_number: str | None
+    topic_tokens: set[str]
+    notes: list[str]
 
 
 def parse_args() -> argparse.Namespace:
@@ -331,128 +379,368 @@ def write_course_inventory(root: Path, sources: list[SourceFile]) -> None:
     target.write_text("\n".join(lines), encoding="utf-8")
 
 
-def batch_sort_key(batch_key: tuple[str, str]) -> tuple[int, int, str]:
-    lecture, topic = batch_key
-    if lecture == "Unassigned":
-        return (1, 0, topic.lower())
-    return (0, int(lecture), topic.lower())
+def topic_tokens(source: SourceFile) -> set[str]:
+    words = re.findall(r"[A-Za-z0-9]+", source.topic_guess.lower())
+    return {
+        word
+        for word in words
+        if len(word) > 2 and word not in TOPIC_STOPWORDS and not word.isdigit()
+    }
 
 
-def split_primary_and_supporting(
-    batch_sources: list[SourceFile],
-) -> tuple[list[SourceFile], list[SourceFile]]:
-    primary = [
-        source for source in batch_sources if source.file_type in PRIMARY_SOURCE_TYPES
-    ]
-
-    if not primary:
-        primary = [
-            source
-            for source in batch_sources
-            if source.file_type in CORE_READING_SOURCE_TYPES
-        ]
-
-    primary_paths = {source.path for source in primary}
-    supporting = [
-        source for source in batch_sources if source.path not in primary_paths
-    ]
-
-    return primary, supporting
+def path_tokens(source: SourceFile) -> set[str]:
+    words = re.findall(r"[A-Za-z0-9]+", Path(source.path).stem.lower())
+    return {
+        word
+        for word in words
+        if len(word) > 2 and word not in TOPIC_STOPWORDS and not word.isdigit()
+    }
 
 
-def source_list_lines(sources: list[SourceFile]) -> list[str]:
+def title_slug(title: str) -> str:
+    words = re.findall(r"[A-Za-z0-9]+", title)
+    slug = "_".join(words[:8]) or "Untitled"
+    return slug[:80]
+
+
+def batch_sort_key(batch: BatchPlan) -> tuple[int, int, str]:
+    if batch.lecture_number is None:
+        return (1, 0, batch.title.lower())
+    return (0, int(batch.lecture_number), batch.title.lower())
+
+
+def source_list_lines(sources: list[SourceFile], indent: str = "-") -> list[str]:
     if not sources:
-        return ["  - None"]
-    return [
-        f"  - `{source.path}` ({source.file_type}, {source.status})"
-        for source in sources
-    ]
+        return [f"{indent} None"]
+    return [f"{indent} `{source.path}`" for source in sources]
 
 
-def expected_output_lines(
-    primary_sources: list[SourceFile],
-    supporting_sources: list[SourceFile],
-) -> list[str]:
-    all_sources = [*primary_sources, *supporting_sources]
-    source_types = {source.file_type for source in all_sources}
+def formula_sheet_likely(sources: list[SourceFile]) -> bool:
+    for source in sources:
+        tokens = topic_tokens(source) | path_tokens(source)
+        if tokens & FORMULA_KEYWORDS:
+            return True
 
-    if source_types == {"exercises"}:
-        return [
-            "  - Source digest covering exercise scope, task types, and source coverage.",
-            "  - Exercise practice file with worked prompts or practice tasks.",
-            "  - Weak-point updates for recurring mistakes or unclear skills.",
-            "  - No master notes unless this batch is later marked as a tutorial/conceptual batch.",
-            "  - Review flag if the exercise topic is unclear from metadata.",
+    return False
+
+
+def expected_output_lines(all_sources: list[SourceFile]) -> list[str]:
+    lines = ["- master notes"]
+
+    if formula_sheet_likely(all_sources):
+        lines.append("- formula sheet")
+
+    lines.extend(
+        [
+            "- flashcards",
+            "- exam questions",
+            "- weak points",
         ]
-
-    lines = [
-        "  - Source digest for the conceptual lecture/topic/module and all assigned supporting sources.",
-        "  - Learning core based on the digest, with source references.",
-        "  - Batch study outputs requested by the workflow or user.",
-    ]
-
-    if "exercises" in source_types:
-        lines.extend(
-            [
-                "  - Exercise-derived practice tasks integrated into exam questions.",
-                "  - Weak-point updates for exercise mistakes or fragile skills.",
-                "  - Do not create separate master notes for attached exercise files.",
-            ]
-        )
+    )
 
     return lines
+
+
+def source_matches_batch(source: SourceFile, batch: BatchPlan) -> bool:
+    if source.lecture_number and batch.lecture_number == source.lecture_number:
+        return True
+
+    source_tokens = topic_tokens(source) | path_tokens(source)
+    return bool(source_tokens and source_tokens & batch.topic_tokens)
+
+
+def matching_batches(source: SourceFile, batches: list[BatchPlan]) -> list[BatchPlan]:
+    return [batch for batch in batches if source_matches_batch(source, batch)]
+
+
+def build_slide_batches(sources: list[SourceFile]) -> list[BatchPlan]:
+    slide_groups: dict[tuple[str | None, str], list[SourceFile]] = {}
+
+    for source in sources:
+        if source.file_type != "slides":
+            continue
+
+        key = (source.lecture_number, source.topic_guess or "Untitled")
+        slide_groups.setdefault(key, []).append(source)
+
+    batches: list[BatchPlan] = []
+    sorted_groups = sorted(
+        slide_groups.items(),
+        key=lambda item: (
+            item[0][0] is None,
+            int(item[0][0] or 0),
+            item[0][1].lower(),
+        ),
+    )
+
+    for (lecture_number, topic), primary_sources in sorted_groups:
+        batch_tokens: set[str] = set()
+        for source in primary_sources:
+            batch_tokens.update(topic_tokens(source))
+            batch_tokens.update(path_tokens(source))
+
+        note = "Created from slide source metadata; slides usually define conceptual lecture batches."
+        if lecture_number:
+            note += f" Lecture {lecture_number} is used as the strongest matching signal."
+
+        batches.append(
+            BatchPlan(
+                title=topic,
+                primary_sources=sorted(primary_sources, key=lambda item: item.path),
+                supporting_sources=[],
+                lecture_number=lecture_number,
+                topic_tokens=batch_tokens,
+                notes=[note],
+            )
+        )
+
+    return batches
+
+
+def clearly_conceptual_non_slide(source: SourceFile) -> bool:
+    if source.file_type not in NON_SLIDE_BATCH_SOURCE_TYPES:
+        return False
+
+    if source.topic_guess == "Untitled":
+        return False
+
+    tokens = topic_tokens(source) | path_tokens(source)
+    conceptual_markers = {
+        "lecture",
+        "lesson",
+        "module",
+        "topic",
+        "unit",
+        "chapter",
+        "seminar",
+        "tutorial",
+    }
+
+    return bool(source.lecture_number or tokens & conceptual_markers or len(tokens) >= 2)
+
+
+def build_non_slide_batches(sources: list[SourceFile]) -> list[BatchPlan]:
+    source_groups: dict[tuple[str, str], list[SourceFile]] = {}
+
+    for source in sorted(sources, key=lambda item: item.path):
+        if not clearly_conceptual_non_slide(source):
+            continue
+
+        if source.lecture_number:
+            key = ("lecture", source.lecture_number)
+        else:
+            key = ("topic", source.topic_guess.lower())
+        source_groups.setdefault(key, []).append(source)
+
+    batches: list[BatchPlan] = []
+    sorted_groups = sorted(
+        source_groups.items(),
+        key=lambda item: (
+            item[0][0] != "lecture",
+            int(item[0][1]) if item[0][0] == "lecture" else 0,
+            item[0][1],
+        ),
+    )
+
+    for (key_type, key_value), primary_sources in sorted_groups:
+        batch_tokens: set[str] = set()
+        for source in primary_sources:
+            batch_tokens.update(topic_tokens(source))
+            batch_tokens.update(path_tokens(source))
+
+        title = primary_sources[0].topic_guess or "Untitled"
+        lecture_number = key_value if key_type == "lecture" else None
+        batches.append(
+            BatchPlan(
+                title=title,
+                primary_sources=primary_sources,
+                supporting_sources=[],
+                lecture_number=lecture_number,
+                topic_tokens=batch_tokens,
+                notes=[
+                    "Created from non-slide lecture/topic source metadata because no slide sources were found."
+                ],
+            )
+        )
+
+    return batches
+
+
+def attach_source_to_batch(
+    source: SourceFile,
+    batches: list[BatchPlan],
+) -> str | None:
+    matches = matching_batches(source, batches)
+
+    if source.file_type == "exams":
+        topic_matched = [
+            batch
+            for batch in matches
+            if topic_tokens(source) & batch.topic_tokens
+        ]
+        if len(topic_matched) == 1:
+            topic_matched[0].supporting_sources.append(source)
+            return "Attached exam as supporting material because lecture/topic metadata matched one conceptual batch."
+        return None
+
+    if len(matches) != 1:
+        return None
+
+    matches[0].supporting_sources.append(source)
+    if source.lecture_number and matches[0].lecture_number == source.lecture_number:
+        return f"Attached {source.file_type} by matching lecture number {source.lecture_number}."
+    return f"Attached {source.file_type} by simple topic keyword matching."
+
+
+def build_batch_plan(
+    sources: list[SourceFile],
+) -> tuple[list[BatchPlan], list[tuple[SourceFile, str]]]:
+    batches = build_slide_batches(sources)
+    created_from_slides = bool(batches)
+
+    if not batches:
+        batches = build_non_slide_batches(sources)
+
+    assigned_paths = {
+        source.path
+        for batch in batches
+        for source in batch.primary_sources
+    }
+    unassigned: list[tuple[SourceFile, str]] = []
+
+    for source in sorted(sources, key=lambda item: item.path):
+        if source.path in assigned_paths:
+            continue
+
+        if source.file_type not in SUPPORT_SOURCE_TYPES:
+            unassigned.append(
+                (source, "No conceptual batch could be inferred from metadata.")
+            )
+            continue
+
+        reason = attach_source_to_batch(source, batches)
+        if reason:
+            matches = matching_batches(source, batches)
+            if len(matches) == 1:
+                matches[0].notes.append(reason)
+            assigned_paths.add(source.path)
+            continue
+
+        if source.file_type == "exams":
+            unassigned.append(
+                (
+                    source,
+                    "Exam file left for review; exams do not create normal conceptual batches by default.",
+                )
+            )
+        elif created_from_slides:
+            unassigned.append(
+                (
+                    source,
+                    "No unique slide-led conceptual batch matched by lecture number or topic words.",
+                )
+            )
+        else:
+            unassigned.append(
+                (
+                    source,
+                    "No clear lecture/topic source or matching conceptual batch was found.",
+                )
+            )
+
+    for batch in batches:
+        batch.supporting_sources.sort(key=lambda item: item.path)
+        batch.notes = list(dict.fromkeys(batch.notes))
+
+    return sorted(batches, key=batch_sort_key), unassigned
+
+
+def difficulty_for_batch(batch: BatchPlan) -> str:
+    all_sources = [*batch.primary_sources, *batch.supporting_sources]
+    tokens: set[str] = set()
+    for source in all_sources:
+        tokens.update(topic_tokens(source))
+        tokens.update(path_tokens(source))
+
+    if tokens & {"advanced", "proof", "theorem", "derivative", "optimization"}:
+        return "high"
+
+    return "medium"
+
+
+def exam_relevance_for_batch(batch: BatchPlan) -> str:
+    source_types = {
+        source.file_type
+        for source in [*batch.primary_sources, *batch.supporting_sources]
+    }
+
+    if source_types & {"exams", "exercises"}:
+        return "high"
+    if source_types & {"slides", "notes"}:
+        return "medium"
+
+    return "low"
 
 
 def write_batch_plan(root: Path, sources: list[SourceFile]) -> None:
     target = root / BATCH_PLAN_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
 
-    grouped: dict[tuple[str, str], list[SourceFile]] = defaultdict(list)
-    for source in sources:
-        lecture = source.lecture_number or "Unassigned"
-        topic = source.topic_guess or "Untitled"
-        grouped[(lecture, topic)].append(source)
+    batches, unassigned = build_batch_plan(sources)
 
     lines = [
         "# Batch Plan",
         "",
-        "This plan groups sources by conceptual lecture, topic, or module when inferable from metadata. Primary sources usually define the batch; supporting sources should inform practice, exam questions, weak points, or context without creating separate master notes.",
+        "This first-pass plan uses filenames, folders, lecture numbers, and simple topic keywords only. "
+        "Slides usually define conceptual batches; exercises, readings, transcripts, notes, and exams "
+        "are attached conservatively as supporting sources.",
         "",
     ]
 
-    if not grouped:
+    if not sources:
         lines.extend(["No source files found.", ""])
     else:
-        for index, batch_key in enumerate(sorted(grouped, key=batch_sort_key), start=1):
-            lecture, topic = batch_key
-            batch_sources = sorted(grouped[batch_key], key=lambda item: item.path)
-            primary_sources, supporting_sources = split_primary_and_supporting(
-                batch_sources
-            )
-            source_types = {source.file_type for source in batch_sources}
-            is_exercise_only = source_types == {"exercises"}
-            title = (
-                f"Exercise Practice - {topic}"
-                if is_exercise_only
-                else topic
-            )
+        for index, batch in enumerate(batches, start=1):
+            title = title_slug(batch.title)
+            all_batch_sources = [*batch.primary_sources, *batch.supporting_sources]
             lines.extend(
                 [
-                    f"## Batch {index}: {title}",
+                    f"## Batch_{index:02d}_{title}",
                     "",
-                    f"- Title: {title}",
-                    f"- Lecture: {lecture}",
-                    "- Primary sources:",
-                    *source_list_lines(primary_sources),
-                    "- Supporting sources:",
-                    *source_list_lines(supporting_sources),
-                    "- Expected outputs:",
-                    *expected_output_lines(primary_sources, supporting_sources),
-                    "- Status: planned",
-                    "- Difficulty: to review",
-                    "- Exam relevance: to review",
+                    "Status: planned",
+                    f"Difficulty: {difficulty_for_batch(batch)}",
+                    f"Exam relevance: {exam_relevance_for_batch(batch)}",
+                    "",
+                    "### Primary sources",
+                    "",
+                    *source_list_lines(batch.primary_sources),
+                    "",
+                    "### Supporting sources",
+                    "",
+                    *source_list_lines(batch.supporting_sources),
+                    "",
+                    "### Expected outputs",
+                    "",
+                    *expected_output_lines(all_batch_sources),
+                    "",
+                    "### Notes",
+                    "",
+                    " ".join(batch.notes),
                 ]
             )
+            lines.append("")
+
+        if unassigned:
+            lines.extend(
+                [
+                    "## Unassigned / needs review",
+                    "",
+                    "These files were discovered but could not be confidently attached to a conceptual batch from metadata alone.",
+                    "",
+                ]
+            )
+            for source, reason in unassigned:
+                lines.append(f"- `{source.path}` - {reason}")
             lines.append("")
 
     target.write_text("\n".join(lines), encoding="utf-8")
