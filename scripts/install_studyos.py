@@ -102,6 +102,23 @@ def copy_tree_without_overwrite(source: Path, destination: Path) -> tuple[int, i
     return copied, skipped
 
 
+def count_copyable_files(source: Path) -> int:
+    return sum(
+        1
+        for source_path in source.rglob("*")
+        if source_path.is_file()
+        and "__pycache__" not in source_path.parts
+        and source_path.suffix != ".pyc"
+    )
+
+
+def copy_skill_without_overwrite(source: Path, destination: Path) -> tuple[int, int]:
+    if destination.exists() or destination.is_symlink():
+        return 0, count_copyable_files(source)
+
+    return copy_tree_without_overwrite(source, destination)
+
+
 def copy_templates(source_root: Path, target: Path) -> tuple[int, int]:
     return copy_tree_without_overwrite(source_root / "templates", target)
 
@@ -121,11 +138,15 @@ def copy_skills(source_root: Path, target: Path) -> tuple[int, int]:
     )
 
     for destination in skill_destinations:
-        copied_count, skipped_count = copy_tree_without_overwrite(
-            skills_source, destination
-        )
-        copied += copied_count
-        skipped += skipped_count
+        for skill_source in sorted(
+            path for path in skills_source.iterdir() if path.is_dir()
+        ):
+            skill_destination = destination / skill_source.name
+            copied_count, skipped_count = copy_skill_without_overwrite(
+                skill_source, skill_destination
+            )
+            copied += copied_count
+            skipped += skipped_count
 
     return copied, skipped
 
