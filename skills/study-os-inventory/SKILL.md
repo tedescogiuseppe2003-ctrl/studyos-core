@@ -59,26 +59,75 @@ For each source file, record:
 
 ## Batch planning rules
 
-Batches should represent conceptual topics, lectures, or modules, not individual files.
+Batches should represent conceptual topics, lectures, modules, or tutorial sessions, not individual files by default.
 
-Slides and lecture-topic notes usually define batches.
+Plan batches around the conceptual structure of the course. Do not create standalone exercise-only batches that would later produce master notes for exercise sheets unless one of the explicit exceptions below applies.
 
-Exercises, exams, readings, transcripts, and personal notes should usually be attached as supporting sources to the closest relevant conceptual batch.
+Primary sources are the files that define the conceptual batch and its main learning scope. Supporting sources are files that reinforce, apply, clarify, assess, or provide context for a conceptual batch but should not normally define a batch on their own.
+
+Use these source-role rules:
+
+- Slides and lecture-topic files usually define primary batches.
+- Lecture notes can define or support batches depending on naming and content signals.
+- Exercises usually support the closest conceptual batch.
+- Readings usually support the closest conceptual batch.
+- Exams usually support relevant conceptual batches or a final review batch.
+- Transcripts usually support the closest lecture batch.
+- Personal notes usually support the closest lecture or topic batch.
 
 Do not create standalone exercise batches unless:
 
-- the exercise file is explicitly a tutorial/session;
-- the exercise contains new theoretical material;
+- the exercise file is explicitly a tutorial or session;
+- it contains new examinable theory;
 - no related conceptual batch can be identified.
 
-If a source cannot be confidently matched, place it under “Unassigned / needs review.”
+If a supporting source cannot be confidently matched to a conceptual batch, place it under `Unassigned / needs review`.
 
-- Each planned batch should include title, primary sources, supporting sources, expected outputs, status, difficulty, and exam relevance.
+Do not process material during inventory. Do not generate outputs during inventory.
+
+Each planned batch must include:
+
+- batch title,
+- status,
+- difficulty,
+- exam relevance,
+- primary sources,
+- supporting sources,
+- expected outputs,
+- notes.
+
+Include an `Unassigned / needs review` section if any discovered source cannot be confidently assigned.
+
+Use this structure for `working/inventory/batch_plan.md`:
+
+```markdown
+# Batch Plan
+
+## Batch: <conceptual topic, lecture, module, or tutorial session title>
+
+- Status: <new | unchanged | stale | needs review>
+- Difficulty: <low | medium | high | unknown>
+- Exam relevance: <low | medium | high | unknown>
+- Primary sources:
+  - `<relative/path>`
+- Supporting sources:
+  - `<relative/path>`
+- Expected outputs:
+  - source digest
+  - learning core
+  - configured final outputs for this batch
+- Notes: <planning notes, assumptions, uncertainty>
+
+## Unassigned / needs review
+
+- `<relative/path>` - <why it could not be confidently matched>
+```
+
 - Group sources conservatively by lecture number and topic guess when no stronger topic structure is available.
 - Keep batches small enough to process one at a time.
 - Do not merge unrelated lectures only because they share a broad topic word.
 - Include every discovered input file in the batch plan, even if lecture/topic is uncertain.
-- Use `Unassigned` when a lecture number cannot be inferred.
+- Use `Unassigned / needs review` when a lecture number, topic, or conceptual match cannot be inferred.
 
 ## Workflow
 
