@@ -1,28 +1,125 @@
 ---
 name: studyos-import
-description: Safely propose and execute source import, then build the initial inventory and conceptual batch plan.
+description: Propose and execute safe source import, build inventory, and create the first conceptual batch plan.
 ---
 
 # Purpose
 
-Import approved raw course files into `inputs/`, create the source inventory, and create the first conceptual batch plan.
+`studyos-import` combines import proposal, import execution, source inventory, and first-pass batch planning. It replaces the old separated import-sources and inventory user-facing skills.
 
-# When to use
+# Modes
 
-Use after StudyOS installation/setup is approved and before planning or processing batches. This skill replaces the old separate import-sources and inventory skills.
+## Mode 1: proposal
 
-# Preflight checks
+Use when `analysis/inventory/import_plan.md` does not exist or the user asks for an import proposal.
 
-- `subject.yaml` exists and `setup.completed` is true.
-- `raw_source.path` is configured and readable when import from an original folder is needed.
-- `inputs/`, `analysis/inventory/`, `study-os/scripts/import_sources.py`, and `study-os/scripts/inventory.py` exist.
-- Stop if any original raw file would need to be moved, renamed, deleted, overwritten, or modified.
+Preflight:
+- `subject.yaml` exists.
+- `subject.yaml` has `raw_source.path`.
+- `raw_source.path` is readable.
+
+Behavior:
+- Read `subject.yaml`.
+- Scan `raw_source.path` read-only.
+- Ignore StudyOS system folders and files:
+  - `inputs/`
+  - `analysis/`
+  - `outputs/`
+  - `exports/`
+  - `review/`
+  - `study-os/`
+  - `.agents/`
+  - `.claude/`
+  - `.git/`
+  - `__pycache__/`
+  - `.DS_Store`
+- Write `analysis/inventory/import_plan.md`.
+- Do not copy files.
+- Do not move files.
+- Do not modify original files.
+
+Command:
+
+```sh
+python3 study-os/scripts/import_sources.py --mode proposal
+```
+
+Stop if `subject.yaml` or `raw_source.path` is missing or unreadable.
+
+## Mode 2: execute
+
+Use only after the user approves `analysis/inventory/import_plan.md`.
+
+Preflight:
+- `analysis/inventory/import_plan.md` exists.
+- The user has approved the proposed copy actions.
+
+Behavior:
+- Read `analysis/inventory/import_plan.md`.
+- Copy approved rows into `inputs/`.
+- Never move originals.
+- Never delete originals.
+- Never modify originals.
+- Never overwrite destination files.
+- Write `analysis/inventory/import_log.md`.
+
+Command:
+
+```sh
+python3 study-os/scripts/import_sources.py --mode execute
+```
+
+Stop if `import_plan.md` is missing, if a proposed destination is outside the approved folders, or if a destination file already exists.
+
+Approved destination folders are restricted to:
+- `inputs/slides/`
+- `inputs/readings/`
+- `inputs/notes/`
+- `inputs/exercises/`
+- `inputs/exams/`
+- `inputs/transcripts/`
+- `inputs/miscellaneous/`
+
+## Mode 3: inventory
+
+Use after import execution or when approved course files already exist under `inputs/`.
+
+Preflight:
+- `inputs/` contains at least one file.
+
+Behavior:
+- Scan only `inputs/`.
+- Create `analysis/inventory/course_inventory.md`.
+- Create `analysis/inventory/batch_plan.md`.
+- Update SQLite state under `study-os/state/`.
+- Do not process material.
+
+Command:
+
+```sh
+python3 study-os/scripts/inventory.py
+```
+
+Stop if `inputs/` is empty.
+
+## Mode 4: full import flow
+
+Use when the user asks to run `studyos-import` without a specific mode.
+
+Behavior:
+1. If `analysis/inventory/import_plan.md` does not exist, run proposal mode.
+2. Stop and ask the user to review and approve `analysis/inventory/import_plan.md`.
+3. After approval, run execute mode.
+4. Run inventory mode.
+5. Leave the first-pass `analysis/inventory/batch_plan.md` ready for `studyos-plan`.
+
+Do not silently continue from proposal to execute. User approval is required between those steps.
 
 # Reads
 
 - `subject.yaml`
 - original raw source folder configured by `raw_source.path`
-- existing `analysis/inventory/import_plan.md`, when executing an approved plan
+- `analysis/inventory/import_plan.md`, when executing
 - copied files under `inputs/`, when inventorying
 
 # Writes
@@ -32,39 +129,29 @@ Use after StudyOS installation/setup is approved and before planning or processi
 - approved copied files under `inputs/`
 - `analysis/inventory/course_inventory.md`
 - `analysis/inventory/batch_plan.md`
-- StudyOS state files under `study-os/state/`
+- SQLite state under `study-os/state/`
 
-# Workflow
-
-1. If no approved import plan exists, run proposal mode: scan the raw source folder read-only, classify files, and write `analysis/inventory/import_plan.md`.
-2. Ask the user to review and approve the copy actions before execution.
-3. In execute mode, copy only approved rows into the correct `inputs/` subfolders without overwriting destination files.
-4. Run inventory on `inputs/` only.
-5. Create a conceptual batch plan grouped by topics, lectures, modules, or tutorial sessions.
-6. Treat exercises, exams, notes, readings, and transcripts as supporting sources unless they are explicitly conceptual material.
-
-# Model routing and efficiency
-
-- Use scripts for copying, hashing, and deterministic inventory.
-- Use fast reasoning for filename/folder classification and straightforward batch grouping.
-- Use deeper reasoning only when source roles or conceptual grouping are ambiguous.
-
-# Quality rules
+# Quality Rules
 
 - Original raw files are read-only.
+- Original raw files are never moved, renamed, deleted, overwritten, or modified.
 - Imported files under `inputs/` are copied, never moved.
 - Destination files are never overwritten.
 - Inventory scans only `inputs/`.
 - The batch plan is conceptual, not merely alphabetical or file-type based.
+- Exercises, exams, notes, readings, and transcripts are supporting sources unless clearly conceptual.
 
-# Stop conditions
+# Stop Conditions
 
-- Setup is incomplete.
-- `raw_source.path` is missing or unreadable and `inputs/` is empty.
-- The import plan has not been approved for execution.
+- `subject.yaml` is missing.
+- `raw_source.path` is missing or unreadable for proposal mode.
+- `analysis/inventory/import_plan.md` is missing for execute mode.
+- The user has not approved the import plan for execute mode.
+- `inputs/` is empty for inventory mode.
+- A proposed destination is outside the approved `inputs/` folders.
 - Copying would overwrite an existing destination file.
 - Inventory cannot confidently associate files with conceptual batches; write an unassigned section and stop for review.
 
-# Completion report
+# Completion Report
 
-Report the import plan path, copied file count, skipped file count, inventory path, batch plan path, and the next recommended skill: `studyos-plan`.
+Report the mode run, import plan path, copied file count, skipped file count, import log path, inventory path, batch plan path, and the next recommended skill: `studyos-plan`.

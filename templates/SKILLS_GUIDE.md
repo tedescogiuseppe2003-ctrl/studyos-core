@@ -27,14 +27,17 @@ These commands are read-only.
 
 ## studyos-import
 
-Use after setup approval. This skill proposes and executes safe import, then builds the first inventory and conceptual batch plan.
+Use after setup approval. This skill proposes safe import, executes approved copy actions, then builds the first inventory and conceptual batch plan.
 
 - Proposal mode scans `raw_source.path` read-only and writes `analysis/inventory/import_plan.md`.
 - Execute mode copies only approved rows into `inputs/` and writes `analysis/inventory/import_log.md`.
 - Inventory scans only `inputs/` and writes `analysis/inventory/course_inventory.md`.
 - Initial planning writes `analysis/inventory/batch_plan.md`.
+- Full import flow creates a proposal if no plan exists, stops for user approval, then after approval runs execute and inventory.
 
-Original raw files are never moved, renamed, deleted, overwritten, or modified. Destination files are never overwritten.
+Proposal mode requires `subject.yaml` and `raw_source.path`. Execute mode requires `analysis/inventory/import_plan.md`. Inventory mode requires at least one file under `inputs/`.
+
+Original raw files are never moved, renamed, deleted, overwritten, or modified. Destination files are never overwritten. Approved copy destinations are restricted to `inputs/slides/`, `inputs/readings/`, `inputs/notes/`, `inputs/exercises/`, `inputs/exams/`, `inputs/transcripts/`, and `inputs/miscellaneous/`.
 
 ## studyos-plan
 

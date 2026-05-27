@@ -28,11 +28,16 @@ IGNORED_STUDYOS_FILENAMES = {
     "workflow.yaml",
 }
 IGNORED_STUDYOS_DIRECTORIES = {
+    ".agents",
+    ".claude",
+    ".git",
+    "__pycache__",
+    "analysis",
+    "exports",
     "inputs",
     "outputs",
     "review",
     "study-os",
-    "analysis",
 }
 APPROVED_DESTINATION_FOLDERS = (
     "inputs/slides",
@@ -504,21 +509,15 @@ def destination_filename(source_path: Path, clean_filename: str) -> str:
     return f"{clean_filename}{source_suffix}"
 
 
-def unique_destination_path(destination_folder: Path, filename: str) -> Path:
+def destination_path(destination_folder: Path, filename: str) -> Path:
     candidate = destination_folder / filename
     if not candidate.exists() and not candidate.is_symlink():
         return candidate
 
-    path = Path(filename)
-    suffix = path.suffix
-    stem = path.stem
-    counter = 1
-
-    while True:
-        candidate = destination_folder / f"{stem}_{counter}{suffix}"
-        if not candidate.exists() and not candidate.is_symlink():
-            return candidate
-        counter += 1
+    raise ImportPlanError(
+        "destination file already exists; StudyOS will not overwrite or rename "
+        f"around an existing file: {candidate}"
+    )
 
 
 def execute_copy(root: Path, raw_source_root: Path, row: PlanRow) -> LogRow:
@@ -546,7 +545,10 @@ def execute_copy(root: Path, raw_source_root: Path, row: PlanRow) -> LogRow:
     if not source_path.is_file():
         return LogRow(row.source, "", "error", "source file does not exist")
 
-    final_path = unique_destination_path(destination_folder, filename)
+    try:
+        final_path = destination_path(destination_folder, filename)
+    except ImportPlanError as error:
+        return LogRow(row.source, "", "error", str(error))
 
     destination_folder.mkdir(parents=True, exist_ok=True)
     try:

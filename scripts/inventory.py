@@ -33,6 +33,10 @@ INPUT_FOLDERS = (
 SUPPORT_SOURCE_TYPES = {"notes", "exercises", "readings", "transcripts", "exams"}
 NON_SLIDE_BATCH_SOURCE_TYPES = {"notes", "readings", "transcripts"}
 
+
+class InventoryError(ValueError):
+    """Raised when inventory cannot safely proceed."""
+
 LECTURE_PATTERNS = (
     re.compile(
         r"\b(?:lecture|lect|lec|lesson|class|session)\s*[-_ ]*0*(\d{1,3})(?=\D|$)",
@@ -752,9 +756,17 @@ def main() -> int:
 
     try:
         files = discover_files(root)
+        if not files:
+            raise InventoryError(
+                "No files found under inputs/. Run studyos-import proposal and execute "
+                "before inventory mode."
+            )
         sources = update_database(root, files)
         write_course_inventory(root, sources)
         write_batch_plan(root, sources)
+    except InventoryError as error:
+        print(f"StudyOS inventory stopped safely: {error}", file=sys.stderr)
+        return 1
     except OSError as error:
         print(f"StudyOS inventory failed: {error}", file=sys.stderr)
         return 1

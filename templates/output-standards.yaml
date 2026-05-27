@@ -32,6 +32,28 @@ quality_modes:
       depth: "formulas, assumptions, derivations, common mistakes"
 
 outputs:
+  import_plan:
+    file: "analysis/inventory/import_plan.md"
+    required_sections:
+      - "Summary"
+      - "Plan"
+
+  import_log:
+    file: "analysis/inventory/import_log.md"
+    required_sections:
+      - "Summary"
+      - "Log"
+
+  course_inventory:
+    file: "analysis/inventory/course_inventory.md"
+    required_sections:
+      - "Course Inventory"
+
+  batch_plan:
+    file: "analysis/inventory/batch_plan.md"
+    required_sections:
+      - "Batch Plan"
+
   digest:
     file: "analysis/batches/digest.md"
     required_sections:

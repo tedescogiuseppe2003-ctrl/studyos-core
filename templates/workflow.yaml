@@ -18,7 +18,37 @@ workflow:
     scripts:
       - "study-os/scripts/import_sources.py"
       - "study-os/scripts/inventory.py"
-    purpose: "Safely import approved raw files, inventory inputs, and create the first conceptual batch plan."
+    purpose: "Propose safe import, execute approved copy actions, inventory inputs, and create the first conceptual batch plan."
+    modes:
+      proposal:
+        requires:
+          - "subject.yaml"
+          - "subject.yaml raw_source.path"
+        writes:
+          - "analysis/inventory/import_plan.md"
+        stops_before:
+          - "copying_files"
+          - "inventory"
+      execute:
+        requires:
+          - "analysis/inventory/import_plan.md"
+          - "user_approval"
+        writes:
+          - "inputs/"
+          - "analysis/inventory/import_log.md"
+      inventory:
+        requires:
+          - "files_under_inputs"
+        writes:
+          - "analysis/inventory/course_inventory.md"
+          - "analysis/inventory/batch_plan.md"
+          - "study-os/state/studyos.sqlite"
+      full_flow:
+        sequence:
+          - "proposal_if_import_plan_missing"
+          - "stop_for_user_approval"
+          - "execute_after_approval"
+          - "inventory"
     inputs:
       - "subject.yaml"
       - "subject.yaml raw_source.path"
@@ -30,8 +60,11 @@ workflow:
       - "analysis/inventory/batch_plan.md"
     checks:
       - "raw_source_is_read_only"
+      - "original_files_are_never_moved_deleted_or_modified"
       - "destination_files_are_not_overwritten"
+      - "destinations_are_restricted_to_approved_inputs_subfolders"
       - "inventory_scans_only_inputs"
+      - "missing_import_plan_stops_execute_mode"
 
   plan:
     skill: "studyos-plan"

@@ -38,6 +38,8 @@ After the setup proposal is approved and written to `subject.yaml`, use skills m
 6. `studyos-merge`
 7. `studyos-export`
 
+`studyos-import` is the combined import and inventory skill. It first writes `analysis/inventory/import_plan.md` from a read-only scan of `raw_source.path`, stops for approval, copies approved files into `inputs/` without moving originals or overwriting destinations, then writes `analysis/inventory/course_inventory.md` and `analysis/inventory/batch_plan.md`.
+
 ## Install A New Subject
 
 Run the installer from the core repo:
