@@ -18,7 +18,7 @@ workflow:
     scripts:
       - "study-os/scripts/import_sources.py"
       - "study-os/scripts/inventory.py"
-    purpose: "Propose safe import, execute approved copy actions, inventory inputs, and create the first conceptual batch plan."
+    purpose: "Propose safe import, execute approved copy actions, inventory inputs, and create the first-pass batch plan from metadata."
     modes:
       proposal:
         requires:
@@ -68,15 +68,33 @@ workflow:
 
   plan:
     skill: "studyos-plan"
-    purpose: "Refine conceptual batches and source assignments before processing."
+    purpose: "Refine the first-pass inventory batch plan into conceptual lectures, topics, modules, or tutorials before processing."
     inputs:
+      - "subject.yaml"
       - "analysis/inventory/course_inventory.md"
       - "analysis/inventory/batch_plan.md"
+      - "inputs/"
     outputs:
       - "analysis/inventory/batch_plan.md"
+      - "analysis/inventory/batch_plan_repair_log.md"
+      - "analysis/inventory/processing_queue.md"
+    model_routing:
+      default: "balanced"
+      deep_when:
+        - "complex_course_structure"
+        - "technical_dependency_chain"
+        - "mixed_lecture_tutorial_numbering"
     checks:
       - "batches_are_conceptual_lectures_topics_or_modules"
+      - "slides_and_lecture_topic_files_usually_define_primary_batches"
       - "exercises_are_supporting_sources_unless_explicitly_conceptual"
+      - "ordinary_exercises_do_not_become_standalone_master_note_batches"
+      - "readings_notes_transcripts_and_exams_are_supporting_sources_when_matched"
+      - "unclear_files_go_to_unassigned_needs_review"
+      - "dependencies_are_added_where_inferable"
+      - "all_inventory_files_are_accounted_for"
+      - "inputs_are_not_modified"
+      - "material_is_not_processed"
 
   batch:
     skill: "studyos-batch"

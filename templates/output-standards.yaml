@@ -53,6 +53,25 @@ outputs:
     file: "analysis/inventory/batch_plan.md"
     required_sections:
       - "Batch Plan"
+    required_batch_fields:
+      - "title"
+      - "status"
+      - "difficulty"
+      - "exam relevance"
+      - "depends on"
+      - "primary sources"
+      - "supporting sources"
+      - "expected outputs"
+      - "notes"
+
+  batch_plan_repair_log:
+    file: "analysis/inventory/batch_plan_repair_log.md"
+    required_sections:
+      - "Summary"
+      - "Changes"
+      - "Unassigned Files"
+      - "Dependencies"
+      - "Warnings"
 
   digest:
     file: "analysis/batches/digest.md"

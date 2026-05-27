@@ -27,7 +27,7 @@ The agent fills `subject.yaml` only after approval.
 ## Folder Structure
 
 - `inputs/` contains copied course files after import. Treat these files as read-only.
-- `analysis/` contains import plans, inventory, first-pass batch plans, source digests, learning cores, visual notes, validation records, and processing state.
+- `analysis/` contains import plans, inventory, first-pass and refined batch plans, repair logs, source digests, learning cores, visual notes, validation records, and processing state.
 - `outputs/` contains batch-level, course-level, and merged study outputs.
 - `exports/pdf/unmerged/` and `exports/pdf/merged/` contain PDF exports.
 - `review/` contains validation reports, weak points, unresolved questions, source coverage, and progress tracking.
@@ -43,8 +43,8 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 
 - `python3 study-os/scripts/studyos.py status` reports the current workspace state and next recommended manual skill.
 - `python3 study-os/scripts/studyos.py doctor` checks local readiness without modifying files.
-- `studyos-import` proposes safe import, stops for approval, executes approved copy actions, then creates inventory and the first conceptual batch plan.
-- `studyos-plan` refines the conceptual batch plan.
+- `studyos-import` proposes safe import, stops for approval, executes approved copy actions, then creates inventory and the first-pass batch plan from metadata.
+- `studyos-plan` refines that first-pass plan into conceptual lectures, topics, modules, or tutorials before processing.
 - `studyos-batch` processes one planned batch into digest, learning core, and configured outputs.
 - `studyos-validate` validates batch, course, repaired, or merged outputs.
 - `studyos-course` processes remaining batches sequentially and creates course-level outputs.
@@ -57,8 +57,8 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 2. Run `studyos-import` proposal mode to create `analysis/inventory/import_plan.md`.
 3. Review and approve the import plan.
 4. Run `studyos-import` execute mode to copy approved files into `inputs/`.
-5. Run `studyos-import` inventory mode to create `analysis/inventory/course_inventory.md` and `analysis/inventory/batch_plan.md`.
-6. Run `studyos-plan`.
+5. Run `studyos-import` inventory mode to create `analysis/inventory/course_inventory.md` and the first-pass `analysis/inventory/batch_plan.md`.
+6. Run `studyos-plan` to refine conceptual batches, source assignments, dependencies, and any `Unassigned / needs review` entries.
 7. Run `studyos-batch` for one batch.
 8. Run `studyos-validate`.
 9. Run `studyos-course` if you want remaining batches processed sequentially.
@@ -76,6 +76,7 @@ Review `analysis/inventory/import_plan.md` before import execute. Do not continu
 - Missing import plan: run `studyos-import` proposal mode.
 - Empty `inputs/`: run `studyos-import` proposal mode, approve the plan, then run execute mode.
 - Missing `batch_plan.md`: run `studyos-import` inventory mode, then `studyos-plan`.
+- Random file-level or exercise-only batches in `batch_plan.md`: run `studyos-plan` before processing.
 - Missing digest, learning core, or outputs: run `studyos-batch`.
 - Missing validation reports: run `studyos-validate`.
 - Missing merged outputs: run `studyos-merge`.

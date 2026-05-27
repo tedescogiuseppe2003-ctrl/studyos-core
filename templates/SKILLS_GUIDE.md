@@ -27,12 +27,12 @@ These commands are read-only.
 
 ## studyos-import
 
-Use after setup approval. This skill proposes safe import, executes approved copy actions, then builds the first inventory and conceptual batch plan.
+Use after setup approval. This skill proposes safe import, executes approved copy actions, then builds the first inventory and first-pass batch plan.
 
 - Proposal mode scans `raw_source.path` read-only and writes `analysis/inventory/import_plan.md`.
 - Execute mode copies only approved rows into `inputs/` and writes `analysis/inventory/import_log.md`.
 - Inventory scans only `inputs/` and writes `analysis/inventory/course_inventory.md`.
-- Initial planning writes `analysis/inventory/batch_plan.md`.
+- Initial planning writes `analysis/inventory/batch_plan.md` from filenames, folders, lecture numbers, and simple topic keywords.
 - Full import flow creates a proposal if no plan exists, stops for user approval, then after approval runs execute and inventory.
 
 Proposal mode requires `subject.yaml` and `raw_source.path`. Execute mode requires `analysis/inventory/import_plan.md`. Inventory mode requires at least one file under `inputs/`.
@@ -41,11 +41,16 @@ Original raw files are never moved, renamed, deleted, overwritten, or modified. 
 
 ## studyos-plan
 
-Use after `studyos-import`. This skill refines `analysis/inventory/batch_plan.md` before processing.
+Use after `studyos-import`. This skill refines the first-pass `analysis/inventory/batch_plan.md` before processing. It is distinct from inventory: inventory discovers and classifies files, while planning turns the draft into conceptual batches.
 
 - Batches should represent concepts, lectures, modules, or tutorial themes.
+- Slides and lecture-topic files usually define primary batches.
 - Exercises, readings, transcripts, notes, and exams should support conceptual batches where possible.
+- Ordinary exercises should not become standalone master-note batches unless they are explicitly tutorial or conceptual.
+- Each refined batch should include title, status, difficulty, exam relevance, dependencies, primary sources, supporting sources, expected outputs, and notes.
 - Ambiguous files remain in a needs-review section instead of being hidden.
+- The skill writes `analysis/inventory/batch_plan_repair_log.md` and may write `analysis/inventory/processing_queue.md` when useful.
+- It must not process, summarize, solve, validate, or transform course material.
 
 ## studyos-batch
 
