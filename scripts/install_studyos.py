@@ -15,6 +15,7 @@ from init_db import init_db
 CORE_REPO_HINT = "~/Developer/studyos-core"
 
 COURSE_LOCAL_SCRIPTS = (
+    "studyos.py",
     "init_db.py",
     "inventory.py",
     "import_sources.py",

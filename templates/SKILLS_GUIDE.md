@@ -18,6 +18,15 @@ Quality mode controls how much detail each processing skill should produce.
 
 Higher visual, formula, or validation depth increases source screening and checking rigor, especially for exam-critical diagrams, tables, charts, formulas, assumptions, and weak points.
 
+## Status And Readiness
+
+Use these read-only commands whenever you need to inspect the workspace without advancing the pipeline:
+
+- `python3 study-os/scripts/studyos.py status` prints installed/setup state, source/import/inventory/processing/output counts, validation/final-pack presence, and the next recommended manual skill.
+- `python3 study-os/scripts/studyos.py doctor` checks required folders, scripts, skills, config files, `subject.yaml`, readable `raw_source.path` when configured, and obvious stale setup issues.
+
+These commands do not import files, run inventory, process batches, validate outputs, synthesize outputs, or modify files.
+
 ## study-os-import-sources
 
 Use this first when the course material is still in an original raw folder.

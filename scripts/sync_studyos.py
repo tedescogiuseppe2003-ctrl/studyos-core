@@ -29,6 +29,7 @@ INTENTIONALLY_NOT_TOUCHED = (
 )
 
 COURSE_LOCAL_SCRIPTS = (
+    "studyos.py",
     "init_db.py",
     "inventory.py",
     "import_sources.py",

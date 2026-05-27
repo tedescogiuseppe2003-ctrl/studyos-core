@@ -65,6 +65,8 @@ Generated files live under `working/`, `outputs/`, `review/`, and `study-os/stat
 
 ## Skill Commands
 
+- `python3 study-os/scripts/studyos.py status` reports the current StudyOS workspace state and the next recommended manual skill. It does not import, inventory, process, validate, synthesize, or modify files.
+- `python3 study-os/scripts/studyos.py doctor` checks local readiness, installed folders/scripts/skills/config, and obvious stale setup issues. It does not modify files.
 - `study-os-import-sources` scans the configured raw source folder read-only. In proposal mode it writes `working/inventory/import_plan.md`. In execute mode it copies approved files into `inputs/` and writes `working/inventory/import_log.md`.
 - `study-os-inventory` scans `inputs/`, creates `working/inventory/course_inventory.md`, and creates `working/inventory/batch_plan.md`.
 - `study-os-process-batch` processes one planned batch. It creates a digest, a learning core, and the configured batch outputs.
@@ -88,13 +90,14 @@ Generated files live under `working/`, `outputs/`, `review/`, and `study-os/stat
 
 After installation/setup, call skills manually one step at a time:
 
-1. Run `study-os-import-sources` in proposal mode.
-2. Run `study-os-import-sources` in execute mode when the import plan is acceptable.
-3. Run `study-os-inventory`.
-4. Run `study-os-process-batch` for one batch to test quality.
-5. Run `study-os-validate` for that batch.
-6. Run `study-os-process-course` if you want remaining batches processed sequentially.
-7. Run `study-os-synthesize` when the course is processed and validated.
+1. Optionally run `python3 study-os/scripts/studyos.py status` or `python3 study-os/scripts/studyos.py doctor` to inspect readiness.
+2. Run `study-os-import-sources` in proposal mode.
+3. Run `study-os-import-sources` in execute mode when the import plan is acceptable.
+4. Run `study-os-inventory`.
+5. Run `study-os-process-batch` for one batch to test quality.
+6. Run `study-os-validate` for that batch.
+7. Run `study-os-process-course` if you want remaining batches processed sequentially.
+8. Run `study-os-synthesize` when the course is processed and validated.
 
 Review `working/inventory/import_plan.md` before import execute. Do not continue with execute mode unless the proposed copies are acceptable.
 
