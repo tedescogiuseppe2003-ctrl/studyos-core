@@ -22,15 +22,28 @@ Typical user request:
 
 `Install StudyOS in this folder using ~/Developer/studyos-core.`
 
-Immediately after installation, before importing or processing any files, the agent must ask the setup questions below and fill `subject.yaml` automatically from the answers.
+Immediately after installation, before importing or processing any files, the agent must inspect the folder name and visible raw course files, then propose a complete `subject.yaml` setup using reasonable defaults.
 
 The user should not manually edit `subject.yaml` unless they want to.
 
-## Setup questions
+## Proposal-first setup
 
-The setup wizard happens immediately after installation and before import, inventory, batch planning, or output generation.
+The setup proposal happens immediately after installation and before import, inventory, batch planning, or output generation.
 
-The agent must ask for:
+The final install UX is:
+
+1. User opens an existing course folder in VS Code.
+2. User asks: `Install StudyOS in this folder using ~/Developer/studyos-core.`
+3. Agent installs StudyOS from the external core repo.
+4. Agent initializes or confirms the database.
+5. Agent syncs latest scripts and skills.
+6. Agent inspects the folder name and visible raw course files read-only.
+7. Agent proposes a complete `subject.yaml` setup.
+8. Agent asks the user to approve the setup or request modifications.
+9. Agent fills `subject.yaml` only after user approval.
+10. Agent stops without importing, inventorying, or processing material.
+
+The proposal must include:
 
 - subject name
 - course level: Bachelor / Master / PhD / Other
@@ -63,7 +76,17 @@ The agent must ask for:
   - standard
   - rigorous audit
 
-These setup answers are stored in `subject.yaml`. The installing agent writes the file automatically.
+The agent should infer defaults from the folder name and visible files. It should not ask setup questions one by one unless the proposed setup is impossible to infer.
+
+Technical or formula-heavy subjects should default to rigorous setup. This includes finance, risk management, statistics, econometrics, mathematics, derivatives, portfolio theory, quantitative methods, and similar courses.
+
+Standard defaults are appropriate for non-technical courses unless visible files or the folder name suggest higher rigor.
+
+After presenting the proposal, the agent asks:
+
+`Do you approve this setup, or do you want modifications?`
+
+If the user requests modifications, the agent updates the proposal and asks again. These approved setup values are stored in `subject.yaml`. The installing agent writes the file automatically only after approval.
 
 ## Quality and depth modes
 
@@ -83,9 +106,13 @@ Validation depth controls how deeply StudyOS checks structure, citations, comple
 
 existing course folder opened in VS Code
 -> install StudyOS from external core repo
--> ask setup questions
--> fill `subject.yaml`
--> copy raw files into `inputs/` when approved
+-> initialize database
+-> sync latest scripts and skills
+-> inspect folder name and visible raw files
+-> propose complete setup
+-> ask user to approve or modify
+-> fill `subject.yaml` after approval
+-> manually run import proposal and approved copy through `study-os-import-sources`
 -> inventory
 -> conceptual batch plan
 -> manually process one batch or skill step at a time
@@ -136,7 +163,7 @@ inputs/
 - `outputs/`: final study material
 - `review/`: weak points, validation, unresolved questions
 - `study-os/`: scripts, skills, config, state
-- `subject.yaml`: course configuration filled from setup answers
+- `subject.yaml`: course configuration filled from the approved setup proposal
 
 ## Rules
 
@@ -147,8 +174,11 @@ inputs/
 - Never move, delete, rename, overwrite, or modify files in the original raw source folder.
 - Never overwrite destination files during import.
 - Never modify files in `inputs/` after import.
-- Ask all setup questions immediately after installation and before import or processing.
-- Store setup answers in `subject.yaml`.
+- After installation, infer and propose a complete setup from the folder name and visible raw files.
+- Ask the user to approve or modify the proposed setup.
+- Store approved setup values in `subject.yaml`.
+- Fill `subject.yaml` only after user approval.
+- Do not import, inventory, or process material during installation.
 - Process material by conceptual batch, not all at once.
 - Batches should represent topics, lectures, or modules.
 - Use exercises, readings, transcripts, notes, and exams as supporting sources when they belong to a conceptual batch.
@@ -179,6 +209,7 @@ inputs/
 - study-os-inventory
 - study-os-process-batch
 - study-os-validate
+- study-os-process-course
 - study-os-synthesize
 
 ## v1 testing philosophy

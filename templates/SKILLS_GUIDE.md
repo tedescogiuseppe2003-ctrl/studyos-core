@@ -4,7 +4,9 @@ This guide describes the installed StudyOS skills and the order to use them. The
 
 ## Installation Boundary
 
-Installation/setup ends after the agent runs the external core installer, runs sync, initializes or confirms the database, asks setup questions, fills `subject.yaml`, and creates or updates `STUDYOS_GUIDE.md`.
+Installation/setup ends after the agent runs the external core installer, initializes or confirms the database, runs sync for the latest scripts and skills, inspects the folder name and visible raw course files, proposes a complete setup, gets user approval, fills `subject.yaml`, and creates or updates `STUDYOS_GUIDE.md`.
+
+The agent should not ask setup questions one by one unless a complete proposal is impossible to infer. It fills `subject.yaml` only after the user approves the proposal or an updated proposal.
 
 Installation/setup must not import files, run inventory, create an import plan, create a batch plan, summarize material, validate outputs, or process course material. After setup, the user manually calls the skills below step by step.
 

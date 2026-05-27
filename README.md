@@ -14,9 +14,30 @@ The user normally opens an existing course folder in VS Code and asks:
 
 > Install StudyOS in this folder using ~/Developer/studyos-core.
 
-The agent then uses the external core repo to run `scripts/install_studyos.py`, runs `scripts/sync_studyos.py`, confirms the database exists, asks the setup questions, fills `subject.yaml`, creates or updates `STUDYOS_GUIDE.md`, and stops.
+The agent then uses the external core repo to run `scripts/install_studyos.py`, initializes or confirms the database, runs `scripts/sync_studyos.py` to sync latest scripts and skills, inspects the folder name and visible raw course files read-only, proposes a complete setup for `subject.yaml`, asks for approval or modifications, fills `subject.yaml` only after approval, creates or updates `STUDYOS_GUIDE.md`, and stops.
 
-The user should not manually edit `subject.yaml` unless desired. The setup wizard fills it from answers about the subject, course level, material language, exam type, raw source path, desired outputs, quality/depth settings, and file-protection confirmations.
+The agent should not ask setup questions one by one unless the proposed setup is impossible to infer.
+
+The proposal should include:
+
+- subject name
+- course level
+- language
+- exam type
+- desired outputs
+- quality/depth mode
+- visual handling depth
+- formula handling depth
+- validation depth
+- `raw_source.path`
+- read-only original files
+- `copy_into_inputs` strategy
+
+Then the agent asks:
+
+> Do you approve this setup, or do you want modifications?
+
+The user should not manually edit `subject.yaml` unless desired. The installing agent writes it from the approved proposal.
 
 Installation and setup do not import files, run inventory, or process course material. After installation/setup, the user manually calls StudyOS skills step by step.
 
@@ -31,7 +52,7 @@ Ask the agent:
 > Install StudyOS in this folder using ~/Developer/studyos-core.
 
 Step 3:
-Answer the setup questions. The agent fills `subject.yaml` automatically, creates or updates `STUDYOS_GUIDE.md`, and stops.
+Review the proposed setup. Approve it or request modifications. The agent fills `subject.yaml` only after approval, creates or updates `STUDYOS_GUIDE.md`, and stops.
 
 Step 4:
 When ready, manually use the skills one by one:
@@ -40,6 +61,7 @@ When ready, manually use the skills one by one:
 - `study-os-inventory`
 - `study-os-process-batch`
 - `study-os-validate`
+- `study-os-process-course`
 - `study-os-synthesize`
 
 ## Install A New Subject
@@ -64,7 +86,7 @@ cd ~/Developer/studyos-core
 python3 scripts/sync_studyos.py ~/StudyOS-Test/TestCourse
 ```
 
-The installing agent should then ask for:
+The installing agent should then inspect the folder name and visible raw course files read-only, infer reasonable defaults, and propose a complete setup including:
 
 - Subject name
 - Course level
@@ -79,7 +101,9 @@ The installing agent should then ask for:
 - Confirmation that original files are read-only
 - Confirmation that StudyOS copies files into `inputs/`
 
-It should fill `subject.yaml` from those answers. StudyOS treats `raw_source.path` as read-only and imports approved files by copying them into `inputs/` only when the user later runs `study-os-import-sources`.
+For technical or formula-heavy subjects such as finance, risk management, statistics, econometrics, mathematics, derivatives, portfolio theory, and quantitative methods, the proposal should default to rigorous quality, visual, formula, and validation settings. Other courses should use standard defaults unless the folder contents suggest otherwise.
+
+The agent should ask: "Do you approve this setup, or do you want modifications?" It should fill `subject.yaml` only after approval. StudyOS treats `raw_source.path` as read-only and imports approved files by copying them into `inputs/` only when the user later runs `study-os-import-sources`.
 
 ## Sync An Existing Subject
 

@@ -10,9 +10,11 @@ Normal request:
 
 > Install StudyOS in this folder using ~/Developer/studyos-core.
 
-The installing agent runs the external core installer, runs core sync, confirms the database exists, asks setup questions, fills `subject.yaml`, creates or updates this guide, and stops.
+The installing agent runs the external core installer, initializes or confirms the database, runs core sync for the latest scripts and skills, inspects the folder name and visible raw course files read-only, proposes a complete setup, asks for approval or modifications, fills `subject.yaml` only after approval, creates or updates this guide, and stops.
 
-The setup questions the agent should ask are:
+## Setup Proposal After Installation
+
+StudyOS proposes settings automatically after installation. The agent uses the folder name and visible raw course files to infer a complete setup, including:
 
 - Subject name.
 - Course level: Bachelor, Master, PhD, or Other.
@@ -27,7 +29,15 @@ The setup questions the agent should ask are:
 - Formula handling depth: normal or rigorous.
 - Validation depth: structural only, standard, or rigorous audit.
 
-The user should not manually edit `subject.yaml` unless desired. Installation/setup does not import files, run inventory, or process course material.
+The agent should not ask these setup questions one by one unless a complete proposal is impossible to infer. For technical or formula-heavy subjects, the proposal should default to rigorous quality, formula, and validation settings.
+
+After presenting the proposal, the agent asks:
+
+> Do you approve this setup, or do you want modifications?
+
+The user can approve the setup or request changes. If changes are requested, the agent updates the proposal and asks again.
+
+The user should not manually edit `subject.yaml` unless desired. The agent fills `subject.yaml` only after approval. Installation/setup does not import files, run inventory, create an import plan, or process course material.
 
 ## Quality Modes And Output Budgets
 
@@ -41,9 +51,9 @@ Visual handling depth, formula handling depth, and validation depth further adju
 
 ## subject.yaml
 
-`subject.yaml` stores the course setup answers and processing configuration. It contains the subject name, course level, material language, exam type, requested outputs, quality/depth mode, visual handling depth, formula handling depth, validation depth, model routing, and `raw_source.path` for the original course folder.
+`subject.yaml` stores the approved course setup and processing configuration. It contains the subject name, course level, material language, exam type, requested outputs, quality/depth mode, visual handling depth, formula handling depth, validation depth, model routing, and `raw_source.path` for the original course folder.
 
-The user normally does not edit this file manually. The installing agent fills it from the setup answers before import, inventory, or processing.
+The user normally does not edit this file manually. The installing agent fills it from the approved setup proposal before import, inventory, or processing.
 
 ## Folder Structure
 

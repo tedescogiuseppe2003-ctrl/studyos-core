@@ -25,7 +25,7 @@ Use the cheapest sufficient model. Start with a lower tier and escalate only whe
 
 Tiers:
 
-- `fast`: setup questions, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
+- `fast`: setup proposal drafting, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
 - `balanced`: batch plan repair, digest creation, normal concept explanation, normal output generation, flashcards, exam questions.
 - `deep`: formulas, derivations, technical finance/statistics/econometrics explanations, difficult conceptual synthesis, essential visual analysis, formula screenshots, definition screenshots, complex charts/tables/diagrams.
 - `audit`: validation, source-grounding review, hallucination detection, final synthesis review.
@@ -34,28 +34,33 @@ Tiers:
 For this skill:
 
 - Use `script` for install, sync, database initialization, and deterministic file checks.
-- Use `fast` for setup questions, config filling, simple defaults, and guide/report formatting.
-- Do not use `balanced`, `deep`, or `audit` unless installation uncovers a configuration ambiguity that cannot be resolved from setup answers.
+- Use `fast` for setup proposal drafting, config filling, simple defaults, and guide/report formatting.
+- Do not use `balanced`, `deep`, or `audit` unless installation uncovers a configuration ambiguity that cannot be resolved from the setup proposal.
 - Never use deep reasoning to process course content during installation; installation must stop before import, inventory, validation, or synthesis.
 
-## Setup Wizard Behavior
+## Proposal-First Setup Workflow
 
-When the user asks something like "Install StudyOS in this folder using ~/Developer/studyos-core", act as a small setup wizard:
+When the user asks something like "Install StudyOS in this folder using ~/Developer/studyos-core", install StudyOS and propose setup before writing `subject.yaml`:
 
 1. Identify the target folder as the current workspace unless the user names another target.
 2. Use the user-provided core repo path, or `~/Developer/studyos-core` when the user does not provide one.
 3. Read `PROJECT_BRIEF.md` from the external core repo.
 4. Run `python3 <core-repo>/scripts/install_studyos.py <target-folder>`.
-5. Run `python3 <core-repo>/scripts/sync_studyos.py <target-folder>`.
-6. Confirm `study-os/state/studyos.sqlite` exists. Initialize it by running `python3 <core-repo>/scripts/init_db.py` from the target folder only if it is missing.
-7. Ask setup questions for missing values.
-8. Fill `subject.yaml` from the setup answers.
-9. Create or update `STUDYOS_GUIDE.md`, preserving any existing course-specific notes unless the user asks for replacement.
-10. Stop.
+5. Confirm `study-os/state/studyos.sqlite` exists. Initialize it by running `python3 <core-repo>/scripts/init_db.py` from the target folder only if it is missing.
+6. Run `python3 <core-repo>/scripts/sync_studyos.py <target-folder>` to sync the latest scripts and skills.
+7. Inspect the target folder name and visible raw course files read-only.
+8. Propose a complete `subject.yaml` setup with inferred defaults.
+9. Ask: "Do you approve this setup, or do you want modifications?"
+10. If the user requests changes, update the proposal and ask for approval again.
+11. After approval, fill `subject.yaml` from the approved proposal.
+12. Create or update `STUDYOS_GUIDE.md`, preserving any existing course-specific notes unless the user asks for replacement.
+13. Stop.
 
 Never run an installed workspace copy of `install_studyos.py`. The installer is core-only. If an old `study-os/scripts/install_studyos.py` exists, ignore it and run sync from the external core repo so the deprecated copy is removed.
 
-Ask for these setup values when they are missing:
+Do not ask setup questions one by one unless a complete proposal is impossible to infer from the folder name, visible files, and ordinary defaults.
+
+The proposal must include:
 
 - Subject name
 - Course level
@@ -91,6 +96,26 @@ Defaults:
 - `analysis_depth.validation_depth`: `standard`
 - `graphify.enabled`: `false`
 
+Rigorous defaults:
+
+For technical or formula-heavy subjects, default to rigorous setup unless the user has already specified otherwise. This includes finance, risk management, statistics, econometrics, mathematics, derivatives, portfolio theory, quantitative methods, and similar subjects.
+
+For these subjects, propose:
+
+- `processing.quality_mode`: `rigorous`
+- `analysis_depth.visual_handling`: `rigorous`
+- `analysis_depth.formula_handling`: `rigorous`
+- `analysis_depth.validation_depth`: `rigorous audit`
+- desired outputs including formula sheets, exam questions, cheat sheets, and final review pack unless the folder suggests a non-exam use case
+
+For non-technical subjects, use standard defaults unless visible files or the folder name suggest a need for higher rigor.
+
+Approval gate:
+
+- Do not write `subject.yaml` until the user approves the proposal.
+- If the user requests modifications, update the proposal and ask again.
+- Fill `subject.yaml` only after approval.
+
 The user should not need to manually edit `subject.yaml` unless they want to.
 
 After setup, tell the user that the next step is manual and skill-by-skill, starting with `study-os-import-sources` when they are ready. Do not run that skill for them during installation.
@@ -119,7 +144,7 @@ After setup, tell the user that the next step is manual and skill-by-skill, star
   - `templates/`
   - `scripts/` into `study-os/scripts/`
   - `skills/` into `study-os/skills/`, `.agents/skills/`, and `.claude/skills/`
-- `subject.yaml` after installation, using the setup answers.
+- `subject.yaml` after installation, using the approved setup proposal.
 - `study-os/state/studyos.sqlite` only when initializing missing state.
 - `STUDYOS_GUIDE.md` to create or update setup guidance.
 
@@ -177,21 +202,24 @@ Ensure these files exist after installation:
 2. Confirm the target subject folder path.
 3. Confirm the external core repo path, defaulting to `~/Developer/studyos-core`.
 4. Run `python3 <core-repo>/scripts/install_studyos.py <target-folder>`.
-5. Run `python3 <core-repo>/scripts/sync_studyos.py <target-folder>`.
-6. Confirm SQLite state exists at `study-os/state/studyos.sqlite`.
-7. Ask the setup wizard questions for missing values.
-8. Fill `subject.yaml` from the setup answers without changing raw course files.
-9. Create or update `STUDYOS_GUIDE.md`, preserving any existing course-specific notes unless the user asks for replacement.
-10. Report:
+5. Confirm SQLite state exists at `study-os/state/studyos.sqlite`; initialize it from the external core repo if missing.
+6. Run `python3 <core-repo>/scripts/sync_studyos.py <target-folder>` to sync the latest scripts and skills.
+7. Inspect the target folder name and visible raw course files read-only.
+8. Propose a complete setup for `subject.yaml` using reasonable defaults.
+9. Ask the user to approve the proposal or request modifications.
+10. After approval, fill `subject.yaml` from the approved proposal without changing raw course files.
+11. Create or update `STUDYOS_GUIDE.md`, preserving any existing course-specific notes unless the user asks for replacement.
+12. Report:
    - target path,
    - directories created,
    - files copied,
    - files skipped because they already existed,
-   - `subject.yaml` fields filled,
+   - `subject.yaml` fields filled after approval,
    - guide files installed,
    - any missing source files in the core repo,
    - that installation/setup is complete and no import, inventory, or processing was run.
-11. Stop. Do not continue into import or inventory.
+   - the next recommended manual skill, normally `study-os-import-sources`.
+13. Stop. Do not continue into import or inventory.
 
 ## Quality Bar
 
