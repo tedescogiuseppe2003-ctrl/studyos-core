@@ -4,6 +4,7 @@ tiers:
   fast:
     purpose: "Low-cost, low-risk extraction and formatting."
     use_for:
+      - "import proposal metadata"
       - "inventory"
       - "file classification"
       - "simple metadata extraction"
@@ -16,6 +17,7 @@ tiers:
   balanced:
     purpose: "Default course-material processing."
     use_for:
+      - "conceptual batch planning for normal courses"
       - "source digests"
       - "learning cores"
       - "flashcards"
@@ -27,8 +29,10 @@ tiers:
   deep:
     purpose: "Complex reasoning and merging."
     use_for:
+      - "rigorous quality mode"
       - "difficult concepts"
       - "formula derivations"
+      - "essential visual analysis"
       - "exam questions"
       - "final merge"
     avoid_for:
@@ -40,6 +44,7 @@ tiers:
     use_for:
       - "citation validation"
       - "formula validation"
+      - "visual coverage validation"
       - "coverage review"
       - "unsupported claim detection"
     avoid_for:
@@ -47,11 +52,59 @@ tiers:
       - "bulk summarization"
 
 defaults:
+  import_proposal: "fast"
   inventory: "fast"
+  planning: "balanced"
   digest: "balanced"
   learning_core: "balanced"
+  essential_visual_analysis: "deep"
   flashcards: "balanced"
   formula_sheet: "deep"
   exam_questions: "deep"
   validation: "audit"
   merge: "deep"
+
+quality_mode_overrides:
+  economy:
+    prefer:
+      inventory: "fast"
+      planning: "fast"
+      digest: "balanced"
+      learning_core: "balanced"
+      flashcards: "fast"
+      validation: "audit"
+    visual_depth: "minimal"
+    formula_depth: "normal"
+    validation_depth: "structural_or_standard"
+  standard:
+    prefer:
+      inventory: "fast"
+      planning: "balanced"
+      digest: "balanced"
+      learning_core: "balanced"
+      flashcards: "balanced"
+      formula_sheet: "deep"
+      exam_questions: "deep"
+      validation: "audit"
+      merge: "deep"
+    visual_depth: "standard"
+    formula_depth: "normal"
+    validation_depth: "standard"
+  rigorous:
+    prefer:
+      planning: "deep"
+      digest: "deep_for_difficult_batches_else_balanced"
+      learning_core: "deep_for_difficult_batches_else_balanced"
+      essential_visual_analysis: "deep"
+      formula_sheet: "deep"
+      exam_questions: "deep"
+      validation: "audit"
+      merge: "deep"
+    visual_depth: "rigorous"
+    formula_depth: "rigorous"
+    validation_depth: "rigorous_audit"
+
+repair_policy:
+  route_only_affected_sections_to_deeper_models: true
+  preserve_valid_content: true
+  rerun_validation_after_repair: true

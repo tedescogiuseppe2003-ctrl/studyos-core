@@ -26,7 +26,7 @@ Fresh installs and syncs install only these final skill names:
 
 There is no normal user workflow skill for installation and no master orchestration skill.
 
-`studyos-merge` is the installed full-course consolidation skill. `studyos-synthesize` is not installed as a user-facing skill.
+`studyos-merge` is the installed full-course consolidation skill.
 
 ## Normal User Workflow
 
@@ -41,6 +41,8 @@ After the setup proposal is approved and written to `subject.yaml`, use skills m
 7. `studyos-export`
 
 `studyos-import` is the combined import and inventory skill. It first writes `analysis/inventory/import_plan.md` from a read-only scan of `raw_source.path`, stops for approval, copies approved files into `inputs/` without moving originals or overwriting destinations, then writes `analysis/inventory/course_inventory.md` and `analysis/inventory/batch_plan.md`.
+
+`studyos-plan` refines the first batch plan into conceptual batches. `studyos-batch` processes one selected batch. `studyos-validate` checks outputs and guides targeted repair. `studyos-course` processes remaining planned batches with validation after each batch. Visual screening is integrated into batch, course, and validation work; it is not a separate skill.
 
 `studyos-merge` reads validated batch learning cores and batch outputs, then writes the final full-course structure:
 
@@ -63,6 +65,22 @@ python3 study-os/scripts/export_outputs.py --root .
 ```
 
 PDF is preferred when `pandoc` and a LaTeX PDF engine are available. If PDF dependencies are unavailable, the exporter writes print-ready HTML and reports the fallback. Internal `analysis/`, `review/`, validation, and debug files are not exported by default.
+
+## Installed Course Folder
+
+A StudyOS course folder is self-explaining after install:
+
+- `inputs/` contains approved copied course files. Originals stay protected at `subject.yaml` -> `raw_source.path`; import is copy-only and never moves, deletes, renames, overwrites, or edits raw files.
+- `analysis/` contains working evidence: import plans, inventory, conceptual batch plans, batch digests, learning cores, visual notes, validation details, and processing state.
+- `outputs/` contains study-facing Markdown outputs: notes, formulas, flashcards, questions, cheat sheets, study plans, and final packs.
+- `exports/pdf/unmerged/` contains batch-level exports by category.
+- `exports/pdf/merged/` contains consolidated full-course exports.
+- `review/` contains weak points, unresolved questions, source coverage, visual issues, validation reports, and progress tracking.
+- `study-os/` contains local scripts, installed skills, config, and state synced from the external core repo.
+
+Quality modes are `economy`, `standard`, and `rigorous`. Economy is lighter and faster, standard is the default, and rigorous uses deeper formula, visual, and validation handling for exam-critical or technical courses. Model routing uses fast models for simple metadata work, balanced models for normal generation, deep models for formulas and merging, and audit models for validation.
+
+If a preflight warning appears, stop and fix the missing prerequisite instead of forcing the current step. Common fixes are approving the setup, approving the import plan, running import before planning, running plan before batch processing, validating before merge, or repairing blocking validation findings before export.
 
 ## Install A New Subject
 

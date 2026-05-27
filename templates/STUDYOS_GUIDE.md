@@ -26,10 +26,11 @@ The agent fills `subject.yaml` only after approval.
 
 ## Folder Structure
 
-- `inputs/` contains copied course files after import. Treat these files as read-only.
-- `analysis/` contains import plans, inventory, first-pass and refined batch plans, repair logs, source digests, learning cores, visual notes, validation records, and processing state.
-- `outputs/` contains batch-level, course-level, and merged study outputs.
-- `exports/pdf/unmerged/` and `exports/pdf/merged/` contain PDF exports, or print-ready HTML fallbacks when local PDF tooling is unavailable.
+- `inputs/` contains approved copied course files after import. Treat these files as read-only processing inputs, not as editable working files.
+- `analysis/` contains process evidence: import plans, inventory, first-pass and refined batch plans, repair logs, source digests, learning cores, visual notes, validation records, and processing state.
+- `outputs/` contains study-facing Markdown outputs: notes, formulas, flashcards, questions, cheat sheets, study plans, and final packs.
+- `exports/pdf/unmerged/` contains batch-level exports grouped by output category.
+- `exports/pdf/merged/` contains consolidated full-course exports.
 - `review/` contains validation reports, weak points, unresolved questions, source coverage, and progress tracking.
 - `study-os/` contains installed scripts, skills, config guides, and local state.
 
@@ -38,6 +39,8 @@ The agent fills `subject.yaml` only after approval.
 The original raw course folder configured at `subject.yaml` -> `raw_source.path` is read-only. StudyOS must never move, rename, delete, overwrite, or modify anything there.
 
 Import copies approved files into `inputs/`. Files under `inputs/` are also treated as read-only after import.
+
+Import is copy-only. It never moves raw files, never deletes raw files, never renames raw files, never edits raw files, and never overwrites an existing destination file in `inputs/`. If a destination already exists, the import plan must propose a safe alternate action or stop for user review.
 
 ## Skill Commands
 
@@ -69,6 +72,23 @@ Review `analysis/inventory/import_plan.md` before import execute. Do not continu
 
 `studyos-import` full flow runs proposal first if no plan exists, then stops for approval. It must not silently execute without an approved plan.
 
+## Quality And Model Routing
+
+Quality mode is stored in `subject.yaml` and interpreted with `study-os/config/output-standards.yaml`.
+
+- `economy` is faster and lighter. Use it for low-stakes review or when you only need compact outputs.
+- `standard` is the default. It balances coverage, source traceability, visual screening, and validation cost.
+- `rigorous` is slower and deeper. Use it for technical, formula-heavy, or exam-critical courses.
+
+Model routing is configured in `study-os/config/model-routing.yaml`.
+
+- `fast` is for metadata, inventory, classification, and formatting.
+- `balanced` is for normal digests, learning cores, explanations, and most flashcards.
+- `deep` is for formulas, difficult concepts, exam questions, essential visual analysis, and merge work.
+- `audit` is for validation, citation checks, formula checks, coverage review, and unsupported-claim detection.
+
+Use the deeper tier only for the affected section when repairing validation issues. Do not regenerate unrelated outputs just to fix one finding.
+
 ## Common Missing-Step Warnings
 
 - Missing `subject.yaml` or `study-os/`: install StudyOS first.
@@ -80,6 +100,8 @@ Review `analysis/inventory/import_plan.md` before import execute. Do not continu
 - Missing digest, learning core, or outputs: run `studyos-batch`.
 - Missing validation reports: run `studyos-validate`.
 - Missing merged outputs: run `studyos-merge`.
+
+When a preflight warning appears, stop the current skill and do exactly the recommended prerequisite. Do not bypass warnings by manually creating placeholder files. If the warning mentions blocking validation, repair the affected output, rerun `studyos-validate`, and continue only after the blocking issue is cleared or explicitly recorded as unresolved by the user.
 
 ## Output Locations
 

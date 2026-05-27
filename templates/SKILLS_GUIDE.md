@@ -46,7 +46,7 @@ Use after `studyos-import`. This skill refines the first-pass `analysis/inventor
 - Batches should represent concepts, lectures, modules, or tutorial themes.
 - Slides and lecture-topic files usually define primary batches.
 - Exercises, readings, transcripts, notes, and exams should support conceptual batches where possible.
-- Ordinary exercises should not become standalone master-note batches unless they are explicitly tutorial or conceptual.
+- Ordinary exercises should not become standalone note batches unless they are explicitly tutorial or conceptual.
 - Each refined batch should include title, status, difficulty, exam relevance, dependencies, primary sources, supporting sources, expected outputs, and notes.
 - Ambiguous files remain in a needs-review section instead of being hidden.
 - The skill writes `analysis/inventory/batch_plan_repair_log.md` and may write `analysis/inventory/processing_queue.md` when useful.
@@ -155,4 +155,16 @@ If merged outputs are missing, export only unmerged outputs and warn. If unmerge
 
 ## Preflight Behavior
 
-If a skill is called too early, it must stop and report what is missing, why it cannot continue, and which skill to run first.
+If a skill is called too early, it must stop and report what is missing, why it cannot continue, and which skill to run first. Do not continue by inventing placeholder inventory, plans, validation reports, or outputs.
+
+Common responses:
+
+- Missing StudyOS files: install or sync from the external core repo first.
+- Missing approved setup: approve the proposed `subject.yaml` setup before import.
+- Missing import approval: review `analysis/inventory/import_plan.md`, approve or modify it, then run import execute.
+- Empty `inputs/`: complete approved copy-only import first.
+- Missing or file-level batch plan: run `studyos-plan`.
+- Missing validation: run `studyos-validate` before merge.
+- Blocking validation findings: repair the affected sections, preserve valid content, rerun validation, and continue only when blocking issues are cleared or explicitly carried as unresolved.
+
+Warnings are meant to protect raw files and output quality. Treat them as the next task, not as optional noise.

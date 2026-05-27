@@ -2,7 +2,7 @@
 
 quality_modes:
   economy:
-    master_notes:
+    notes:
       words_per_batch: "800-1200"
     flashcards:
       count_per_batch: "15-25"
@@ -12,7 +12,7 @@ quality_modes:
       depth: "only essential formulas"
 
   standard:
-    master_notes:
+    notes:
       words_per_batch: "1200-2200"
     flashcards:
       count_per_batch: "25-45"
@@ -22,7 +22,7 @@ quality_modes:
       depth: "all important formulas"
 
   rigorous:
-    master_notes:
+    notes:
       words_per_batch: "as long as needed for completeness"
     flashcards:
       count_per_batch: "40-70 per batch if exam-heavy"
@@ -303,6 +303,9 @@ outputs:
     condition: "required when validation leaves unanswered source, formula, or visual questions"
 
 rules:
+  raw_source_files_are_protected: true
+  import_is_copy_only: true
+  imported_inputs_are_read_only_after_import: true
   require_source_references: true
   final_outputs_must_use_learning_cores: true
   unresolved_questions_must_be_flagged: true

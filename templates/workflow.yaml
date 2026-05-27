@@ -3,6 +3,16 @@
 workflow:
   setup:
     purpose: "Install StudyOS from the external core repo, propose setup, write subject.yaml after approval, and stop."
+    sequence:
+      - "user_opens_existing_course_folder"
+      - "install_from_external_core_repo"
+      - "initialize_or_confirm_local_state"
+      - "sync_scripts_skills_and_config"
+      - "inspect_folder_name_and_visible_raw_files_read_only"
+      - "propose_complete_subject_yaml_setup"
+      - "ask_user_to_approve_or_modify"
+      - "write_subject_yaml_after_approval"
+      - "stop_before_course_work"
     outputs:
       - "subject.yaml"
       - "STUDYOS_GUIDE.md"
@@ -12,6 +22,7 @@ workflow:
     checks:
       - "course_material_is_not_imported_or_processed_during_setup"
       - "only_final_skill_names_are_installed"
+      - "original_raw_files_are_not_modified"
 
   import:
     skill: "studyos-import"
@@ -60,6 +71,7 @@ workflow:
       - "analysis/inventory/batch_plan.md"
     checks:
       - "raw_source_is_read_only"
+      - "import_is_copy_only"
       - "original_files_are_never_moved_deleted_or_modified"
       - "destination_files_are_not_overwritten"
       - "destinations_are_restricted_to_approved_inputs_subfolders"
@@ -88,7 +100,7 @@ workflow:
       - "batches_are_conceptual_lectures_topics_or_modules"
       - "slides_and_lecture_topic_files_usually_define_primary_batches"
       - "exercises_are_supporting_sources_unless_explicitly_conceptual"
-      - "ordinary_exercises_do_not_become_standalone_master_note_batches"
+      - "ordinary_exercises_do_not_become_standalone_note_batches"
       - "readings_notes_transcripts_and_exams_are_supporting_sources_when_matched"
       - "unclear_files_go_to_unassigned_needs_review"
       - "dependencies_are_added_where_inferable"
@@ -113,6 +125,9 @@ workflow:
       - "digest_created_before_learning_core"
       - "learning_core_created_before_outputs"
       - "source_coverage_lists_every_assigned_source"
+      - "visual_screening_is_integrated"
+      - "visual_coverage_is_recorded_for_slide_pdf_image_sources"
+      - "essential_visual_findings_are_analyzed_or_marked_unresolved"
 
   validate:
     skill: "studyos-validate"
@@ -128,6 +143,8 @@ workflow:
       - "analysis/validation/"
     checks:
       - "deterministic_checks_run"
+      - "visual_coverage_is_checked"
+      - "repair_is_targeted_to_affected_sections"
       - "blocking_issues_stop_processing"
 
   course:
@@ -183,6 +200,7 @@ workflow:
       - "course_is_not_processed_as_one_giant_batch"
       - "each_batch_is_validated_before_the_next_batch"
       - "validation_is_not_skipped"
+      - "visual_screening_is_integrated"
       - "blocking_validation_issues_stop_processing"
       - "essential_unresolved_visual_content_stops_processing"
       - "inputs_are_not_modified"
@@ -251,3 +269,20 @@ workflow:
       - "merged_exports_use_full_course_outputs"
       - "internal_analysis_and_review_files_are_not_exported_by_default"
       - "content_and_source_references_are_preserved"
+
+  preflight:
+    purpose: "Stop early when prerequisites are missing and tell the user the exact next safe step."
+    rules:
+      - "do_not_create_placeholder_inputs_inventory_plans_validation_reports_or_outputs"
+      - "do_not_bypass_missing_user_approval"
+      - "do_not_continue_past_blocking_validation_findings"
+      - "repair_blocking_findings_then_rerun_studyos_validate"
+    warnings:
+      missing_setup: "Install StudyOS and approve the setup before import."
+      missing_import_plan: "Run studyos-import proposal mode and review analysis/inventory/import_plan.md."
+      missing_import_approval: "Approve or modify the import plan before copy execution."
+      empty_inputs: "Complete approved copy-only import before inventory, planning, or processing."
+      missing_batch_plan: "Run studyos-import inventory mode, then studyos-plan."
+      unrefined_batch_plan: "Run studyos-plan before studyos-batch or studyos-course."
+      missing_validation: "Run studyos-validate before studyos-merge."
+      blocking_validation: "Repair affected sections, rerun studyos-validate, and continue only when blocking issues are cleared or explicitly carried as unresolved."
