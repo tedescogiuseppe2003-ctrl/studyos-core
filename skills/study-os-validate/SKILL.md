@@ -32,6 +32,7 @@ For this skill:
 - Use `audit` plus `deep` for formula issues, visual issues, source-grounding issues, hallucination detection, inconsistent derivations, or exam-critical validation failures.
 - Use `balanced` for ordinary clarity, formatting, active-recall quality, and output-completeness review when source grounding is straightforward.
 - Do not use `deep` for mechanical report formatting or script output summarization.
+- Check output length and rigor against the configured quality mode in `output-standards.yaml`.
 
 ## Preflight
 
@@ -137,13 +138,29 @@ After deterministic checks, perform a human-quality review against the relevant 
 Review these areas:
 
 - source grounding: every substantive claim is supported by a source, digest, or learning core;
+- source-type handling: slides, notes, exercises, readings, exams, transcripts, and miscellaneous files were used according to their roles;
 - formula quality: formulas are correct for the stated assumptions and include variables, assumptions, interpretation, use cases, mistakes, and source;
 - conceptual clarity: explanations are precise, not circular, and distinguish similar concepts;
 - active recall quality: flashcards force retrieval rather than passive recognition;
 - exam usefulness: exam questions reflect definitions, explanations, calculations, exercises, and likely exam tasks;
+- output budgets: master notes, flashcard counts, exam-question counts, and formula-sheet depth match the selected quality mode or document a justified exception;
 - missing weak points: uncertainty, conventions, unsupported gaps, and common mistakes are recorded.
 
 The LLM review must use all relevant batch sources, including slides, notes, exercises, readings, and transcripts assigned to the batch.
+
+## Repair Before Regenerate
+
+Validation should recommend targeted repair before regeneration.
+
+When validation finds issues and correction is in scope:
+
+- patch only affected sections or files;
+- preserve valid content and valid source references;
+- do not regenerate unrelated outputs;
+- rerun validation after repair or record the exact targeted re-check;
+- mark remaining uncertainty clearly in the report and affected artifact.
+
+Recommend full regeneration only when targeted repair cannot make the affected artifact trustworthy, such as missing source coverage across the artifact, unsupported conceptual structure, or pervasive formula inconsistency.
 
 ## Report Format
 

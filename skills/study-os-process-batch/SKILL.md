@@ -38,6 +38,12 @@ For this skill:
 - Use `balanced` for normal exam questions and `deep` for difficult, formula-heavy, or high-stakes exam questions.
 - Use `script` for deterministic validation scripts or status updates run during the workflow.
 
+Apply the configured quality mode from `output-standards.yaml` when deciding output size:
+
+- `economy`: prefer compact outputs and essential formulas only.
+- `standard`: use the normal balanced output budgets.
+- `rigorous`: expand only where completeness, exam risk, formulas, or dense source material require it.
+
 ## Preflight
 
 Before processing a batch, confirm:
@@ -119,17 +125,17 @@ For every assigned source:
 - carry its important facts, examples, definitions, formulas, practice prompts, and warnings into the learning core when they support the batch concept,
 - cite it in downstream outputs when its content is used.
 
-Special handling:
+Source-type handling:
 
+- Slides are the primary theory source when assigned as core lecture material. Extract definitions, formulas, diagrams, charts, tables, professor emphasis, and visually essential content that may be tested or needed to understand the concept.
+- Notes provide professor emphasis, personal doubts, traps, clarifications, caveats, and likely exam warnings. Integrate these into weak points and the learning core.
+- Exercises must not be summarized as theory by default. Convert them into practice questions, extract repeated problem types, update weak points, and connect them to relevant formulas and concepts.
+- Readings provide relevant theory, definitions, assumptions, limitations, and deeper explanations. Do not over-summarize readings unless the material is exam-relevant; connect useful reading material to the batch concepts.
+- Exams provide exam patterns, likely question types, answer expectations, recurring assessment angles, and final-review signals. Connect these to exam questions and final-review notes.
+- Transcripts provide explanations, examples, emphasis, professor-style phrasing, and spoken clarifications.
+- Miscellaneous sources must be classified by role before use. If the role is uncertain, flag the uncertainty in the batch digest.
 - Primary sources define the conceptual core of the batch.
 - Supporting sources must still be used, but they must support the batch concept rather than become unrelated standalone outputs.
-- Slides often provide definitions, sequence, notation, and lecture structure.
-- Exercises contribute exam questions, practice tasks, weak points, recurring mistakes, and fragile skills.
-- Readings contribute theory, formal definitions, assumptions, limitations, and deeper explanations.
-- Notes contribute professor emphasis, doubts, traps, caveats, and likely exam warnings.
-- Transcripts contribute explanations, examples, emphasis, and spoken clarifications.
-- Exams contribute likely exam patterns, task formats, and recurring assessment angles.
-- Miscellaneous assigned sources must be checked and either mapped to the learning core or explained as unused.
 
 ## Batch Type Rules
 
@@ -166,6 +172,7 @@ Create one batch digest in `working/digests/`.
 The digest must include:
 
 - batch name and scope,
+- batch processing plan,
 - complete source list,
 - source coverage,
 - key topics,
@@ -178,6 +185,25 @@ The digest must include:
 - source references.
 
 The digest must include this required section:
+
+```markdown
+## Batch Processing Plan
+
+- Sources:
+- Primary sources:
+- Supporting sources:
+- Priority:
+- Complexity:
+- Formula risk:
+- Visual risk:
+- Outputs needed:
+- Recommended model tier:
+- Potential issues:
+```
+
+Use the plan to set depth, source priorities, visual screening effort, formula handling, and output budgets before generating outputs.
+
+The digest must also include this required section:
 
 ```markdown
 ## Source Coverage
@@ -240,6 +266,24 @@ Formula sheet entries must include:
 - `Common mistake:`
 - `Source:`
 
+Respect the configured output length budget:
+
+- `economy`: master notes 800-1200 words per batch, 15-25 flashcards per batch, 5-10 exam questions per batch, and only essential formulas.
+- `standard`: master notes 1200-2200 words per batch, 25-45 flashcards per batch, 8-18 exam questions per batch, and all important formulas.
+- `rigorous`: master notes as long as needed for completeness, 40-70 flashcards per batch when exam-heavy, 15-30 exam questions per batch, and formulas with assumptions, derivations, and common mistakes.
+
+If a source set cannot fit the selected budget without losing exam-critical material, preserve correctness and flag the reason for exceeding the budget.
+
+## Repair Before Regenerate
+
+When validation finds issues in a processed batch:
+
+- patch only the affected digest, learning-core, output, weak-point, unresolved-question, or validation sections;
+- preserve valid content and source references;
+- do not regenerate unrelated outputs;
+- rerun validation after the repair or record the exact targeted re-check performed;
+- mark remaining uncertainty clearly instead of smoothing it over.
+
 ## Lazy Visual Analysis
 
 Use visual analysis only when a chart, table, diagram, equation image, or slide visual contains testable information that is not captured in text. If visual analysis is skipped, note why only when the decision affects the batch.
@@ -251,7 +295,7 @@ Use visual analysis only when a chart, table, diagram, equation image, or slide 
 3. Classify the batch as conceptual, tutorial/conceptual exercise-only, or ordinary exercise-only.
 4. Identify primary sources and supporting sources.
 5. Read and check all assigned sources.
-6. Create or update the source digest, including the required `Source Coverage` table.
+6. Create or update the source digest, including the required `Batch Processing Plan` and `Source Coverage` table.
 7. Create or update the learning core from the digest.
 8. Create requested outputs from the learning core, applying the exercise-only restrictions above.
 9. Update `review/weak-points.md` and `review/unresolved-questions.md`.

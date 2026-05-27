@@ -8,6 +8,16 @@ Installation/setup ends after the agent runs the external core installer, runs s
 
 Installation/setup must not import files, run inventory, create an import plan, create a batch plan, summarize material, validate outputs, or process course material. After setup, the user manually calls the skills below step by step.
 
+## Quality Modes
+
+Quality mode controls how much detail each processing skill should produce.
+
+- `economy`: compact and faster. Master notes target 800-1200 words per batch, flashcards 15-25, exam questions 5-10, and formula sheets include only essential formulas.
+- `standard`: balanced default. Master notes target 1200-2200 words per batch, flashcards 25-45, exam questions 8-18, and formula sheets include all important formulas.
+- `rigorous`: completeness-oriented. Master notes can be as long as needed, flashcards can reach 40-70 per exam-heavy batch, exam questions 15-30, and formula sheets include formulas, assumptions, derivations, and common mistakes.
+
+Higher visual, formula, or validation depth increases source screening and checking rigor, especially for exam-critical diagrams, tables, charts, formulas, assumptions, and weak points.
+
 ## study-os-import-sources
 
 Use this first when the course material is still in an original raw folder.
@@ -54,6 +64,16 @@ Use this to process one planned batch from `working/inventory/batch_plan.md`.
 - Updates weak points and unresolved questions under `review/`.
 - Is best for testing quality one topic at a time before running the rest of the course.
 
+Source-type rules:
+
+- Slides are the primary theory source when assigned as core lecture material.
+- Notes feed professor emphasis, doubts, traps, clarifications, and weak points.
+- Exercises become practice questions, repeated problem types, weak points, and concept/formula links instead of theory summaries by default.
+- Readings add relevant theory, definitions, assumptions, limitations, and deeper explanations without unnecessary over-summary.
+- Exams add patterns, likely question types, answer expectations, and final-review signals.
+- Transcripts add explanations, examples, emphasis, and professor-style phrasing.
+- Miscellaneous sources are classified before use, with uncertainty flagged in the digest.
+
 Run `study-os-validate` after processing a batch.
 
 ## study-os-validate
@@ -70,6 +90,8 @@ Use this after a batch has digest, learning core, and outputs.
 
 Validation does not rewrite outputs unless the user explicitly asks for fixes.
 
+When fixes are in scope, validation should lead to targeted repair before regeneration: patch only affected sections, preserve valid content, avoid regenerating unrelated outputs, rerun validation after repair, and mark remaining uncertainty clearly.
+
 ## study-os-process-course
 
 Use this after one batch has been processed and validated successfully.
@@ -83,6 +105,8 @@ Use this after one batch has been processed and validated successfully.
 - Updates `review/progress-tracker.md` and `study-os/state/run-log.md`.
 
 This skill does not synthesize final course-level outputs.
+
+During course processing, validation issues are repaired batch by batch. A minor issue should trigger a focused patch and recheck for the current batch, not regeneration of unrelated outputs or other batches.
 
 ## study-os-synthesize
 

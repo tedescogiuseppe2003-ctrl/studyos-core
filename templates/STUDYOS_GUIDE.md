@@ -16,6 +16,16 @@ The setup questions cover subject name, course level, material language, exam ty
 
 The user should not manually edit `subject.yaml` unless desired. Installation/setup does not import files, run inventory, or process course material.
 
+## Quality Modes And Output Budgets
+
+Quality mode controls analysis depth, output size, and rigor.
+
+- `economy` is faster and compact: master notes are about 800-1200 words per batch, flashcards 15-25, exam questions 5-10, and formula sheets include only essential formulas.
+- `standard` is the default balance: master notes are about 1200-2200 words per batch, flashcards 25-45, exam questions 8-18, and formula sheets include all important formulas.
+- `rigorous` prioritizes completeness for exam-heavy or technical material: master notes are as long as needed, flashcards can reach 40-70 per exam-heavy batch, exam questions 15-30, and formula sheets include formulas, assumptions, derivations, and common mistakes.
+
+Visual handling depth, formula handling depth, and validation depth further adjust rigor. Higher depth means more careful source screening and validation, especially for diagrams, charts, tables, formulas, assumptions, and exam-critical details.
+
 ## Folder Structure
 
 - `subject.yaml` stores the course setup: subject name, level, language, exam type, raw source path, processing settings, requested outputs, validation settings, and model routing.
@@ -48,6 +58,18 @@ Generated files live under `working/`, `outputs/`, `review/`, and `study-os/stat
 - `study-os-validate` validates a processed batch with deterministic checks and, when configured, LLM review. It writes reports under `review/` and `working/validation/`.
 - `study-os-process-course` processes remaining planned batches sequentially only when the user explicitly asks for that skill. It validates each batch before moving to the next and stops on severe issues.
 - `study-os-synthesize` creates final course-level outputs after batches have been processed and validated.
+
+## Source-Type Processing
+
+`study-os-process-batch` uses source roles to avoid wasting time and to keep outputs consistent.
+
+- Slides are usually the primary theory source and are screened for definitions, formulas, diagrams, charts, tables, professor emphasis, and visually essential content.
+- Notes contribute professor emphasis, doubts, traps, clarifications, caveats, and weak points.
+- Exercises are converted into practice questions, repeated problem types, weak points, and links to formulas or concepts instead of being summarized as theory by default.
+- Readings contribute relevant theory, definitions, assumptions, limitations, and deeper explanations without over-summarizing unless exam-relevant.
+- Exams contribute exam patterns, likely question types, answer expectations, and final-review signals.
+- Transcripts contribute explanations, examples, emphasis, professor-style phrasing, and spoken clarifications.
+- Miscellaneous sources are classified by role before use; uncertain roles are flagged in the batch digest.
 
 ## Recommended Workflow
 
@@ -105,3 +127,7 @@ Safe reruns:
 - Rerun one batch when its sources or outputs are stale.
 - Rerun validation after repairing a batch.
 - Rerun synthesis after all included batches are processed and validated.
+
+## Repair Before Regenerate
+
+When validation finds issues, repair only the affected sections or files. Preserve valid content, do not regenerate unrelated outputs, rerun validation after repair, and leave remaining uncertainty clearly marked.

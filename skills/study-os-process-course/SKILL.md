@@ -36,6 +36,7 @@ For this skill:
 - Do not use a `deep` model for every batch automatically. Escalate only for batches or artifacts with formula-heavy, visual-essential, technically difficult, or exam-critical triggers.
 - Use `audit` for validation decisions and source-grounding review before moving to the next batch.
 - Use `script` for deterministic checks, validation scripts, state updates, and run-log mechanics.
+- Apply the configured quality mode from `output-standards.yaml` consistently across batches so output length and rigor remain predictable.
 
 ## Preflight
 
@@ -173,6 +174,18 @@ For each selected batch, complete this loop before considering the next batch:
 
 Do not begin processing the next batch until the current batch has been processed, validated, and either accepted or repaired.
 
+## Repair Before Regenerate
+
+When validation finds issues during course processing:
+
+- patch only the affected sections or files for the current batch;
+- preserve valid digest, learning-core, output, source-reference, weak-point, and unresolved-question content;
+- do not regenerate unrelated outputs or other batches;
+- rerun validation for the repaired batch before continuing;
+- mark remaining uncertainty clearly in the affected artifact and validation report.
+
+Use full regeneration only when the artifact is structurally unusable, source coverage is fundamentally wrong, or targeted repair would be less reliable than rebuilding the affected artifact. Do not rebuild the rest of the course to fix one batch.
+
 ## Processing Requirements
 
 For each batch:
@@ -204,6 +217,7 @@ Create or update only the configured or expected outputs for the batch.
 Output requirements:
 
 - Master notes must be based on the learning core and cite source references.
+- Master notes, flashcards, exam questions, and formula sheets must respect the selected quality-mode budgets from `output-standards.yaml` unless exam-critical completeness requires a documented exception.
 - Formula sheets must include required fields:
   - `Formula:`
   - `Variables:`
