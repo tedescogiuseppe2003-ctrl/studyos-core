@@ -74,23 +74,22 @@ outputs:
       - "Warnings"
 
   digest:
-    file: "analysis/batches/digest.md"
+    file: "analysis/batches/<batch>_digest.md"
     required_sections:
-      - "Scope"
-      - "Source List"
       - "Batch Processing Plan"
       - "Source Coverage"
-      - "Key Topics"
-      - "Important Details"
+      - "Visual Coverage"
+      - "Core extracted content"
       - "Definitions"
       - "Formulas"
+      - "Important tables/charts/diagrams"
       - "Examples"
-      - "Weak Points"
-      - "Unresolved Questions"
-      - "Source References"
+      - "Weak points"
+      - "Unresolved questions"
+      - "Source references"
 
   learning_core:
-    file: "analysis/batches/learning-core.md"
+    file: "analysis/batches/<batch>_learning_core.md"
     required_sections:
       - "Learning Objectives"
       - "Core Concepts"
@@ -103,8 +102,29 @@ outputs:
       - "Unresolved Questions"
       - "Source References"
 
+  visual_notes:
+    file: "analysis/visual/<batch>_visual_notes.md"
+    condition: "required only when visual findings exist"
+    required_sections:
+      - "Visual Scope"
+      - "Essential Visuals"
+      - "Findings"
+      - "Unresolved Visual Issues"
+      - "Source References"
+
+  batch_notes:
+    file: "outputs/notes/<batch>.md"
+    required_sections:
+      - "Scope"
+      - "Core Notes"
+      - "Definitions"
+      - "Examples"
+      - "Weak Points"
+      - "Source References"
+
   formula_sheet:
-    file: "outputs/formulas/formula-sheet.md"
+    file: "outputs/formulas/<batch>_formulas.md"
+    condition: "required only when formulas exist"
     required_sections:
       - "Notation"
       - "Formula Index"
@@ -115,7 +135,7 @@ outputs:
       - "Source References"
 
   flashcards:
-    file: "outputs/flashcards/flashcards.md"
+    file: "outputs/flashcards/<batch>_flashcards.md"
     required_sections:
       - "Deck Scope"
       - "Concept Cards"
@@ -126,7 +146,7 @@ outputs:
       - "Source References"
 
   exam_questions:
-    file: "outputs/questions/exam-questions.md"
+    file: "outputs/questions/<batch>_questions.md"
     required_sections:
       - "Exam Scope"
       - "Question Set"
@@ -141,3 +161,5 @@ rules:
   final_outputs_must_use_learning_cores: true
   unresolved_questions_must_be_flagged: true
   weak_points_must_be_carried_forward: true
+  visual_screening_integrated_in_batch: true
+  separate_visual_skill_required: false

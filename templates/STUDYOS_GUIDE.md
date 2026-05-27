@@ -45,7 +45,7 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 - `python3 study-os/scripts/studyos.py doctor` checks local readiness without modifying files.
 - `studyos-import` proposes safe import, stops for approval, executes approved copy actions, then creates inventory and the first-pass batch plan from metadata.
 - `studyos-plan` refines that first-pass plan into conceptual lectures, topics, modules, or tutorials before processing.
-- `studyos-batch` processes one planned batch into digest, learning core, and configured outputs.
+- `studyos-batch` processes one selected conceptual batch into digest, learning core, configured outputs, review updates, and integrated visual screening.
 - `studyos-validate` validates batch, course, repaired, or merged outputs.
 - `studyos-course` processes remaining batches sequentially and creates course-level outputs.
 - `studyos-merge` creates consolidated full-course outputs and the final review pack.
@@ -59,7 +59,7 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 4. Run `studyos-import` execute mode to copy approved files into `inputs/`.
 5. Run `studyos-import` inventory mode to create `analysis/inventory/course_inventory.md` and the first-pass `analysis/inventory/batch_plan.md`.
 6. Run `studyos-plan` to refine conceptual batches, source assignments, dependencies, and any `Unassigned / needs review` entries.
-7. Run `studyos-batch` for one batch.
+7. Run `studyos-batch` for one selected conceptual batch.
 8. Run `studyos-validate`.
 9. Run `studyos-course` if you want remaining batches processed sequentially.
 10. Run `studyos-merge` when course outputs are processed and validated.
@@ -83,6 +83,9 @@ Review `analysis/inventory/import_plan.md` before import execute. Do not continu
 
 ## Output Locations
 
+- Batch digests: `analysis/batches/<batch>_digest.md`
+- Batch learning cores: `analysis/batches/<batch>_learning_core.md`
+- Batch visual notes: `analysis/visual/<batch>_visual_notes.md` when visual findings exist
 - Notes: `outputs/notes/`
 - Formula sheets: `outputs/formulas/`
 - Flashcards: `outputs/flashcards/`
@@ -92,6 +95,21 @@ Review `analysis/inventory/import_plan.md` before import execute. Do not continu
 - Final review packs: `outputs/final-pack/`
 - Unmerged PDF exports: `exports/pdf/unmerged/`
 - Merged PDF exports: `exports/pdf/merged/`
+
+Batch output files use these names:
+
+- Notes: `outputs/notes/<batch>.md`
+- Formula sheets: `outputs/formulas/<batch>_formulas.md` when formulas exist
+- Flashcards: `outputs/flashcards/<batch>_flashcards.md`
+- Exam questions: `outputs/questions/<batch>_questions.md`
+
+`studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
+
+## Integrated Visual Screening
+
+Visual screening is part of `studyos-batch`, `studyos-course`, and `studyos-validate`. There is no separate visual skill.
+
+Every batch with slides, PDFs, or images must include Visual Coverage in the digest. If no essential visuals exist, the digest says so explicitly. Essential visuals include formulas, definitions, charts, tables, rankings, benchmark values, model diagrams, process diagrams, and summary visual slides.
 
 ## Repair Before Regenerate
 

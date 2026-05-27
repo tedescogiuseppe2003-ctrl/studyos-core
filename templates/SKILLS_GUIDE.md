@@ -54,13 +54,27 @@ Use after `studyos-import`. This skill refines the first-pass `analysis/inventor
 
 ## studyos-batch
 
-Use to process one selected planned batch.
+Use to process one selected conceptual batch.
 
+- Requires `analysis/inventory/batch_plan.md`, `analysis/inventory/course_inventory.md`, a selected batch, and files under `inputs/`.
 - Reads assigned sources under `inputs/`.
-- Writes batch digests and learning cores under `analysis/batches/`.
-- Writes configured batch outputs under `outputs/`.
-- Adds visual notes under `analysis/visual/` when relevant.
-- Updates weak points and unresolved questions under `review/`.
+- Reads existing review files when present.
+- Builds Source Coverage before generating outputs.
+- Screens visuals internally and analyzes essential visuals when needed.
+- Writes `analysis/batches/<batch>_digest.md`.
+- Writes `analysis/batches/<batch>_learning_core.md`.
+- Writes `analysis/visual/<batch>_visual_notes.md` when visual findings exist.
+- Writes `outputs/notes/<batch>.md`.
+- Writes `outputs/formulas/<batch>_formulas.md` when formulas exist.
+- Writes `outputs/flashcards/<batch>_flashcards.md`.
+- Writes `outputs/questions/<batch>_questions.md`.
+- Updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
+
+Every digest includes Batch Processing Plan, Source Coverage, Visual Coverage, Core extracted content, Definitions, Formulas, Important tables/charts/diagrams, Examples, Weak points, Unresolved questions, and Source references.
+
+If the batch has slides, PDFs, or images, Visual Coverage is required. If no essential visuals exist, the digest says so explicitly. Essential visuals include formulas in images, definitions in images, charts, tables, rankings, benchmark values, model diagrams, process diagrams, and summary visual slides.
+
+Use model routing from `subject.yaml` and `study-os/config/model-routing.yaml` when available: balanced for normal batches, deep for formula-heavy batches, deep only for affected essential visuals, fast or balanced for flashcards, and balanced or deep for exam questions depending on difficulty. Repair affected sections before regenerating entire outputs.
 
 Run `studyos-validate` after each processed batch.
 
@@ -82,6 +96,7 @@ Use after at least one representative batch has been processed and validated.
 - Uses `studyos-batch` semantics for each batch.
 - Uses `studyos-validate` semantics before moving to the next batch.
 - Creates course-level outputs while preserving batch boundaries.
+- Includes integrated visual screening; no separate visual skill is needed.
 
 This skill does not create merged final outputs.
 
