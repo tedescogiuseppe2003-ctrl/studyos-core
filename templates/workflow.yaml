@@ -132,18 +132,61 @@ workflow:
 
   course:
     skill: "studyos-course"
-    purpose: "Process remaining planned batches sequentially and create course-level outputs."
+    purpose: "Process remaining planned or unprocessed batches sequentially and validate each batch before continuing."
     inputs:
+      - "subject.yaml"
       - "analysis/inventory/batch_plan.md"
-      - "inputs/"
-      - "review/validation-report.md"
-    outputs:
+      - "analysis/inventory/processing_queue.md optional"
       - "analysis/batches/"
       - "outputs/"
+      - "review/"
+      - "inputs/"
+    outputs:
+      - "analysis/batches/"
+      - "analysis/visual/"
+      - "analysis/validation/"
+      - "outputs/notes/"
+      - "outputs/formulas/"
+      - "outputs/flashcards/"
+      - "outputs/questions/"
+      - "review/"
       - "review/progress-tracker.md"
+      - "study-os/state/ optional"
+    preflight:
+      requires:
+        - "analysis/inventory/batch_plan.md"
+        - "files_under_inputs"
+      optional:
+        - "analysis/inventory/processing_queue.md"
+      warnings:
+        - "Recommended: process and validate one batch manually before full course processing."
+    sequence:
+      - "preflight"
+      - "read_batch_plan"
+      - "read_processing_queue_if_present"
+      - "identify_planned_unprocessed_stale_or_repairable_failed_batches"
+      - "process_each_batch_with_studyos_batch_semantics"
+      - "validate_each_batch_before_continuing"
+      - "repair_minor_local_issues_when_safe"
+      - "revalidate_after_repair"
+      - "stop_on_blocking_issues"
+      - "report_processed_skipped_stopped_batches"
+    parallelism:
+      default: "sequential"
+      allow_only_if_configured: true
+      checks:
+        - "no_aggressive_parallelism_by_default"
+        - "dependent_batches_are_not_parallelized"
+        - "digest_and_learning_core_of_same_batch_are_not_parallelized"
+        - "parallel_branches_require_merged_validation_before_downstream_work"
     checks:
       - "course_is_not_processed_as_one_giant_batch"
       - "each_batch_is_validated_before_the_next_batch"
+      - "validation_is_not_skipped"
+      - "blocking_validation_issues_stop_processing"
+      - "essential_unresolved_visual_content_stops_processing"
+      - "inputs_are_not_modified"
+      - "completion_report_includes_processed_skipped_stopped_validation_unresolved_and_next_skill"
 
   merge:
     skill: "studyos-merge"

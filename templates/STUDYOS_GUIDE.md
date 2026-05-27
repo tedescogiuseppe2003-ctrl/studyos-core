@@ -47,7 +47,7 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 - `studyos-plan` refines that first-pass plan into conceptual lectures, topics, modules, or tutorials before processing.
 - `studyos-batch` processes one selected conceptual batch into digest, learning core, configured outputs, review updates, and integrated visual screening.
 - `studyos-validate` validates batch, course, repaired, or merged outputs.
-- `studyos-course` processes remaining batches sequentially and creates course-level outputs.
+- `studyos-course` processes remaining planned or unprocessed batches sequentially, validates each batch before continuing, and reports processed, skipped, and stopped batches.
 - `studyos-merge` creates consolidated full-course outputs and the final review pack.
 - `studyos-export` exports unmerged and merged PDF deliverables.
 
@@ -61,7 +61,7 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 6. Run `studyos-plan` to refine conceptual batches, source assignments, dependencies, and any `Unassigned / needs review` entries.
 7. Run `studyos-batch` for one selected conceptual batch.
 8. Run `studyos-validate`.
-9. Run `studyos-course` if you want remaining batches processed sequentially.
+9. Run `studyos-course` if you want remaining planned or unprocessed batches processed sequentially with validation after each batch.
 10. Run `studyos-merge` when course outputs are processed and validated.
 11. Run `studyos-export`.
 
@@ -105,6 +105,20 @@ Batch output files use these names:
 - Exam questions: `outputs/questions/<batch>_questions.md`
 
 `studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
+
+## Course Processing
+
+`studyos-course` reads `subject.yaml`, `analysis/inventory/batch_plan.md`, optional `analysis/inventory/processing_queue.md`, `analysis/batches/`, `outputs/`, and `review/`. It requires files under `inputs/` and stops if the batch plan is missing.
+
+If no validated batch exists yet, the agent warns:
+
+> Recommended: process and validate one batch manually before full course processing.
+
+The skill identifies planned, unprocessed, stale, or previously failed batches and processes them one batch at a time using `studyos-batch` semantics. Each batch is validated with `studyos-validate` semantics before the next batch starts. Minor localized issues may be repaired and revalidated. Blocking validation issues, missing assigned sources, ambiguous ordering, or unresolved essential visual content stop processing.
+
+Default processing is sequential. Safe parallel processing is allowed only when configured in `subject.yaml`; dependent batches must not be parallelized, digest and learning-core work for the same batch must not be parallelized, and merged validation is required before downstream work continues.
+
+The completion report lists batches processed, batches skipped, stopped batch if any, validation status, unresolved issues, files written, and the recommended next skill: `studyos-merge`.
 
 ## Integrated Visual Screening
 

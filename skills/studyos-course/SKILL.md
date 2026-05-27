@@ -1,49 +1,78 @@
 ---
 name: studyos-course
-description: Process remaining StudyOS batches sequentially and create course-level outputs without merging the final course pack.
+description: Process remaining planned or unprocessed StudyOS batches sequentially, validating each batch before continuing.
 ---
 
 # Purpose
 
-Continue batch processing across the course and create course-level outputs while preserving batch boundaries.
+Process remaining planned or unprocessed batches across the course while preserving batch boundaries.
+
+This skill is a controlled sequential runner for batch work. It must not process the whole course as one giant batch, must not skip validation, and must stop when blocking validation or essential unresolved visual content prevents safe continuation.
 
 # When to use
 
-Use after at least one batch has been processed and validated successfully, when the user wants to process remaining planned batches.
+Use when the user wants remaining planned, unprocessed, stale, or previously failed batches handled in order after import and planning are complete.
 
 # Preflight checks
 
-- `analysis/inventory/batch_plan.md` exists and has planned or stale batches.
-- At least one representative batch has passed validation, unless the user explicitly accepts the risk.
-- Assigned source files exist under `inputs/`.
-- Stop on unresolved blocking validation issues.
+- `analysis/inventory/batch_plan.md` exists.
+- At least one file exists under `inputs/`.
+- `analysis/inventory/processing_queue.md` may be used when present to determine execution order.
+- Assigned source files for each candidate batch exist under `inputs/`.
+- Existing validation reports and review files do not contain unresolved blocking issues for prerequisite material.
+- Warn if no validated batch exists yet:
+  `Recommended: process and validate one batch manually before full course processing.`
+
+Stop before processing when `batch_plan.md` is missing, `inputs/` is empty, assigned source files are missing for the next batch, the batch plan is ambiguous enough to make ordering unsafe, or a blocking validation issue is already present.
 
 # Reads
 
 - `subject.yaml`
-- `analysis/inventory/course_inventory.md`
 - `analysis/inventory/batch_plan.md`
-- existing batch digests and learning cores
-- validation reports and review files
-- assigned sources under `inputs/`
+- `analysis/inventory/processing_queue.md`, if present
+- `analysis/batches/`
+- `outputs/`
+- `review/`
+- assigned source files under `inputs/`
 
 # Writes
 
-- additional batch digests and learning cores under `analysis/batches/`
-- configured unmerged outputs under `outputs/`
-- course-level outputs under `outputs/`
+- batch digests and learning cores under `analysis/batches/`
 - visual notes under `analysis/visual/`
-- validation handoff notes under `analysis/validation/`
+- validation details under `analysis/validation/`
+- notes under `outputs/notes/`
+- formula sheets under `outputs/formulas/`
+- flashcards under `outputs/flashcards/`
+- exam questions under `outputs/questions/`
+- review updates under `review/`
 - `review/progress-tracker.md`
+- optional processing state under `study-os/state/`
 
 # Workflow
 
-1. Identify remaining planned, stale, or failed batches.
-2. Process batches sequentially using `studyos-batch` semantics.
-3. Validate each batch with `studyos-validate` semantics before moving to the next.
-4. Repair minor issues locally when appropriate and revalidate.
-5. Stop on severe issues.
-6. Create requested course-level outputs from validated batch material without merging the final full-course pack.
+1. Run preflight checks.
+2. Read `analysis/inventory/batch_plan.md`.
+3. Read `analysis/inventory/processing_queue.md` when present.
+4. Identify planned, unprocessed, stale, or previously failed batches.
+5. For each batch, in dependency-safe order:
+   - run the `studyos-batch` workflow conceptually for that batch;
+   - create or update digest, learning core, visual notes, and configured outputs;
+   - validate the batch with `studyos-validate` semantics;
+   - repair minor localized issues when appropriate;
+   - revalidate repaired files before continuing;
+   - stop on blocking issues.
+6. Update review files and progress state after each validated batch.
+7. Report processed, skipped, and stopped batches.
+
+Do not create merged final outputs. Full-course consolidation belongs to `studyos-merge`.
+
+# Batch selection
+
+- Planned batches are batches listed in `batch_plan.md` with a processable status.
+- Unprocessed batches are planned batches with missing digest, learning core, outputs, or validation records.
+- Stale batches are batches whose assigned sources, digest, learning core, or outputs appear newer or inconsistent with existing validation.
+- Failed batches are batches with prior validation issues that are not blocking and can be repaired locally.
+- Skip batches that are already processed and validated, unless their sources or outputs are stale.
 
 # Model routing and efficiency
 
@@ -51,20 +80,41 @@ Use after at least one batch has been processed and validated successfully, when
 - Use deeper reasoning for technical, formula-heavy, or visually dense batches.
 - Avoid processing the whole course as one giant context.
 
+# Parallelism
+
+- Default to sequential processing.
+- Use parallelism only when `subject.yaml` explicitly enables safe parallel batches.
+- Do not use aggressive parallelism by default.
+- Do not parallelize dependent batches.
+- Do not parallelize digest creation and learning-core generation for the same batch.
+- Validate and merge validation findings from all parallel branches before any downstream batch continues.
+
 # Quality rules
 
 - Preserve batch boundaries.
 - Do not skip validation between batches.
-- Course-level outputs must be grounded in validated batch material.
+- Do not continue if essential visual content is unresolved and blocking.
+- Outputs must be grounded in validated batch material.
+- Do not modify protected raw files or files under `inputs/`.
 - Do not create merged final outputs; that belongs to `studyos-merge`.
 
 # Stop conditions
 
 - Batch plan is missing or ambiguous.
+- `inputs/` is empty.
 - Assigned source files are missing.
 - A batch fails validation with blocking issues.
+- Essential visual content is unresolved and blocking.
 - The work would require modifying protected raw files or `inputs/`.
 
 # Completion report
 
-Report batches processed, batches skipped, validation status, files written, remaining issues, and the next recommended skill: `studyos-merge`.
+Report:
+
+- batches processed
+- batches skipped
+- stopped batch, if any
+- validation status
+- unresolved issues
+- files written
+- recommended next skill: `studyos-merge`
