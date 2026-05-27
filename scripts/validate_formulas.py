@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-FORMULA_DIR = Path("outputs/formula-sheets")
+FORMULA_DIR = Path("outputs/formulas")
 REPORT_PATH = Path("review/formula_validation_report.md")
 TEXT_SUFFIXES = {".md", ".text", ".txt"}
 REQUIRED_FIELDS = (

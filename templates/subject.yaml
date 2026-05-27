@@ -35,7 +35,7 @@ analysis_depth:
   visual_handling: "standard" # minimal | standard | rigorous
   formula_handling: "normal" # normal | rigorous
   validation_depth: "standard" # structural_only | standard | rigorous_audit
-  synthesis_depth: "standard" # concise | standard | rigorous
+  merge_depth: "standard" # concise | standard | rigorous
 
 outputs:
   master_notes: true
@@ -81,4 +81,4 @@ model_routing:
   visual_analysis: "deep"
   output_generation: "balanced"
   validation: "audit"
-  synthesis: "deep"
+  merge: "deep"

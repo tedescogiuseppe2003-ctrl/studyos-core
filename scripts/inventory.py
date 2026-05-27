@@ -16,7 +16,7 @@ from init_db import init_db
 
 
 DB_PATH = Path("study-os/state/studyos.sqlite")
-INVENTORY_DIR = Path("working/inventory")
+INVENTORY_DIR = Path("analysis/inventory")
 COURSE_INVENTORY_PATH = INVENTORY_DIR / "course_inventory.md"
 BATCH_PLAN_PATH = INVENTORY_DIR / "batch_plan.md"
 

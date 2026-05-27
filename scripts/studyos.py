@@ -19,21 +19,22 @@ REQUIRED_FOLDERS = (
     "inputs/exams",
     "inputs/transcripts",
     "inputs/miscellaneous",
-    "working",
-    "working/inventory",
-    "working/digests",
-    "working/learning-cores",
-    "working/visual-notes",
-    "working/validation",
+    "analysis",
+    "analysis/inventory",
+    "analysis/batches",
+    "analysis/visual",
+    "analysis/validation",
+    "analysis/state",
     "outputs",
-    "outputs/master-notes",
-    "outputs/formula-sheets",
+    "outputs/notes",
+    "outputs/formulas",
     "outputs/flashcards",
-    "outputs/exam-questions",
+    "outputs/questions",
     "outputs/cheat-sheets",
     "outputs/study-plan",
-    "outputs/final-review-pack",
-    "outputs/assets",
+    "outputs/final-pack",
+    "exports/pdf/unmerged",
+    "exports/pdf/merged",
     "review",
     "study-os/config",
     "study-os/state",
@@ -55,27 +56,27 @@ REQUIRED_SCRIPTS = (
 )
 
 REQUIRED_SKILLS = (
-    "study-os/skills/study-os-install",
-    "study-os/skills/study-os-import-sources",
-    "study-os/skills/study-os-inventory",
-    "study-os/skills/study-os-process-batch",
-    "study-os/skills/study-os-process-course",
-    "study-os/skills/study-os-validate",
-    "study-os/skills/study-os-synthesize",
-    ".agents/skills/study-os-install",
-    ".agents/skills/study-os-import-sources",
-    ".agents/skills/study-os-inventory",
-    ".agents/skills/study-os-process-batch",
-    ".agents/skills/study-os-process-course",
-    ".agents/skills/study-os-validate",
-    ".agents/skills/study-os-synthesize",
-    ".claude/skills/study-os-install",
-    ".claude/skills/study-os-import-sources",
-    ".claude/skills/study-os-inventory",
-    ".claude/skills/study-os-process-batch",
-    ".claude/skills/study-os-process-course",
-    ".claude/skills/study-os-validate",
-    ".claude/skills/study-os-synthesize",
+    "study-os/skills/studyos-import",
+    "study-os/skills/studyos-plan",
+    "study-os/skills/studyos-batch",
+    "study-os/skills/studyos-validate",
+    "study-os/skills/studyos-course",
+    "study-os/skills/studyos-merge",
+    "study-os/skills/studyos-export",
+    ".agents/skills/studyos-import",
+    ".agents/skills/studyos-plan",
+    ".agents/skills/studyos-batch",
+    ".agents/skills/studyos-validate",
+    ".agents/skills/studyos-course",
+    ".agents/skills/studyos-merge",
+    ".agents/skills/studyos-export",
+    ".claude/skills/studyos-import",
+    ".claude/skills/studyos-plan",
+    ".claude/skills/studyos-batch",
+    ".claude/skills/studyos-validate",
+    ".claude/skills/studyos-course",
+    ".claude/skills/studyos-merge",
+    ".claude/skills/studyos-export",
 )
 
 REQUIRED_CONFIG_FILES = (
@@ -271,36 +272,35 @@ def next_recommended_skill(root: Path, config: dict[str, Any]) -> str:
     )
 
     if not studyos_installed(root):
-        return "study-os-install"
+        return "install StudyOS"
     if not (root / "subject.yaml").is_file() or not nested_get(
         config, "setup", "completed"
     ):
-        return "study-os-install"
+        return "complete StudyOS setup"
     if raw_path is not None and not path_is_readable(raw_path):
         return "fix subject.yaml raw_source.path"
     if raw_path is not None and not (
-        root / "working/inventory/import_plan.md"
+        root / "analysis/inventory/import_plan.md"
     ).is_file():
-        return "study-os-import-sources proposal"
-    if (root / "working/inventory/import_plan.md").is_file() and not (
-        root / "working/inventory/import_log.md"
+        return "studyos-import proposal"
+    if (root / "analysis/inventory/import_plan.md").is_file() and not (
+        root / "analysis/inventory/import_log.md"
     ).is_file() and inputs_count == 0:
-        return "study-os-import-sources execute"
+        return "studyos-import execute"
     if inputs_count == 0:
-        return "study-os-import-sources"
-    if not (root / "working/inventory/course_inventory.md").is_file() or not (
-        root / "working/inventory/batch_plan.md"
+        return "studyos-import"
+    if not (root / "analysis/inventory/course_inventory.md").is_file() or not (
+        root / "analysis/inventory/batch_plan.md"
     ).is_file():
-        return "study-os-inventory"
+        return "studyos-import"
     if (
-        count_files(root / "working/digests") == 0
-        or count_files(root / "working/learning-cores") == 0
+        count_files(root / "analysis/batches") == 0
     ):
-        return "study-os-process-batch"
+        return "studyos-plan, then studyos-batch"
     if not (root / "review/validation-report.md").is_file():
-        return "study-os-validate"
-    if not has_files(root / "outputs/final-review-pack"):
-        return "study-os-synthesize"
+        return "studyos-validate"
+    if not has_files(root / "outputs/final-pack"):
+        return "studyos-course, then studyos-merge"
     return "review outputs"
 
 
@@ -330,23 +330,22 @@ def run_status(root: Path) -> int:
     )
     print_row(
         "import_plan.md exists",
-        yes_no((root / "working/inventory/import_plan.md").is_file()),
+        yes_no((root / "analysis/inventory/import_plan.md").is_file()),
     )
     print_row(
         "import_log.md exists",
-        yes_no((root / "working/inventory/import_log.md").is_file()),
+        yes_no((root / "analysis/inventory/import_log.md").is_file()),
     )
     print_row("files in inputs/", inputs_count)
     print_row(
         "course_inventory.md exists",
-        yes_no((root / "working/inventory/course_inventory.md").is_file()),
+        yes_no((root / "analysis/inventory/course_inventory.md").is_file()),
     )
     print_row(
         "batch_plan.md exists",
-        yes_no((root / "working/inventory/batch_plan.md").is_file()),
+        yes_no((root / "analysis/inventory/batch_plan.md").is_file()),
     )
-    print_row("processed digests count", count_files(root / "working/digests"))
-    print_row("learning cores count", count_files(root / "working/learning-cores"))
+    print_row("batch analysis files count", count_files(root / "analysis/batches"))
     print_row("output files count", count_files(root / "outputs"))
     print_row(
         "validation report exists",
@@ -354,7 +353,7 @@ def run_status(root: Path) -> int:
     )
     print_row(
         "final review pack exists",
-        yes_no(has_files(root / "outputs/final-review-pack")),
+        yes_no(has_files(root / "outputs/final-pack")),
     )
     print_row("next recommended skill", next_recommended_skill(root, config))
     return 0
@@ -383,24 +382,19 @@ def stale_setup_issues(root: Path, config: dict[str, Any]) -> list[str]:
         issues.append("setup.completed is true but subject.name is empty")
     if setup_completed and raw_path is None:
         issues.append("setup.completed is true but raw_source.path is empty")
-    if (root / "working/inventory/import_log.md").is_file() and not (
-        root / "working/inventory/import_plan.md"
+    if (root / "analysis/inventory/import_log.md").is_file() and not (
+        root / "analysis/inventory/import_plan.md"
     ).is_file():
         issues.append("import_log.md exists without import_plan.md")
-    if (root / "working/inventory/batch_plan.md").is_file() and not (
-        root / "working/inventory/course_inventory.md"
+    if (root / "analysis/inventory/batch_plan.md").is_file() and not (
+        root / "analysis/inventory/course_inventory.md"
     ).is_file():
         issues.append("batch_plan.md exists without course_inventory.md")
     if (
-        count_files(root / "working/learning-cores") > 0
-        and count_files(root / "working/digests") == 0
-    ):
-        issues.append("learning cores exist but no digests were found")
-    if (
         count_files(root / "outputs") > 0
-        and count_files(root / "working/learning-cores") == 0
+        and count_files(root / "analysis/batches") == 0
     ):
-        issues.append("outputs exist but no learning cores were found")
+        issues.append("outputs exist but no batch analysis files were found")
 
     return issues
 

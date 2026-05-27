@@ -9,8 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-OUTPUT_PATH = Path("outputs/final-review-pack/final_review_pack.md")
-LEARNING_CORES_DIR = Path("working/learning-cores")
+OUTPUT_PATH = Path("outputs/final-pack/final_review_pack.md")
+LEARNING_CORES_DIR = Path("analysis/batches")
 REVIEW_FILES = (
     Path("review/validation-report.md"),
     Path("review/source-coverage.md"),
@@ -71,7 +71,7 @@ def build_final_pack(root: Path) -> Path:
         f"Root: `{root}`",
         "",
         "This minimal pack is assembled from existing learning cores and review artifacts. "
-        "It does not replace the `study-os-synthesize` skill for richer course-level synthesis.",
+        "It does not replace the `studyos-merge` skill for richer course-level merging.",
         "",
         "## Included Learning Cores",
         "",

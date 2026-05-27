@@ -41,11 +41,12 @@ After installation, point the user to `STUDYOS_GUIDE.md` and continue only when 
 
 Use the v1 workflow in `templates/workflow.yaml`:
 
-1. `install`
-2. `import_sources`
-3. `inventory`
-4. `process_batch`
-5. `validate`
-6. `synthesize`
+1. `studyos-import`
+2. `studyos-plan`
+3. `studyos-batch`
+4. `studyos-validate`
+5. `studyos-course`
+6. `studyos-merge`
+7. `studyos-export`
 
 Keep each change small and test the current step before moving forward.

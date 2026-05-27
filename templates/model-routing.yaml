@@ -9,7 +9,7 @@ tiers:
       - "simple metadata extraction"
       - "format cleanup"
     avoid_for:
-      - "concept synthesis"
+      - "cross-source merging"
       - "validation"
       - "exam question design"
 
@@ -25,12 +25,12 @@ tiers:
       - "ambiguous or mathematically dense material"
 
   deep:
-    purpose: "Complex reasoning and synthesis."
+    purpose: "Complex reasoning and merging."
     use_for:
       - "difficult concepts"
       - "formula derivations"
       - "exam questions"
-      - "final synthesis"
+      - "final merge"
     avoid_for:
       - "bulk inventory"
       - "mechanical formatting"
@@ -54,4 +54,4 @@ defaults:
   formula_sheet: "deep"
   exam_questions: "deep"
   validation: "audit"
-  synthesis: "deep"
+  merge: "deep"

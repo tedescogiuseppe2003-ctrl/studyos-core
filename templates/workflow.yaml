@@ -1,124 +1,73 @@
-# StudyOS v1.1 workflow.
+# StudyOS workflow.
 
 workflow:
-  install:
-    skill: "study-os-install"
-    purpose: "Create the separate StudyOS workspace without touching the raw source folder."
-    inputs:
-      - "StudyOS core templates/"
-      - "StudyOS core scripts/"
-      - "StudyOS core skills/"
+  setup:
+    purpose: "Install StudyOS from the external core repo, propose setup, write subject.yaml after approval, and stop."
     outputs:
       - "subject.yaml"
       - "STUDYOS_GUIDE.md"
-      - "AGENTS.md"
-      - "CLAUDE.md"
-      - "workflow.yaml"
-      - "output-standards.yaml"
-      - "model-routing.yaml"
-      - "inputs/"
-      - "analysis/"
-      - "outputs/"
-      - "exports/pdf/unmerged/"
-      - "exports/pdf/merged/"
-      - "review/"
       - "study-os/"
-      - ".agents/"
-      - ".claude/"
-      - "study-os/config/SKILLS_GUIDE.md"
+      - ".agents/skills/"
+      - ".claude/skills/"
     checks:
-      - "agent_asked_only_missing_setup_questions"
-      - "subject_yaml_filled_from_setup_answers"
-      - "raw_source_folder_is_external_and_read_only"
-      - "required_workspace_directories_exist"
-      - "inputs_is_empty_or_imported_copy_area"
-      - "course_material_is_not_imported_or_processed_during_install"
+      - "course_material_is_not_imported_or_processed_during_setup"
+      - "only_final_skill_names_are_installed"
 
-  import_sources_proposal:
-    skill: "study-os-import-sources"
-    script: "study-os/scripts/import_sources.py --mode proposal"
-    purpose: "Scan subject.yaml raw_source.path read-only and create an import plan."
+  import:
+    skill: "studyos-import"
+    scripts:
+      - "study-os/scripts/import_sources.py"
+      - "study-os/scripts/inventory.py"
+    purpose: "Safely import approved raw files, inventory inputs, and create the first conceptual batch plan."
     inputs:
       - "subject.yaml"
       - "subject.yaml raw_source.path"
-    outputs:
-      - "analysis/inventory/import_plan.md"
-    checks:
-      - "raw_source_is_read_only"
-      - "no_files_are_copied"
-      - "no_files_are_moved_deleted_renamed_or_modified"
-      - "plan_uses_only_approved_inputs_subfolders"
-
-  import_sources_execute:
-    skill: "study-os-import-sources"
-    script: "study-os/scripts/import_sources.py --mode execute"
-    purpose: "Copy approved import-plan rows into inputs/ without overwriting."
-    inputs:
-      - "subject.yaml"
-      - "subject.yaml raw_source.path"
-      - "analysis/inventory/import_plan.md"
-    outputs:
-      - "inputs/slides/"
-      - "inputs/readings/"
-      - "inputs/notes/"
-      - "inputs/exercises/"
-      - "inputs/exams/"
-      - "inputs/transcripts/"
-      - "inputs/miscellaneous/"
-      - "analysis/inventory/import_log.md"
-    checks:
-      - "only_rows_marked_copy_are_copied"
-      - "destination_files_are_not_overwritten"
-      - "raw_source_is_never_modified"
-      - "destinations_are_approved_inputs_subfolders"
-
-  inventory:
-    skill: "study-os-inventory"
-    script: "study-os/scripts/inventory.py"
-    purpose: "Scan only imported files under inputs/ and create conceptual planning artifacts."
-    inputs:
       - "inputs/"
     outputs:
+      - "analysis/inventory/import_plan.md"
+      - "analysis/inventory/import_log.md"
       - "analysis/inventory/course_inventory.md"
       - "analysis/inventory/batch_plan.md"
-      - "study-os/state/studyos.sqlite"
     checks:
+      - "raw_source_is_read_only"
+      - "destination_files_are_not_overwritten"
       - "inventory_scans_only_inputs"
-      - "all_imported_sources_are_listed"
+
+  plan:
+    skill: "studyos-plan"
+    purpose: "Refine conceptual batches and source assignments before processing."
+    inputs:
+      - "analysis/inventory/course_inventory.md"
+      - "analysis/inventory/batch_plan.md"
+    outputs:
+      - "analysis/inventory/batch_plan.md"
+    checks:
       - "batches_are_conceptual_lectures_topics_or_modules"
       - "exercises_are_supporting_sources_unless_explicitly_conceptual"
 
-  process_first_batch:
-    skill: "study-os-process-batch"
-    purpose: "Process one planned conceptual batch before attempting the rest of the course."
+  batch:
+    skill: "studyos-batch"
+    purpose: "Process one planned conceptual batch."
     inputs:
       - "analysis/inventory/course_inventory.md"
       - "analysis/inventory/batch_plan.md"
       - "inputs/"
     outputs:
-      - "analysis/batches/*-digest.md"
-      - "analysis/batches/*-learning-core.md"
-      - "outputs/notes/"
-      - "outputs/formulas/"
-      - "outputs/flashcards/"
-      - "outputs/questions/"
-      - "outputs/cheat-sheets/"
-      - "outputs/study-plan/"
+      - "analysis/batches/"
+      - "analysis/visual/"
+      - "outputs/"
       - "review/weak-points.md"
       - "review/unresolved-questions.md"
     checks:
       - "digest_created_before_learning_core"
       - "learning_core_created_before_outputs"
       - "source_coverage_lists_every_assigned_source"
-      - "ordinary_exercise_only_batches_do_not_create_master_notes"
 
-  validate_first_batch:
-    skill: "study-os-validate"
-    purpose: "Validate the first processed batch before continuing."
+  validate:
+    skill: "studyos-validate"
+    purpose: "Validate processed, repaired, course-level, or merged outputs."
     inputs:
-      - "analysis/inventory/batch_plan.md"
-      - "analysis/batches/*-digest.md"
-      - "analysis/batches/*-learning-core.md"
+      - "analysis/"
       - "outputs/"
       - "inputs/"
     outputs:
@@ -127,78 +76,45 @@ workflow:
       - "review/formula_validation_report.md"
       - "analysis/validation/"
     checks:
-      - "deterministic_structure_citation_and_formula_checks_run"
-      - "llm_review_checks_grounding_clarity_exam_usefulness_and_missing_sources"
-      - "severe_issues_stop_processing"
+      - "deterministic_checks_run"
+      - "blocking_issues_stop_processing"
 
-  process_remaining_batches:
-    skill: "study-os-process-course"
-    purpose: "Process remaining planned batches sequentially, validating each batch before continuing."
+  course:
+    skill: "studyos-course"
+    purpose: "Process remaining planned batches sequentially and create course-level outputs."
     inputs:
-      - "analysis/inventory/course_inventory.md"
       - "analysis/inventory/batch_plan.md"
       - "inputs/"
       - "review/validation-report.md"
     outputs:
-      - "analysis/batches/*-digest.md"
-      - "analysis/batches/*-learning-core.md"
+      - "analysis/batches/"
       - "outputs/"
-      - "review/validation-report.md"
-      - "review/source-coverage.md"
-      - "review/formula_validation_report.md"
       - "review/progress-tracker.md"
-      - "study-os/state/run-log.md"
     checks:
       - "course_is_not_processed_as_one_giant_batch"
       - "each_batch_is_validated_before_the_next_batch"
-      - "blocking_validation_issues_stop_the_course_run"
 
-  synthesize:
-    skill: "study-os-synthesize"
-    purpose: "Create final course-level outputs from validated learning cores and validated batch outputs."
+  merge:
+    skill: "studyos-merge"
+    purpose: "Merge validated batch and course outputs into full-course deliverables."
     inputs:
-      - "analysis/inventory/batch_plan.md"
-      - "analysis/batches/*-learning-core.md"
+      - "analysis/batches/"
       - "outputs/"
-      - "review/validation-report.md"
-      - "review/source-coverage.md"
-      - "review/formula_validation_report.md"
-      - "review/weak-points.md"
-      - "review/unresolved-questions.md"
+      - "review/"
     outputs:
       - "outputs/final-pack/"
     checks:
-      - "final_outputs_are_based_on_learning_cores"
-      - "synthesis_integrates_across_batches_instead_of_concatenating_only"
+      - "merged_outputs_are_based_on_validated_material"
       - "source_references_and_unresolved_questions_are_preserved"
 
-  validate_final_synthesis:
-    skill: "study-os-validate"
-    purpose: "Validate final synthesis after course-level outputs are created."
-    inputs:
-      - "outputs/final-pack/"
-      - "analysis/batches/*-learning-core.md"
-      - "review/"
-      - "inputs/"
-    outputs:
-      - "review/validation-report.md"
-      - "review/source-coverage.md"
-      - "review/formula_validation_report.md"
-    checks:
-      - "final_synthesis_is_grounded_in_validated_learning_cores"
-      - "citations_resolve_to_inputs"
-      - "formula_fields_are_complete"
-      - "unresolved_questions_remain_visible"
-
   export:
-    skill: "study-os-export"
+    skill: "studyos-export"
     purpose: "Export unmerged and merged study outputs to PDF."
     inputs:
       - "outputs/"
-      - "outputs/final-pack/"
     outputs:
       - "exports/pdf/unmerged/"
       - "exports/pdf/merged/"
     checks:
-      - "unmerged_exports_preserve_individual_outputs"
-      - "merged_exports_use_final_pack_outputs"
+      - "unmerged_exports_preserve_batch_boundaries"
+      - "merged_exports_use_full_course_outputs"

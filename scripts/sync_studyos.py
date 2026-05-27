@@ -39,12 +39,43 @@ COURSE_LOCAL_SCRIPTS = (
     "export_final_pack.py",
 )
 
+INSTALLED_SKILL_NAMES = (
+    "studyos-import",
+    "studyos-plan",
+    "studyos-batch",
+    "studyos-validate",
+    "studyos-course",
+    "studyos-merge",
+    "studyos-export",
+)
+
 DEPRECATED_RELATIVE_PATHS = (
     "study-os/scripts/install_studyos.py",
     "study-os/scripts/sort_inputs.py",
     "study-os/skills/study-os-sort-inputs",
     ".agents/skills/study-os-sort-inputs",
     ".claude/skills/study-os-sort-inputs",
+    "study-os/skills/study-os-install",
+    "study-os/skills/study-os-import-sources",
+    "study-os/skills/study-os-inventory",
+    "study-os/skills/study-os-process-batch",
+    "study-os/skills/study-os-process-course",
+    "study-os/skills/study-os-validate",
+    "study-os/skills/study-os-synthesize",
+    ".agents/skills/study-os-install",
+    ".agents/skills/study-os-import-sources",
+    ".agents/skills/study-os-inventory",
+    ".agents/skills/study-os-process-batch",
+    ".agents/skills/study-os-process-course",
+    ".agents/skills/study-os-validate",
+    ".agents/skills/study-os-synthesize",
+    ".claude/skills/study-os-install",
+    ".claude/skills/study-os-import-sources",
+    ".claude/skills/study-os-inventory",
+    ".claude/skills/study-os-process-batch",
+    ".claude/skills/study-os-process-course",
+    ".claude/skills/study-os-validate",
+    ".claude/skills/study-os-synthesize",
 )
 
 SKILLS_GUIDE_DESTINATION = Path("study-os/config/SKILLS_GUIDE.md")
@@ -90,6 +121,15 @@ def validate_sources(source_root: Path) -> None:
     if missing_scripts:
         missing = ", ".join(str(path) for path in missing_scripts)
         raise FileNotFoundError(f"Missing required StudyOS scripts: {missing}")
+
+    missing_skills = [
+        source_root / "skills" / skill_name / "SKILL.md"
+        for skill_name in INSTALLED_SKILL_NAMES
+        if not (source_root / "skills" / skill_name / "SKILL.md").is_file()
+    ]
+    if missing_skills:
+        missing = ", ".join(str(path) for path in missing_skills)
+        raise FileNotFoundError(f"Missing required StudyOS skills: {missing}")
 
     required_templates = (
         source_root / "templates/STUDYOS_GUIDE.md",
@@ -159,6 +199,19 @@ def remove_deprecated_paths(target: Path) -> tuple[str, ...]:
             path.unlink()
         removed.append(relative_path)
 
+    for relative_destination in SKILL_DESTINATIONS:
+        destination = target / relative_destination
+        if not destination.is_dir():
+            continue
+        for path in sorted(destination.iterdir()):
+            if not path.name.startswith("study-os-"):
+                continue
+            if path.is_dir() and not path.is_symlink():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+            removed.append(f"{relative_destination}/{path.name}")
+
     return tuple(removed)
 
 
@@ -190,9 +243,8 @@ def sync_skills(source_root: Path, target: Path) -> tuple[int, int, tuple[str, .
 
     for relative_destination in SKILL_DESTINATIONS:
         destination = target / relative_destination
-        for skill_source in sorted(
-            path for path in skills_source.iterdir() if path.is_dir()
-        ):
+        for skill_name in INSTALLED_SKILL_NAMES:
+            skill_source = skills_source / skill_name
             copied += copy_tree_replace(skill_source, destination / skill_source.name)
             folders_synced += 1
             synced_paths.append(f"{relative_destination}/{skill_source.name}")

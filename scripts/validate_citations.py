@@ -13,7 +13,7 @@ from pathlib import Path
 
 REPORT_PATH = Path("review/source-coverage.md")
 
-SCAN_FOLDERS = ("working", "outputs")
+SCAN_FOLDERS = ("analysis", "outputs")
 TEXT_SUFFIXES = {
     ".csv",
     ".json",
@@ -42,7 +42,7 @@ PLACEHOLDER_PATTERN = re.compile(
 TRAILING_PUNCTUATION = " \t\r\n`'\".,;:)]}"
 LEADING_PUNCTUATION = " \t\r\n`'\"([{"
 PIPELINE_REFERENCE_PREFIXES = (
-    "working/",
+    "analysis/",
     "outputs/",
     "review/",
     "study-os/",

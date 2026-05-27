@@ -14,20 +14,19 @@ REPORT_PATH = Path("review/validation-report.md")
 
 REQUIRED_FOLDERS = (
     "inputs",
-    "working",
-    "working/inventory",
-    "working/digests",
-    "working/learning-cores",
+    "analysis",
+    "analysis/inventory",
+    "analysis/batches",
     "outputs",
     "review",
     "study-os",
 )
 
 REQUIRED_OUTPUT_CATEGORIES = (
-    "master-notes",
-    "formula-sheets",
+    "notes",
+    "formulas",
     "flashcards",
-    "exam-questions",
+    "questions",
     "cheat-sheets",
     "study-plan",
 )

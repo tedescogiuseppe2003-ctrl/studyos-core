@@ -1,149 +1,100 @@
 # StudyOS Skills Guide
 
-This guide describes the installed StudyOS skills and the order to use them. The workflow is manual and guided: the user chooses each step, and each skill stops when required earlier artifacts are missing.
+This guide describes the installed StudyOS skills and the order to use them. The workflow is manual: after installation and approved setup, the user calls one skill at a time.
 
 ## Installation Boundary
 
-Installation/setup ends after the agent runs the external core installer, initializes or confirms the database, runs sync for the latest scripts and skills, inspects the folder name and visible raw course files, proposes a complete setup, gets user approval, fills `subject.yaml`, and creates or updates `STUDYOS_GUIDE.md`.
+Installation/setup ends after the agent runs the external core installer, initializes or confirms the database, runs sync, inspects the folder name and visible raw course files read-only, proposes a complete setup, gets approval, fills `subject.yaml`, and creates or updates `STUDYOS_GUIDE.md`.
 
-The agent should not ask setup questions one by one unless a complete proposal is impossible to infer. It fills `subject.yaml` only after the user approves the proposal or an updated proposal.
-
-Installation/setup must not import files, run inventory, create an import plan, create a batch plan, summarize material, validate outputs, or process course material. After setup, the user manually calls the skills below step by step.
-
-## Quality Modes
-
-Quality mode controls how much detail each processing skill should produce.
-
-- `economy`: compact and faster. Master notes target 800-1200 words per batch, flashcards 15-25, exam questions 5-10, and formula sheets include only essential formulas.
-- `standard`: balanced default. Master notes target 1200-2200 words per batch, flashcards 25-45, exam questions 8-18, and formula sheets include all important formulas.
-- `rigorous`: completeness-oriented. Master notes can be as long as needed, flashcards can reach 40-70 per exam-heavy batch, exam questions 15-30, and formula sheets include formulas, assumptions, derivations, and common mistakes.
-
-Higher visual, formula, or validation depth increases source screening and checking rigor, especially for exam-critical diagrams, tables, charts, formulas, assumptions, and weak points.
+Installation/setup must not import files, create an import plan, run inventory, create a batch plan, process material, validate outputs, merge outputs, or export PDFs.
 
 ## Status And Readiness
 
-Use these read-only commands whenever you need to inspect the workspace without advancing the pipeline:
+- `python3 study-os/scripts/studyos.py status` prints workspace state and the next recommended manual skill.
+- `python3 study-os/scripts/studyos.py doctor` checks required folders, scripts, skills, config files, `subject.yaml`, readable `raw_source.path`, and obvious stale setup issues.
 
-- `python3 study-os/scripts/studyos.py status` prints installed/setup state, source/import/inventory/processing/output counts, validation/final-pack presence, and the next recommended manual skill.
-- `python3 study-os/scripts/studyos.py doctor` checks required folders, scripts, skills, config files, `subject.yaml`, readable `raw_source.path` when configured, and obvious stale setup issues.
+These commands are read-only.
 
-These commands do not import files, run inventory, process batches, validate outputs, synthesize outputs, or modify files.
+## Skill Order
 
-## study-os-import-sources
+1. `studyos-import`
+2. `studyos-plan`
+3. `studyos-batch`
+4. `studyos-validate`
+5. `studyos-course`
+6. `studyos-merge`
+7. `studyos-export`
 
-Use this first when the course material is still in an original raw folder.
+## studyos-import
 
-Proposal mode:
+Use after setup approval. This skill proposes and executes safe import, then builds the first inventory and conceptual batch plan.
 
-- Scans `subject.yaml` -> `raw_source.path` read-only.
-- Classifies raw course files by filename, folder, metadata, and minimal skimming only when needed.
-- Writes `analysis/inventory/import_plan.md`.
-- Does not copy, move, rename, delete, modify, summarize, or process files.
+- Proposal mode scans `raw_source.path` read-only and writes `analysis/inventory/import_plan.md`.
+- Execute mode copies only approved rows into `inputs/` and writes `analysis/inventory/import_log.md`.
+- Inventory scans only `inputs/` and writes `analysis/inventory/course_inventory.md`.
+- Initial planning writes `analysis/inventory/batch_plan.md`.
 
-Execute mode:
+Original raw files are never moved, renamed, deleted, overwritten, or modified. Destination files are never overwritten.
 
-- Reads the approved `analysis/inventory/import_plan.md`.
-- Copies approved rows into `inputs/`.
-- Writes `analysis/inventory/import_log.md`.
-- Never modifies original files.
-- Never overwrites destination files.
+## studyos-plan
 
-Run this before `study-os-inventory` unless `inputs/` already contains approved copied course files.
+Use after `studyos-import`. This skill refines `analysis/inventory/batch_plan.md` before processing.
 
-## study-os-inventory
+- Batches should represent concepts, lectures, modules, or tutorial themes.
+- Exercises, readings, transcripts, notes, and exams should support conceptual batches where possible.
+- Ambiguous files remain in a needs-review section instead of being hidden.
 
-Use this after source files exist under `inputs/`.
+## studyos-batch
 
-- Scans only approved `inputs/` folders.
-- Creates `analysis/inventory/course_inventory.md`.
-- Creates `analysis/inventory/batch_plan.md`.
-- Groups files into conceptual batches such as topics, lectures, modules, or tutorial sessions.
-- Treats exercises as supporting sources unless they are explicitly tutorial or conceptual material.
-- Does not summarize, process, validate, or generate study outputs.
+Use to process one selected planned batch.
 
-Run this before `study-os-process-batch`. Use `study-os-process-course` only when the user explicitly asks to process remaining batches sequentially.
-
-## study-os-process-batch
-
-Use this to process one planned batch from `analysis/inventory/batch_plan.md`.
-
-- Processes one batch at a time.
-- Reads every assigned source for that batch.
-- Creates a source digest in `analysis/batches/`.
-- Creates a learning core in `analysis/batches/`.
-- Creates configured batch outputs under `outputs/`.
-- Includes source coverage so outputs can be traced back to assigned batch sources.
-- Includes visual screening when implemented and when diagrams, charts, tables, screenshots, or other visual material are relevant.
+- Reads assigned sources under `inputs/`.
+- Writes batch digests and learning cores under `analysis/batches/`.
+- Writes configured batch outputs under `outputs/`.
+- Adds visual notes under `analysis/visual/` when relevant.
 - Updates weak points and unresolved questions under `review/`.
-- Is best for testing quality one topic at a time before running the rest of the course.
 
-Source-type rules:
+Run `studyos-validate` after each processed batch.
 
-- Slides are the primary theory source when assigned as core lecture material.
-- Notes feed professor emphasis, doubts, traps, clarifications, and weak points.
-- Exercises become practice questions, repeated problem types, weak points, and concept/formula links instead of theory summaries by default.
-- Readings add relevant theory, definitions, assumptions, limitations, and deeper explanations without unnecessary over-summary.
-- Exams add patterns, likely question types, answer expectations, and final-review signals.
-- Transcripts add explanations, examples, emphasis, and professor-style phrasing.
-- Miscellaneous sources are classified before use, with uncertainty flagged in the digest.
+## studyos-validate
 
-Run `study-os-validate` after processing a batch.
+Use after batch processing, course-level processing, repairs, or merging.
 
-## study-os-validate
+- Runs deterministic structure, citation, and formula checks where available.
+- Reviews grounding, source coverage, visual coverage, clarity, and exam usefulness according to configured depth.
+- Writes reports under `review/` and `analysis/validation/`.
 
-Use this after a batch has digest, learning core, and outputs.
+Validation should lead to targeted repair before regeneration. It must not silently rewrite outputs.
 
-- Runs deterministic structure checks.
-- Checks citations when configured.
-- Checks formula fields and formula sources when configured.
-- Checks source grounding so claims can be traced to imported material.
-- Checks visual coverage when relevant source material includes diagrams, charts, tables, screenshots, or other visuals.
-- Performs LLM review if requested in `subject.yaml`.
-- Reviews grounding, clarity, active recall quality, exam usefulness, weak points, and unresolved questions.
-- Writes validation reports under `review/`.
-- May write additional handoff notes under `analysis/validation/`.
+## studyos-course
 
-Validation does not rewrite outputs unless the user explicitly asks for fixes.
+Use after at least one representative batch has been processed and validated.
 
-When fixes are in scope, validation should lead to targeted repair before regeneration: patch only affected sections, preserve valid content, avoid regenerating unrelated outputs, rerun validation after repair, and mark remaining uncertainty clearly.
-
-## study-os-process-course
-
-Use this after one batch has been processed and validated successfully.
-
-- Reads `analysis/inventory/batch_plan.md`.
 - Processes remaining planned or stale batches sequentially.
-- Uses the `study-os-process-batch` workflow for each batch.
-- Validates each batch before continuing.
-- Repairs minor validation issues when appropriate.
-- Stops on severe issues such as missing sources, ambiguous batch plans, unsupported claims, inconsistent formulas, missing source coverage, or any need to modify protected files.
-- Updates `review/progress-tracker.md` and `study-os/state/run-log.md`.
+- Uses `studyos-batch` semantics for each batch.
+- Uses `studyos-validate` semantics before moving to the next batch.
+- Creates course-level outputs while preserving batch boundaries.
 
-This skill does not synthesize final course-level outputs.
+This skill does not create merged final outputs.
 
-During course processing, validation issues are repaired batch by batch. A minor issue should trigger a focused patch and recheck for the current batch, not regeneration of unrelated outputs or other batches.
+## studyos-merge
 
-## study-os-synthesize
+Use after relevant batch and course outputs are processed and validated.
 
-Use this after relevant batches have been processed and validated.
+- Merges validated batch and course material into consolidated full-course outputs.
+- Preserves source references, weak points, unresolved questions, and validation findings.
+- Writes merged deliverables under `outputs/`, including the final review pack.
 
-- Creates final full-course notes when requested.
-- Creates a course-level formula sheet when requested.
-- Creates flashcards when requested.
-- Creates a question bank when requested.
-- Creates a cheat sheet when requested.
-- Creates a study plan when requested.
-- Creates a final review pack when requested.
-- Uses validated learning cores and validated outputs as the primary basis.
+Run `studyos-validate` on merged outputs when validation depth requires it.
 
-Synthesis should preserve source references, weak points, unresolved questions, and validation findings.
+## studyos-export
+
+Use after desired outputs exist and have acceptable validation status.
+
+- Exports unmerged batch/course outputs to `exports/pdf/unmerged/`.
+- Exports merged full-course outputs to `exports/pdf/merged/`.
+- Preserves batch boundaries for unmerged exports.
 
 ## Preflight Behavior
 
-If a skill is called too early, it must stop and report:
-
-- what is missing,
-- why it cannot continue,
-- which skill to run first.
-
-Do not skip earlier steps to keep moving. Run the missing prerequisite skill, then retry the current skill.
+If a skill is called too early, it must stop and report what is missing, why it cannot continue, and which skill to run first.

@@ -12,8 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-PLAN_PATH = Path("working/inventory/import_plan.md")
-LOG_PATH = Path("working/inventory/import_log.md")
+PLAN_PATH = Path("analysis/inventory/import_plan.md")
+LOG_PATH = Path("analysis/inventory/import_log.md")
 SUBJECT_CONFIG_PATH = Path("subject.yaml")
 
 SKIP_ACTIONS = {"skip", "needs review"}
@@ -32,7 +32,7 @@ IGNORED_STUDYOS_DIRECTORIES = {
     "outputs",
     "review",
     "study-os",
-    "working",
+    "analysis",
 }
 APPROVED_DESTINATION_FOLDERS = (
     "inputs/slides",
