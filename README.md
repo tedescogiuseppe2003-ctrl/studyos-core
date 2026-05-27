@@ -26,6 +26,8 @@ Fresh installs and syncs install only these final skill names:
 
 There is no normal user workflow skill for installation and no master orchestration skill.
 
+`studyos-merge` is the installed full-course consolidation skill. `studyos-synthesize` is not installed as a user-facing skill.
+
 ## Normal User Workflow
 
 After the setup proposal is approved and written to `subject.yaml`, use skills manually:
@@ -39,6 +41,18 @@ After the setup proposal is approved and written to `subject.yaml`, use skills m
 7. `studyos-export`
 
 `studyos-import` is the combined import and inventory skill. It first writes `analysis/inventory/import_plan.md` from a read-only scan of `raw_source.path`, stops for approval, copies approved files into `inputs/` without moving originals or overwriting destinations, then writes `analysis/inventory/course_inventory.md` and `analysis/inventory/batch_plan.md`.
+
+`studyos-merge` reads validated batch learning cores and batch outputs, then writes the final full-course structure:
+
+- `outputs/notes/full_course_notes.md`
+- `outputs/formulas/full_formula_sheet.md`
+- `outputs/flashcards/full_flashcards.md`
+- `outputs/questions/full_question_bank.md`
+- `outputs/cheat-sheets/final_cheat_sheet.md`
+- `outputs/study-plan/full_course_study_plan.md`
+- `outputs/final-pack/final_review_pack.md`
+
+Merge does not mean concatenate: it consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, and carries exam-relevant visual findings.
 
 ## Install A New Subject
 

@@ -48,7 +48,7 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 - `studyos-batch` processes one selected conceptual batch into digest, learning core, configured outputs, review updates, and integrated visual screening.
 - `studyos-validate` validates batch, course, repaired, or merged outputs.
 - `studyos-course` processes remaining planned or unprocessed batches sequentially, validates each batch before continuing, and reports processed, skipped, and stopped batches.
-- `studyos-merge` creates consolidated full-course outputs and the final review pack.
+- `studyos-merge` merges validated batch outputs into consolidated full-course outputs and the final review pack.
 - `studyos-export` exports unmerged and merged PDF deliverables.
 
 ## Recommended Workflow
@@ -62,7 +62,7 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 7. Run `studyos-batch` for one selected conceptual batch.
 8. Run `studyos-validate`.
 9. Run `studyos-course` if you want remaining planned or unprocessed batches processed sequentially with validation after each batch.
-10. Run `studyos-merge` when course outputs are processed and validated.
+10. Run `studyos-merge` when batch outputs are processed and validated.
 11. Run `studyos-export`.
 
 Review `analysis/inventory/import_plan.md` before import execute. Do not continue with execute mode unless the proposed copies are acceptable.
@@ -104,6 +104,16 @@ Batch output files use these names:
 - Flashcards: `outputs/flashcards/<batch>_flashcards.md`
 - Exam questions: `outputs/questions/<batch>_questions.md`
 
+Merged full-course output files use these names:
+
+- Notes: `outputs/notes/full_course_notes.md`
+- Formula sheet: `outputs/formulas/full_formula_sheet.md`
+- Flashcards: `outputs/flashcards/full_flashcards.md`
+- Question bank: `outputs/questions/full_question_bank.md`
+- Cheat sheet: `outputs/cheat-sheets/final_cheat_sheet.md`
+- Study plan: `outputs/study-plan/full_course_study_plan.md`
+- Final review pack: `outputs/final-pack/final_review_pack.md`
+
 `studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
 
 ## Course Processing
@@ -119,6 +129,14 @@ The skill identifies planned, unprocessed, stale, or previously failed batches a
 Default processing is sequential. Safe parallel processing is allowed only when configured in `subject.yaml`; dependent batches must not be parallelized, digest and learning-core work for the same batch must not be parallelized, and merged validation is required before downstream work continues.
 
 The completion report lists batches processed, batches skipped, stopped batch if any, validation status, unresolved issues, files written, and the recommended next skill: `studyos-merge`.
+
+## Merge Outputs
+
+`studyos-merge` reads validated learning cores from `analysis/batches/*_learning_core.md`, batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md`, plus `review/weak-points.md`, `review/unresolved-questions.md`, and `review/validation-report.md`.
+
+Merge does not mean concatenate. The skill consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, carries exam-relevant visual findings, and creates a final 7-day plan plus a last-48-hour plan.
+
+The completion report lists merged outputs created, unresolved issues included, validation or audit recommendations, and the recommended next skill: `studyos-export`.
 
 ## Integrated Visual Screening
 

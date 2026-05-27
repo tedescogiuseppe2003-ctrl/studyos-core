@@ -44,6 +44,7 @@ DEPRECATED_RELATIVE_PATHS = (
     "study-os/skills/study-os-process-course",
     "study-os/skills/study-os-validate",
     "study-os/skills/study-os-synthesize",
+    "study-os/skills/studyos-synthesize",
     ".agents/skills/study-os-install",
     ".agents/skills/study-os-import-sources",
     ".agents/skills/study-os-inventory",
@@ -51,6 +52,7 @@ DEPRECATED_RELATIVE_PATHS = (
     ".agents/skills/study-os-process-course",
     ".agents/skills/study-os-validate",
     ".agents/skills/study-os-synthesize",
+    ".agents/skills/studyos-synthesize",
     ".claude/skills/study-os-install",
     ".claude/skills/study-os-import-sources",
     ".claude/skills/study-os-inventory",
@@ -58,6 +60,7 @@ DEPRECATED_RELATIVE_PATHS = (
     ".claude/skills/study-os-process-course",
     ".claude/skills/study-os-validate",
     ".claude/skills/study-os-synthesize",
+    ".claude/skills/studyos-synthesize",
 )
 
 TEMPLATE_DESTINATIONS = {

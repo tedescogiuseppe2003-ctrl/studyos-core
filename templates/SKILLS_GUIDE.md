@@ -120,13 +120,22 @@ This skill does not process the whole course as one giant batch and does not cre
 
 ## studyos-merge
 
-Use after relevant batch and course outputs are processed and validated.
+Use after relevant batch outputs are processed and validated.
 
-- Merges validated batch and course material into consolidated full-course outputs.
-- Preserves source references, weak points, unresolved questions, and validation findings.
-- Writes merged deliverables under `outputs/`, including the final review pack.
+- Reads learning cores from `analysis/batches/*_learning_core.md`.
+- Reads validated batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md`.
+- Reads `review/weak-points.md`, `review/unresolved-questions.md`, and `review/validation-report.md`.
+- Merges by consolidating duplicate concepts, harmonizing notation, deduplicating formulas, identifying dependencies, and preserving source references.
+- Prioritizes weak points, unresolved questions, likely exam questions, and exam-relevant visual findings.
+- Writes `outputs/notes/full_course_notes.md`.
+- Writes `outputs/formulas/full_formula_sheet.md`.
+- Writes `outputs/flashcards/full_flashcards.md`.
+- Writes `outputs/questions/full_question_bank.md`.
+- Writes `outputs/cheat-sheets/final_cheat_sheet.md`.
+- Writes `outputs/study-plan/full_course_study_plan.md`, including a final 7-day plan and last-48-hour plan.
+- Writes `outputs/final-pack/final_review_pack.md`.
 
-Run `studyos-validate` on merged outputs when validation depth requires it.
+Merge does not mean concatenate. Run audit validation on the final merged pack when validation depth or exam risk requires it.
 
 ## studyos-export
 

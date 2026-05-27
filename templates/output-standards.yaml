@@ -156,6 +156,90 @@ outputs:
       - "Common Pitfalls"
       - "Source References"
 
+  full_course_notes:
+    file: "outputs/notes/full_course_notes.md"
+    required_sections:
+      - "Scope"
+      - "Dependency Map"
+      - "Consolidated Notes"
+      - "Definitions"
+      - "Examples"
+      - "Weak Points"
+      - "Unresolved Questions"
+      - "Exam-Relevant Visual Findings"
+      - "Source References"
+
+  full_formula_sheet:
+    file: "outputs/formulas/full_formula_sheet.md"
+    required_sections:
+      - "Notation"
+      - "Formula Index"
+      - "Formulas"
+      - "Variable Definitions"
+      - "Assumptions"
+      - "When To Use"
+      - "Dependencies"
+      - "Common Mistakes"
+      - "Source References"
+
+  full_flashcards:
+    file: "outputs/flashcards/full_flashcards.md"
+    required_sections:
+      - "Deck Scope"
+      - "Concept Cards"
+      - "Definition Cards"
+      - "Formula Cards"
+      - "Application Cards"
+      - "Weak Point Cards"
+      - "Source References"
+
+  full_question_bank:
+    file: "outputs/questions/full_question_bank.md"
+    required_sections:
+      - "Exam Scope"
+      - "Likely Exam Questions"
+      - "Question Set"
+      - "Answer Key"
+      - "Worked Solutions"
+      - "Grading Notes"
+      - "Common Pitfalls"
+      - "Source References"
+
+  final_cheat_sheet:
+    file: "outputs/cheat-sheets/final_cheat_sheet.md"
+    required_sections:
+      - "Exam-Critical Concepts"
+      - "Notation"
+      - "Key Formulas"
+      - "Common Pitfalls"
+      - "Weak Points"
+      - "Last Checks"
+      - "Source References"
+
+  full_course_study_plan:
+    file: "outputs/study-plan/full_course_study_plan.md"
+    required_sections:
+      - "Study Scope"
+      - "Dependencies"
+      - "7-Day Plan"
+      - "Last 48 Hours"
+      - "Weak Point Priorities"
+      - "Unresolved Questions"
+
+  final_review_pack:
+    file: "outputs/final-pack/final_review_pack.md"
+    required_sections:
+      - "Summary"
+      - "Priority Review"
+      - "Weak Points"
+      - "Unresolved Questions"
+      - "Likely Exam Questions"
+      - "Formula Review"
+      - "Exam-Relevant Visual Findings"
+      - "7-Day Plan"
+      - "Last 48 Hours"
+      - "Source References"
+
   validation_report:
     file: "review/validation-report.md"
     required_sections:
@@ -191,6 +275,14 @@ rules:
   final_outputs_must_use_learning_cores: true
   unresolved_questions_must_be_flagged: true
   weak_points_must_be_carried_forward: true
+  merge_does_not_mean_concatenate: true
+  merged_outputs_must_consolidate_duplicate_concepts: true
+  merged_outputs_must_harmonize_notation: true
+  merged_formula_sheets_must_deduplicate_formulas: true
+  merged_outputs_must_identify_dependencies: true
+  merged_outputs_must_include_likely_exam_questions: true
+  merged_outputs_must_include_final_7_day_and_last_48_hour_plans: true
+  merged_outputs_must_include_exam_relevant_visual_findings: true
   visual_screening_integrated_in_batch: true
   visual_coverage_required_for_slide_pdf_image_batches: true
   essential_visuals_must_be_analyzed_or_unresolved: true
