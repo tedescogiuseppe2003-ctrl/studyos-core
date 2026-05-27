@@ -240,6 +240,38 @@ outputs:
       - "Last 48 Hours"
       - "Source References"
 
+  export_unmerged_notes:
+    input_glob: "outputs/notes/Batch_*.md"
+    output_folder: "exports/pdf/unmerged/notes/"
+    format: "pdf preferred; print-ready html fallback"
+
+  export_unmerged_formulas:
+    input_glob: "outputs/formulas/Batch_*.md"
+    output_folder: "exports/pdf/unmerged/formulas/"
+    format: "pdf preferred; print-ready html fallback"
+
+  export_unmerged_flashcards:
+    input_glob: "outputs/flashcards/Batch_*.md"
+    output_folder: "exports/pdf/unmerged/flashcards/"
+    format: "pdf preferred; print-ready html fallback"
+
+  export_unmerged_questions:
+    input_glob: "outputs/questions/Batch_*.md"
+    output_folder: "exports/pdf/unmerged/questions/"
+    format: "pdf preferred; print-ready html fallback"
+
+  export_merged_outputs:
+    input_files:
+      - "outputs/notes/full_course_notes.md"
+      - "outputs/formulas/full_formula_sheet.md"
+      - "outputs/flashcards/full_flashcards.md"
+      - "outputs/questions/full_question_bank.md"
+      - "outputs/cheat-sheets/final_cheat_sheet.md"
+      - "outputs/study-plan/full_course_study_plan.md"
+      - "outputs/final-pack/final_review_pack.md"
+    output_folder: "exports/pdf/merged/"
+    format: "pdf preferred; print-ready html fallback"
+
   validation_report:
     file: "review/validation-report.md"
     required_sections:
@@ -283,6 +315,11 @@ rules:
   merged_outputs_must_include_likely_exam_questions: true
   merged_outputs_must_include_final_7_day_and_last_48_hour_plans: true
   merged_outputs_must_include_exam_relevant_visual_findings: true
+  export_internal_files_by_default: false
+  export_review_or_debug_files_by_default: false
+  export_preserve_content_and_source_references: true
+  export_must_distinguish_unmerged_and_merged_outputs: true
+  export_pdf_fallback_allowed: "clean html or print-ready markdown when PDF dependencies are unavailable"
   visual_screening_integrated_in_batch: true
   visual_coverage_required_for_slide_pdf_image_batches: true
   essential_visuals_must_be_analyzed_or_unresolved: true

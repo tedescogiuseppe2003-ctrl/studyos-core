@@ -29,7 +29,7 @@ The agent fills `subject.yaml` only after approval.
 - `inputs/` contains copied course files after import. Treat these files as read-only.
 - `analysis/` contains import plans, inventory, first-pass and refined batch plans, repair logs, source digests, learning cores, visual notes, validation records, and processing state.
 - `outputs/` contains batch-level, course-level, and merged study outputs.
-- `exports/pdf/unmerged/` and `exports/pdf/merged/` contain PDF exports.
+- `exports/pdf/unmerged/` and `exports/pdf/merged/` contain PDF exports, or print-ready HTML fallbacks when local PDF tooling is unavailable.
 - `review/` contains validation reports, weak points, unresolved questions, source coverage, and progress tracking.
 - `study-os/` contains installed scripts, skills, config guides, and local state.
 
@@ -49,7 +49,7 @@ Import copies approved files into `inputs/`. Files under `inputs/` are also trea
 - `studyos-validate` validates batch, course, repaired, or merged outputs.
 - `studyos-course` processes remaining planned or unprocessed batches sequentially, validates each batch before continuing, and reports processed, skipped, and stopped batches.
 - `studyos-merge` merges validated batch outputs into consolidated full-course outputs and the final review pack.
-- `studyos-export` exports unmerged and merged PDF deliverables.
+- `studyos-export` exports unmerged and merged study-facing deliverables to PDF when possible, with clean print-ready HTML fallback.
 
 ## Recommended Workflow
 
@@ -94,8 +94,8 @@ Review `analysis/inventory/import_plan.md` before import execute. Do not continu
 - Cheat sheets: `outputs/cheat-sheets/`
 - Study plans: `outputs/study-plan/`
 - Final review packs: `outputs/final-pack/`
-- Unmerged PDF exports: `exports/pdf/unmerged/`
-- Merged PDF exports: `exports/pdf/merged/`
+- Unmerged exports: `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, `exports/pdf/unmerged/flashcards/`, and `exports/pdf/unmerged/questions/`
+- Merged exports: `exports/pdf/merged/`
 
 Batch output files use these names:
 
@@ -137,6 +137,44 @@ The completion report lists batches processed, batches skipped, stopped batch if
 Merge does not mean concatenate. The skill consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, carries exam-relevant visual findings, and creates a final 7-day plan plus a last-48-hour plan.
 
 The completion report lists merged outputs created, unresolved issues included, validation or audit recommendations, and the recommended next skill: `studyos-export`.
+
+## Export Outputs
+
+`studyos-export` reads only study-facing Markdown outputs and writes polished exports. It does not export internal analysis files, validation reports, review/debug files, or raw sources by default.
+
+Unmerged batch-level inputs:
+
+- `outputs/notes/Batch_*.md`
+- `outputs/formulas/Batch_*.md`
+- `outputs/flashcards/Batch_*.md`
+- `outputs/questions/Batch_*.md`
+
+Unmerged exports are written by category under:
+
+- `exports/pdf/unmerged/notes/`
+- `exports/pdf/unmerged/formulas/`
+- `exports/pdf/unmerged/flashcards/`
+- `exports/pdf/unmerged/questions/`
+
+Merged full-course inputs:
+
+- `outputs/notes/full_course_notes.md`
+- `outputs/formulas/full_formula_sheet.md`
+- `outputs/flashcards/full_flashcards.md`
+- `outputs/questions/full_question_bank.md`
+- `outputs/cheat-sheets/final_cheat_sheet.md`
+- `outputs/study-plan/full_course_study_plan.md`
+- `outputs/final-pack/final_review_pack.md`
+
+Merged exports are written to `exports/pdf/merged/`.
+
+Run:
+
+```sh
+python3 study-os/scripts/export_outputs.py --root .
+```
+
+The exporter preserves content and source references. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If those dependencies are unavailable, it writes print-ready HTML with MathJax support and reports the fallback in `study-os/state/export-log.md`.
 
 ## Integrated Visual Screening
 

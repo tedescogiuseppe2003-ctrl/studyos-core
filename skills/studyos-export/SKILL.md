@@ -1,63 +1,120 @@
 ---
 name: studyos-export
-description: Export StudyOS unmerged and merged outputs to PDF deliverables.
+description: Export StudyOS unmerged and merged study-facing Markdown outputs to polished PDF deliverables.
 ---
 
 # Purpose
 
-Create exportable PDF deliverables for both unmerged batch-level material and merged full-course material.
+Convert StudyOS study-facing Markdown outputs into polished, readable, student-friendly exports with LaTeX-friendly formatting.
+
+The skill exports both:
+
+- unmerged batch-level outputs
+- merged full-course outputs
+
+It does not rewrite, reinterpret, summarize, or improve the source content. It preserves the existing Markdown content and source references.
 
 # When to use
 
-Use after the desired batch, course, or merged outputs exist and have been validated to the user’s required depth.
+Use after the desired `studyos-batch`, `studyos-course`, or `studyos-merge` outputs exist and have acceptable validation status.
 
 # Preflight checks
 
-- Output files exist under `outputs/`.
-- `exports/pdf/unmerged/` and `exports/pdf/merged/` exist.
-- Export scripts or local PDF tooling are available.
-- Stop if no eligible outputs exist.
+- Confirm at least one exportable study-facing Markdown output exists.
+- If merged outputs are missing, export only unmerged outputs and warn.
+- If unmerged outputs are missing, export only merged outputs and warn.
+- If no exportable outputs exist, stop and tell the user to run `studyos-batch`, `studyos-course`, or `studyos-merge` first.
+- Confirm `study-os/scripts/export_outputs.py` exists.
+- Create export directories if they are missing.
 
 # Reads
 
-- `subject.yaml`
-- unmerged batch and course outputs under `outputs/`
-- merged outputs under `outputs/`
-- validation and source-coverage reports under `review/`
+Unmerged batch-level outputs:
+
+- `outputs/notes/Batch_*.md`
+- `outputs/formulas/Batch_*.md`
+- `outputs/flashcards/Batch_*.md`
+- `outputs/questions/Batch_*.md`
+
+Merged full-course outputs:
+
+- `outputs/notes/full_course_notes.md`
+- `outputs/formulas/full_formula_sheet.md`
+- `outputs/flashcards/full_flashcards.md`
+- `outputs/questions/full_question_bank.md`
+- `outputs/cheat-sheets/final_cheat_sheet.md`
+- `outputs/study-plan/full_course_study_plan.md`
+- `outputs/final-pack/final_review_pack.md`
 
 # Writes
 
-- unmerged PDFs under `exports/pdf/unmerged/`
-- merged PDFs under `exports/pdf/merged/`
-- optional export log under `study-os/state/`
+Unmerged exports:
+
+- `exports/pdf/unmerged/notes/`
+- `exports/pdf/unmerged/formulas/`
+- `exports/pdf/unmerged/flashcards/`
+- `exports/pdf/unmerged/questions/`
+
+Merged exports:
+
+- `exports/pdf/merged/`
+
+Export log:
+
+- `study-os/state/export-log.md`
 
 # Workflow
 
-1. Identify eligible unmerged batch/course outputs.
-2. Identify eligible merged full-course outputs from `studyos-merge`.
-3. Export unmerged material while preserving batch boundaries.
-4. Export merged material as consolidated deliverables.
-5. Record skipped files and export failures.
+1. Run:
 
-# Model routing and efficiency
+   ```sh
+   python3 study-os/scripts/export_outputs.py --root .
+   ```
 
-- Use scripts or deterministic tooling for PDF generation.
-- Use fast reasoning for file selection and export reporting.
-- Do not use deep reasoning unless export readiness depends on interpreting validation findings.
+2. Review the completion report for exported unmerged files, exported merged files, skipped files, failures, export format, and output location.
+3. If the script reports HTML fallback, tell the user that PDF generation dependencies were unavailable and the HTML files are print-ready.
 
-# Quality rules
+# Export rules
 
-- Unmerged exports preserve batch boundaries.
-- Merged exports represent cleaned full-course outputs.
-- Do not export stale or clearly failed outputs without warning.
-- Do not modify source outputs during export.
+- Export only the explicit study-facing output paths listed in this skill.
+- Do not export internal analysis files.
+- Do not export review, validation, or debug files unless the user explicitly requests a custom export outside this default skill.
+- Do not modify files under `outputs/`.
+- Preserve source references exactly as written.
+- Preserve LaTeX expressions; use PDF tooling when available and MathJax-backed HTML fallback when PDF tooling is unavailable.
+- Keep dependencies minimal.
+- Do not add dashboard, Anki, or external app integrations.
+
+# Output-specific formatting
+
+The exporter applies output-specific presentation styling without changing content:
+
+- notes: readable sections, definitions, examples, exam angles
+- formulas: compact formula review, variables, assumptions, common mistakes
+- questions: grouped practice, difficulty cues, expected answers
+- flashcards: clear Q/A formatting
+- cheat sheet: compressed high-yield layout
+- study plan: calendar/task style
+- final review pack: polished exam-prep structure
+
+# PDF dependency behavior
+
+The exporter prefers PDF when `pandoc` and a LaTeX PDF engine are available. If PDF generation dependencies are unavailable, it writes clean print-ready HTML under the same export folders and reports the fallback.
 
 # Stop conditions
 
 - No eligible outputs exist.
-- Required export tooling is unavailable.
-- Validation reports show blocking issues for requested deliverables.
+- The export script is missing.
+- Explicit PDF-only export is requested but PDF tooling is unavailable.
 
 # Completion report
 
-Report exported unmerged PDFs, exported merged PDFs, skipped outputs, failures, and export folders.
+Report:
+
+- exported unmerged files
+- exported merged files
+- skipped files
+- failed files
+- export format
+- output location
+- whether PDF generation fell back to HTML

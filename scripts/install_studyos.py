@@ -22,6 +22,7 @@ COURSE_LOCAL_SCRIPTS = (
     "validate_outputs.py",
     "validate_citations.py",
     "validate_formulas.py",
+    "export_outputs.py",
     "export_final_pack.py",
 )
 
@@ -89,6 +90,10 @@ SUBJECT_DIRECTORIES = (
     "outputs/study-plan",
     "outputs/final-pack",
     "exports/pdf/unmerged",
+    "exports/pdf/unmerged/notes",
+    "exports/pdf/unmerged/formulas",
+    "exports/pdf/unmerged/flashcards",
+    "exports/pdf/unmerged/questions",
     "exports/pdf/merged",
     "review",
     "study-os/config",

@@ -22,6 +22,7 @@ INTENTIONALLY_NOT_TOUCHED = (
     "inputs/",
     "analysis/",
     "outputs/",
+    "exports/",
     "review/",
     "subject.yaml",
     "STUDYOS_GUIDE.md (when already present)",
@@ -36,6 +37,7 @@ COURSE_LOCAL_SCRIPTS = (
     "validate_outputs.py",
     "validate_citations.py",
     "validate_formulas.py",
+    "export_outputs.py",
     "export_final_pack.py",
 )
 

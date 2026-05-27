@@ -54,6 +54,16 @@ After the setup proposal is approved and written to `subject.yaml`, use skills m
 
 Merge does not mean concatenate: it consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, and carries exam-relevant visual findings.
 
+`studyos-export` converts study-facing Markdown outputs into polished student deliverables. It exports unmerged batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md` into category folders under `exports/pdf/unmerged/`. It exports merged full-course outputs into `exports/pdf/merged/`.
+
+The export script is:
+
+```sh
+python3 study-os/scripts/export_outputs.py --root .
+```
+
+PDF is preferred when `pandoc` and a LaTeX PDF engine are available. If PDF dependencies are unavailable, the exporter writes print-ready HTML and reports the fallback. Internal `analysis/`, `review/`, validation, and debug files are not exported by default.
+
 ## Install A New Subject
 
 Run the installer from the core repo:

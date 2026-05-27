@@ -227,12 +227,27 @@ workflow:
 
   export:
     skill: "studyos-export"
-    purpose: "Export unmerged and merged study outputs to PDF."
+    purpose: "Export unmerged and merged study outputs to PDF or print-ready fallback."
     inputs:
-      - "outputs/"
+      - "outputs/notes/Batch_*.md"
+      - "outputs/formulas/Batch_*.md"
+      - "outputs/flashcards/Batch_*.md"
+      - "outputs/questions/Batch_*.md"
+      - "outputs/notes/full_course_notes.md"
+      - "outputs/formulas/full_formula_sheet.md"
+      - "outputs/flashcards/full_flashcards.md"
+      - "outputs/questions/full_question_bank.md"
+      - "outputs/cheat-sheets/final_cheat_sheet.md"
+      - "outputs/study-plan/full_course_study_plan.md"
+      - "outputs/final-pack/final_review_pack.md"
     outputs:
-      - "exports/pdf/unmerged/"
+      - "exports/pdf/unmerged/notes/"
+      - "exports/pdf/unmerged/formulas/"
+      - "exports/pdf/unmerged/flashcards/"
+      - "exports/pdf/unmerged/questions/"
       - "exports/pdf/merged/"
     checks:
       - "unmerged_exports_preserve_batch_boundaries"
       - "merged_exports_use_full_course_outputs"
+      - "internal_analysis_and_review_files_are_not_exported_by_default"
+      - "content_and_source_references_are_preserved"

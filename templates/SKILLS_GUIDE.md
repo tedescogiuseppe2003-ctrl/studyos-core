@@ -141,9 +141,17 @@ Merge does not mean concatenate. Run audit validation on the final merged pack w
 
 Use after desired outputs exist and have acceptable validation status.
 
-- Exports unmerged batch/course outputs to `exports/pdf/unmerged/`.
-- Exports merged full-course outputs to `exports/pdf/merged/`.
-- Preserves batch boundaries for unmerged exports.
+- Reads unmerged batch-level outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md`.
+- Writes unmerged exports to `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, `exports/pdf/unmerged/flashcards/`, and `exports/pdf/unmerged/questions/`.
+- Reads merged full-course outputs from `outputs/notes/full_course_notes.md`, `outputs/formulas/full_formula_sheet.md`, `outputs/flashcards/full_flashcards.md`, `outputs/questions/full_question_bank.md`, `outputs/cheat-sheets/final_cheat_sheet.md`, `outputs/study-plan/full_course_study_plan.md`, and `outputs/final-pack/final_review_pack.md`.
+- Writes merged exports to `exports/pdf/merged/`.
+- Preserves batch boundaries, content, LaTeX expressions, and source references.
+- Does not export `analysis/`, `review/`, validation, debug, or internal files by default.
+- Uses `python3 study-os/scripts/export_outputs.py --root .`.
+
+The exporter prefers PDF when `pandoc` and a LaTeX PDF engine are available. If PDF tooling is unavailable, it writes clean print-ready HTML in the same export folders and reports the fallback.
+
+If merged outputs are missing, export only unmerged outputs and warn. If unmerged outputs are missing, export only merged outputs and warn. If no exportable outputs exist, stop and tell the user to run `studyos-batch`, `studyos-course`, or `studyos-merge` first.
 
 ## Preflight Behavior
 
