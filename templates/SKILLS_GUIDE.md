@@ -2,6 +2,12 @@
 
 This guide describes the installed StudyOS skills and the order to use them. The workflow is manual and guided: the user chooses each step, and each skill stops when required earlier artifacts are missing.
 
+## Installation Boundary
+
+Installation/setup ends after the agent runs the external core installer, runs sync, initializes or confirms the database, asks setup questions, fills `subject.yaml`, and creates or updates `STUDYOS_GUIDE.md`.
+
+Installation/setup must not import files, run inventory, create an import plan, create a batch plan, summarize material, validate outputs, or process course material. After setup, the user manually calls the skills below step by step.
+
 ## study-os-import-sources
 
 Use this first when the course material is still in an original raw folder.
@@ -34,7 +40,7 @@ Use this after source files exist under `inputs/`.
 - Treats exercises as supporting sources unless they are explicitly tutorial or conceptual material.
 - Does not summarize, process, validate, or generate study outputs.
 
-Run this before `study-os-process-batch` or `study-os-process-course`.
+Run this before `study-os-process-batch`. Use `study-os-process-course` only when the user explicitly asks to process remaining batches sequentially.
 
 ## study-os-process-batch
 

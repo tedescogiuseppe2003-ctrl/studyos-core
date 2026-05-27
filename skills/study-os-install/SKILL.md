@@ -7,7 +7,7 @@ description: Install or repair the StudyOS v1 folder structure and local support
 
 Use this skill when setting up StudyOS in a subject folder, repairing a partial installation, or checking whether the local StudyOS structure is complete.
 
-This skill is mostly reference documentation for the installing agent. Before StudyOS is installed, local workspace skills may not exist yet, so the agent should use the core repository installer directly.
+This skill is reference guidance for install behavior. Before StudyOS is installed, local workspace skills may not exist yet, so the agent must use the external core repository directly.
 
 ## Scope
 
@@ -17,52 +17,64 @@ raw source folder -> import plan -> copy into `inputs/` -> inventory -> batch pl
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
-Installation is setup only. Do not import, classify, summarize, process, validate, or synthesize course material during installation.
+Installation is setup only. Do not import, inventory, classify, summarize, process, validate, or synthesize course material during installation.
 
 ## Setup Wizard Behavior
 
 When the user asks something like "Install StudyOS in this folder using ~/Developer/studyos-core", act as a small setup wizard:
 
 1. Identify the target folder as the current workspace unless the user names another target.
-2. Use the named core repo, usually `~/Developer/studyos-core`.
-3. Check whether the target already has enough information in `subject.yaml`.
-4. Ask only for missing essential setup information.
-5. Run the core installer.
-6. Initialize the database if the installer did not already do so.
-7. Fill `subject.yaml` from the setup answers.
-8. Leave original files and imported files untouched.
-9. Point the user to `STUDYOS_GUIDE.md` and the first skill to run.
+2. Use the user-provided core repo path, or `~/Developer/studyos-core` when the user does not provide one.
+3. Read `PROJECT_BRIEF.md` from the external core repo.
+4. Run `python3 <core-repo>/scripts/install_studyos.py <target-folder>`.
+5. Run `python3 <core-repo>/scripts/sync_studyos.py <target-folder>`.
+6. Confirm `study-os/state/studyos.sqlite` exists. Initialize it by running `python3 <core-repo>/scripts/init_db.py` from the target folder only if it is missing.
+7. Ask setup questions for missing values.
+8. Fill `subject.yaml` from the setup answers.
+9. Create or update `STUDYOS_GUIDE.md`, preserving any existing course-specific notes unless the user asks for replacement.
+10. Stop.
 
-Ask for these values only when they are missing:
+Never run an installed workspace copy of `install_studyos.py`. The installer is core-only. If an old `study-os/scripts/install_studyos.py` exists, ignore it and run sync from the external core repo so the deprecated copy is removed.
 
-- subject name;
-- raw/original course folder path;
-- course level, for example Bachelor or Master;
-- language of course material;
-- exam type: written, oral, project, or mixed;
-- desired outputs:
-  - master notes,
-  - formula sheets,
-  - flashcards,
-  - exam questions,
-  - cheat sheets,
-  - study plan,
-  - final review pack;
-- whether original files must be treated as read-only, default yes;
-- whether StudyOS should copy files into `inputs/`, default yes.
+Ask for these setup values when they are missing:
+
+- Subject name
+- Course level
+- Course material language
+- Exam type
+- Original/raw course folder path
+- Desired outputs:
+  - master notes
+  - formula sheets
+  - flashcards
+  - exam questions
+  - cheat sheets
+  - study plan
+  - final review pack
+- Quality/depth mode: economy, standard, rigorous
+- Visual handling depth: minimal, standard, rigorous
+- Formula handling depth: normal, rigorous
+- Validation depth: structural only, standard, rigorous audit
+- Confirmation that original files are read-only
+- Confirmation that StudyOS copies files into `inputs/`
 
 Defaults:
 
 - `raw_source.mode`: `read_only`
 - `raw_source.copy_strategy`: `copy_into_inputs`
-- `processing.mode`: `manual_guided`
-- `processing.batch_strategy`: `conceptual_batches`
+- `processing.quality_mode`: `standard`
+- `processing.batch_strategy`: `lecture_or_topic`
 - `processing.process_incrementally`: `true`
 - `processing.require_validation`: `true`
 - `processing.allow_parallel_batches`: `false`
+- `analysis_depth.visual_handling`: `standard`
+- `analysis_depth.formula_handling`: `normal`
+- `analysis_depth.validation_depth`: `standard`
 - `graphify.enabled`: `false`
 
 The user should not need to manually edit `subject.yaml` unless they want to.
+
+After setup, tell the user that the next step is manual and skill-by-skill, starting with `study-os-import-sources` when they are ready. Do not run that skill for them during installation.
 
 ## May Read
 
@@ -90,6 +102,7 @@ The user should not need to manually edit `subject.yaml` unless they want to.
   - `skills/` into `study-os/skills/`, `.agents/skills/`, and `.claude/skills/`
 - `subject.yaml` after installation, using the setup answers.
 - `study-os/state/studyos.sqlite` only when initializing missing state.
+- `STUDYOS_GUIDE.md` to create or update setup guidance.
 
 ## Must Not Write
 
@@ -98,6 +111,7 @@ The user should not need to manually edit `subject.yaml` unless they want to.
 - Never overwrite existing user-edited files unless the user explicitly asks for overwrite behavior.
 - Do not create digests, learning cores, study outputs, validation reports, final packs, or synthesis artifacts.
 - Do not import files into `inputs/` during installation.
+- Do not create `working/inventory/import_plan.md`, `course_inventory.md`, or `batch_plan.md` during installation.
 
 ## Required Directories
 
@@ -142,21 +156,27 @@ Ensure these files exist after installation:
 
 1. Read `PROJECT_BRIEF.md` from the core repo.
 2. Confirm the target subject folder path.
-3. Ask the setup wizard questions for missing values only.
+3. Confirm the external core repo path, defaulting to `~/Developer/studyos-core`.
 4. Run `python3 <core-repo>/scripts/install_studyos.py <target-folder>`.
-5. Fill `subject.yaml` from the setup answers without changing raw course files.
+5. Run `python3 <core-repo>/scripts/sync_studyos.py <target-folder>`.
 6. Confirm SQLite state exists at `study-os/state/studyos.sqlite`.
-7. Report:
+7. Ask the setup wizard questions for missing values.
+8. Fill `subject.yaml` from the setup answers without changing raw course files.
+9. Create or update `STUDYOS_GUIDE.md`, preserving any existing course-specific notes unless the user asks for replacement.
+10. Report:
    - target path,
    - directories created,
    - files copied,
    - files skipped because they already existed,
    - `subject.yaml` fields filled,
    - guide files installed,
-   - any missing source files in the core repo.
+   - any missing source files in the core repo,
+   - that installation/setup is complete and no import, inventory, or processing was run.
+11. Stop. Do not continue into import or inventory.
 
 ## Quality Bar
 
 - Installation must be idempotent.
 - Existing student/course work must be preserved.
 - `inputs/` is raw course material and is always read-only after directory creation.
+- Setup ends before any course-material workflow begins.

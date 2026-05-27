@@ -2,6 +2,20 @@
 
 StudyOS is a guided study-material workflow for one course. It keeps your original course files protected, copies approved material into `inputs/`, then helps an agent build inventory, batch notes, validation reports, and final review outputs step by step.
 
+## Normal Installation UX
+
+Before installation, this course folder may not have local StudyOS skills yet. Installation is done through the external StudyOS core repo, usually `~/Developer/studyos-core`.
+
+Normal request:
+
+> Install StudyOS in this folder using ~/Developer/studyos-core.
+
+The installing agent runs the external core installer, runs core sync, confirms the database exists, asks setup questions, fills `subject.yaml`, creates or updates this guide, and stops.
+
+The setup questions cover subject name, course level, material language, exam type, original/raw course folder path, desired outputs, quality/depth mode, visual handling depth, formula handling depth, validation depth, confirmation that original files are read-only, and confirmation that StudyOS copies files into `inputs/`.
+
+The user should not manually edit `subject.yaml` unless desired. Installation/setup does not import files, run inventory, or process course material.
+
 ## Folder Structure
 
 - `subject.yaml` stores the course setup: subject name, level, language, exam type, raw source path, processing settings, requested outputs, validation settings, and model routing.
@@ -32,10 +46,12 @@ Generated files live under `working/`, `outputs/`, `review/`, and `study-os/stat
 - `study-os-inventory` scans `inputs/`, creates `working/inventory/course_inventory.md`, and creates `working/inventory/batch_plan.md`.
 - `study-os-process-batch` processes one planned batch. It creates a digest, a learning core, and the configured batch outputs.
 - `study-os-validate` validates a processed batch with deterministic checks and, when configured, LLM review. It writes reports under `review/` and `working/validation/`.
-- `study-os-process-course` processes remaining planned batches sequentially. It validates each batch before moving to the next and stops on severe issues.
+- `study-os-process-course` processes remaining planned batches sequentially only when the user explicitly asks for that skill. It validates each batch before moving to the next and stops on severe issues.
 - `study-os-synthesize` creates final course-level outputs after batches have been processed and validated.
 
 ## Recommended Workflow
+
+After installation/setup, call skills manually one step at a time:
 
 1. Run `study-os-import-sources` in proposal mode.
 2. Review `working/inventory/import_plan.md`.
@@ -43,7 +59,7 @@ Generated files live under `working/`, `outputs/`, `review/`, and `study-os/stat
 4. Run `study-os-inventory`.
 5. Run `study-os-process-batch` for one batch to test quality.
 6. Run `study-os-validate` for that batch.
-7. Run `study-os-process-course` for remaining batches.
+7. Repeat `study-os-process-batch` and `study-os-validate` for additional batches, or explicitly ask for `study-os-process-course`.
 8. Run `study-os-synthesize` when the course is processed and validated.
 
 ## If A Skill Warns That A Previous Step Is Missing
