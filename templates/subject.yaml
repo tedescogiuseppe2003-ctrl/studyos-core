@@ -5,19 +5,37 @@ subject:
   name: ""
   level: ""
   language: ""
-  exam_type: ""
+  exam_type:
+    written: false
+    oral: false
+    project: false
+    mixed: false
+    unknown: true
 
+# Original course material is scanned read-only and copied into inputs/ by default.
 raw_source:
   path: ""
   mode: "read_only"
   copy_strategy: "copy_into_inputs"
 
+setup:
+  completed: false
+  completed_at: ""
+  configured_by_agent: true
+
 processing:
-  mode: "manual_guided"
-  batch_strategy: "conceptual_batches"
+  mode: "course"
+  quality_mode: "standard" # economy | standard | rigorous
+  batch_strategy: "lecture_or_topic"
   process_incrementally: true
   require_validation: true
   allow_parallel_batches: false
+
+analysis_depth:
+  visual_handling: "standard" # minimal | standard | rigorous
+  formula_handling: "normal" # normal | rigorous
+  validation_depth: "standard" # structural_only | standard | rigorous_audit
+  synthesis_depth: "standard" # concise | standard | rigorous
 
 outputs:
   master_notes: true
@@ -30,9 +48,12 @@ outputs:
 
 multimodal:
   enabled: true
-  visual_analysis: "lazy"
+  visual_screening: true
+  visual_analysis: "selective"
   analyze_tables: true
   analyze_charts: true
+  analyze_formula_screenshots: true
+  analyze_definition_screenshots: true
   analyze_decorative_images: false
 
 validation:
@@ -41,14 +62,23 @@ validation:
   require_citations: true
   require_formula_sources: true
   detect_stale_outputs: true
+  visual_coverage_required: true
 
 graphify:
   enabled: false
 
 model_routing:
+  install: "fast"
+  setup: "fast"
+  import_proposal: "fast"
+  import_execution: "script"
   inventory: "fast"
+  batch_plan_repair: "balanced"
   extraction: "balanced"
   concept_building: "balanced"
-  formula_audit: "audit"
+  formula_audit: "deep"
+  visual_screening: "balanced"
+  visual_analysis: "deep"
   output_generation: "balanced"
   validation: "audit"
+  synthesis: "deep"
