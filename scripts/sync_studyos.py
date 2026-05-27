@@ -25,6 +25,7 @@ INTENTIONALLY_NOT_TOUCHED = (
     "exports/",
     "review/",
     "subject.yaml",
+    "raw/original course files",
     "STUDYOS_GUIDE.md (when already present)",
     ".git/",
 )
@@ -51,36 +52,21 @@ INSTALLED_SKILL_NAMES = (
     "studyos-export",
 )
 
-DEPRECATED_RELATIVE_PATHS = (
+OBSOLETE_SKILL_NAMES = (
+    "study-os-import-sources",
+    "study-os-inventory",
+    "study-os-process-batch",
+    "study-os-process-course",
+    "study-os-validate",
+    "study-os-synthesize",
+    "study-os-install",
+    "studyos-synthesize",
+    "study-os-sort-inputs",
+)
+
+DEPRECATED_SCRIPT_PATHS = (
     "study-os/scripts/install_studyos.py",
     "study-os/scripts/sort_inputs.py",
-    "study-os/skills/study-os-sort-inputs",
-    ".agents/skills/study-os-sort-inputs",
-    ".claude/skills/study-os-sort-inputs",
-    "study-os/skills/study-os-install",
-    "study-os/skills/study-os-import-sources",
-    "study-os/skills/study-os-inventory",
-    "study-os/skills/study-os-process-batch",
-    "study-os/skills/study-os-process-course",
-    "study-os/skills/study-os-validate",
-    "study-os/skills/study-os-synthesize",
-    "study-os/skills/studyos-synthesize",
-    ".agents/skills/study-os-install",
-    ".agents/skills/study-os-import-sources",
-    ".agents/skills/study-os-inventory",
-    ".agents/skills/study-os-process-batch",
-    ".agents/skills/study-os-process-course",
-    ".agents/skills/study-os-validate",
-    ".agents/skills/study-os-synthesize",
-    ".agents/skills/studyos-synthesize",
-    ".claude/skills/study-os-install",
-    ".claude/skills/study-os-import-sources",
-    ".claude/skills/study-os-inventory",
-    ".claude/skills/study-os-process-batch",
-    ".claude/skills/study-os-process-course",
-    ".claude/skills/study-os-validate",
-    ".claude/skills/study-os-synthesize",
-    ".claude/skills/studyos-synthesize",
 )
 
 SKILLS_GUIDE_DESTINATION = Path("study-os/config/SKILLS_GUIDE.md")
@@ -190,34 +176,40 @@ def copy_tree_replace(source: Path, destination: Path) -> int:
     return copied
 
 
-def remove_deprecated_paths(target: Path) -> tuple[str, ...]:
-    removed: list[str] = []
+def remove_path(path: Path) -> None:
+    if path.is_dir() and not path.is_symlink():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
 
-    for relative_path in DEPRECATED_RELATIVE_PATHS:
+
+def remove_obsolete_studyos_files(
+    target: Path,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    removed_scripts: list[str] = []
+    removed_skills: list[str] = []
+
+    for relative_path in DEPRECATED_SCRIPT_PATHS:
         path = target / relative_path
         if not path.exists() and not path.is_symlink():
             continue
 
-        if path.is_dir() and not path.is_symlink():
-            shutil.rmtree(path)
-        else:
-            path.unlink()
-        removed.append(relative_path)
+        remove_path(path)
+        removed_scripts.append(relative_path)
 
     for relative_destination in SKILL_DESTINATIONS:
         destination = target / relative_destination
         if not destination.is_dir():
             continue
-        for path in sorted(destination.iterdir()):
-            if not path.name.startswith("study-os-"):
+        for skill_name in OBSOLETE_SKILL_NAMES:
+            path = destination / skill_name
+            if not path.exists() and not path.is_symlink():
                 continue
-            if path.is_dir() and not path.is_symlink():
-                shutil.rmtree(path)
-            else:
-                path.unlink()
-            removed.append(f"{relative_destination}/{path.name}")
 
-    return tuple(removed)
+            remove_path(path)
+            removed_skills.append(f"{relative_destination}/{skill_name}")
+
+    return tuple(removed_scripts), tuple(removed_skills)
 
 
 def sync_scripts(source_root: Path, target: Path) -> tuple[int, int, tuple[str, ...]]:
@@ -293,7 +285,8 @@ def write_sync_log(
     copied_script_paths: tuple[str, ...],
     synced_skill_paths: tuple[str, ...],
     synced_guide_paths: tuple[str, ...],
-    removed_deprecated_paths: tuple[str, ...],
+    removed_deprecated_scripts: tuple[str, ...],
+    removed_obsolete_skills: tuple[str, ...],
     warnings: tuple[str, ...] = (),
     errors: tuple[str, ...] = (),
 ) -> Path:
@@ -315,8 +308,12 @@ def write_sync_log(
         "\n".join(f"- `{relative_path}`" for relative_path in synced_guide_paths)
         or "- None"
     )
-    removed_deprecated_lines = (
-        "\n".join(f"- `{relative_path}`" for relative_path in removed_deprecated_paths)
+    removed_deprecated_script_lines = (
+        "\n".join(f"- `{relative_path}`" for relative_path in removed_deprecated_scripts)
+        or "- None"
+    )
+    removed_obsolete_skill_lines = (
+        "\n".join(f"- `{relative_path}`" for relative_path in removed_obsolete_skills)
         or "- None"
     )
     untouched_lines = "\n".join(
@@ -349,9 +346,13 @@ def write_sync_log(
                 "",
                 synced_guide_lines,
                 "",
-                "## Deprecated Paths Removed",
+                "## Deprecated Scripts Removed",
                 "",
-                removed_deprecated_lines,
+                removed_deprecated_script_lines,
+                "",
+                "## Obsolete StudyOS Skill Folders Removed",
+                "",
+                removed_obsolete_skill_lines,
                 "",
                 "## Files/Folders Intentionally Not Touched",
                 "",
@@ -380,7 +381,6 @@ def main() -> int:
     try:
         validate_sources(source_root)
         validate_target(target)
-        removed_deprecated_paths = remove_deprecated_paths(target)
         copied_scripts, replaced_scripts, copied_script_paths = sync_scripts(
             source_root, target
         )
@@ -391,6 +391,9 @@ def main() -> int:
         ) = sync_skills(source_root, target)
         copied_guides, replaced_guides, synced_guide_paths = sync_guides(
             source_root, target
+        )
+        removed_deprecated_scripts, removed_obsolete_skills = (
+            remove_obsolete_studyos_files(target)
         )
         log_path = write_sync_log(
             target,
@@ -403,7 +406,8 @@ def main() -> int:
             copied_script_paths,
             synced_skill_paths,
             synced_guide_paths,
-            removed_deprecated_paths,
+            removed_deprecated_scripts,
+            removed_obsolete_skills,
         )
     except OSError as error:
         print(f"StudyOS sync failed: {error}", file=sys.stderr)
@@ -425,9 +429,18 @@ def main() -> int:
     print("Synced guide files:")
     for synced_guide_path in synced_guide_paths:
         print(f"  - {synced_guide_path}")
-    print("Deprecated paths removed:")
-    for removed_path in removed_deprecated_paths:
-        print(f"  - {removed_path}")
+    print("Deprecated scripts removed:")
+    if removed_deprecated_scripts:
+        for removed_path in removed_deprecated_scripts:
+            print(f"  - {removed_path}")
+    else:
+        print("  - None")
+    print("Obsolete StudyOS skill folders removed:")
+    if removed_obsolete_skills:
+        for removed_path in removed_obsolete_skills:
+            print(f"  - {removed_path}")
+    else:
+        print("  - None")
     print(f"Sync log: {log_path}")
     return 0
 
