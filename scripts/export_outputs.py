@@ -71,7 +71,7 @@ MERGED_OUTPUTS = (
     ),
     (
         Path("outputs/final-pack/final_review_pack.md"),
-        "final-review-pack",
+        "final-pack",
         "Final Review Pack",
     ),
 )
@@ -84,7 +84,7 @@ TEMPLATE_SUBTITLES = {
     "flashcards": "Clear active-recall question and answer formatting",
     "cheat-sheet": "Compressed high-yield review layout",
     "study-plan": "Calendar and task-oriented study structure",
-    "final-review-pack": "Polished exam-prep structure",
+    "final-pack": "Polished exam-prep structure",
 }
 
 

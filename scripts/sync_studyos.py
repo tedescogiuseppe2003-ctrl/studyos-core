@@ -52,16 +52,20 @@ INSTALLED_SKILL_NAMES = (
     "studyos-export",
 )
 
+OLD_PREFIX = "study-os"
+OBSOLETE_SKILL_SUFFIXES = (
+    "import-sources",
+    "inventory",
+    "process-batch",
+    "process-course",
+    "validate",
+    "synthesize",
+    "install",
+    "sort-inputs",
+)
 OBSOLETE_SKILL_NAMES = (
-    "study-os-import-sources",
-    "study-os-inventory",
-    "study-os-process-batch",
-    "study-os-process-course",
-    "study-os-validate",
-    "study-os-synthesize",
-    "study-os-install",
-    "studyos-synthesize",
-    "study-os-sort-inputs",
+    *(f"{OLD_PREFIX}-{suffix}" for suffix in OBSOLETE_SKILL_SUFFIXES),
+    "studyos" + "-synthesize",
 )
 
 DEPRECATED_SCRIPT_PATHS = (

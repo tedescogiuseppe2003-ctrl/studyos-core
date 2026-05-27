@@ -36,32 +36,32 @@ INSTALLED_SKILL_NAMES = (
     "studyos-export",
 )
 
+OLD_PREFIX = "study-os"
+OLD_SKILL_SUFFIXES = (
+    "install",
+    "import-sources",
+    "inventory",
+    "process-batch",
+    "process-course",
+    "validate",
+    "synthesize",
+)
+OLD_COMPAT_SKILL_NAMES = (f"{OLD_PREFIX}-{suffix}" for suffix in OLD_SKILL_SUFFIXES)
+OLD_EXTRA_SKILL_NAMES = ("studyos" + "-synthesize",)
+OLD_SKILL_NAMES = (*OLD_COMPAT_SKILL_NAMES, *OLD_EXTRA_SKILL_NAMES)
+OLD_SKILL_DESTINATIONS = (
+    "study-os/skills",
+    ".agents/skills",
+    ".claude/skills",
+)
+
 DEPRECATED_RELATIVE_PATHS = (
     "study-os/scripts/install_studyos.py",
-    "study-os/skills/study-os-install",
-    "study-os/skills/study-os-import-sources",
-    "study-os/skills/study-os-inventory",
-    "study-os/skills/study-os-process-batch",
-    "study-os/skills/study-os-process-course",
-    "study-os/skills/study-os-validate",
-    "study-os/skills/study-os-synthesize",
-    "study-os/skills/studyos-synthesize",
-    ".agents/skills/study-os-install",
-    ".agents/skills/study-os-import-sources",
-    ".agents/skills/study-os-inventory",
-    ".agents/skills/study-os-process-batch",
-    ".agents/skills/study-os-process-course",
-    ".agents/skills/study-os-validate",
-    ".agents/skills/study-os-synthesize",
-    ".agents/skills/studyos-synthesize",
-    ".claude/skills/study-os-install",
-    ".claude/skills/study-os-import-sources",
-    ".claude/skills/study-os-inventory",
-    ".claude/skills/study-os-process-batch",
-    ".claude/skills/study-os-process-course",
-    ".claude/skills/study-os-validate",
-    ".claude/skills/study-os-synthesize",
-    ".claude/skills/studyos-synthesize",
+    *(
+        f"{destination}/{skill_name}"
+        for destination in OLD_SKILL_DESTINATIONS
+        for skill_name in OLD_SKILL_NAMES
+    ),
 )
 
 TEMPLATE_DESTINATIONS = {

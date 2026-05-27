@@ -67,7 +67,7 @@ Use after relevant batches have been processed and validated, their learning cor
 
 # Quality rules
 
-- Use merge language, not synthesis language, in user-facing reports.
+- Use merge language, not the older consolidation wording, in user-facing reports.
 - Merged outputs are based on validated intermediates.
 - Preserve traceability to sources and batches.
 - Do not hide unresolved questions or weak points.

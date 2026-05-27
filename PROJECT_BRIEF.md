@@ -173,7 +173,7 @@ There is no master orchestration skill. The user manually calls these skills one
 
 Visual screening is integrated into `studyos-batch`, `studyos-course`, and `studyos-validate`. It is not a separate user-facing skill.
 
-`studyos-merge` replaces the older synthesis concept. StudyOS should use merge language for full-course consolidation.
+`studyos-merge` replaces the older full-course consolidation concept. StudyOS should use merge language for full-course consolidation.
 
 ## Target workflow
 
