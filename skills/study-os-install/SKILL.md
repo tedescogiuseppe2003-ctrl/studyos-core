@@ -19,6 +19,25 @@ Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian expor
 
 Installation is setup only. Do not import, inventory, classify, summarize, process, validate, or synthesize course material during installation.
 
+## Model routing and efficiency
+
+Use the cheapest sufficient model. Start with a lower tier and escalate only when the task requires deeper reasoning. Do not sacrifice precision for speed when exam relevance is high, but do not use deep reasoning for mechanical tasks.
+
+Tiers:
+
+- `fast`: setup questions, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
+- `balanced`: batch plan repair, digest creation, normal concept explanation, normal output generation, flashcards, exam questions.
+- `deep`: formulas, derivations, technical finance/statistics/econometrics explanations, difficult conceptual synthesis, essential visual analysis, formula screenshots, definition screenshots, complex charts/tables/diagrams.
+- `audit`: validation, source-grounding review, hallucination detection, final synthesis review.
+- `script`: deterministic execution, import execution, hashing, inventory script, validation scripts, sync/install.
+
+For this skill:
+
+- Use `script` for install, sync, database initialization, and deterministic file checks.
+- Use `fast` for setup questions, config filling, simple defaults, and guide/report formatting.
+- Do not use `balanced`, `deep`, or `audit` unless installation uncovers a configuration ambiguity that cannot be resolved from setup answers.
+- Never use deep reasoning to process course content during installation; installation must stop before import, inventory, validation, or synthesis.
+
 ## Setup Wizard Behavior
 
 When the user asks something like "Install StudyOS in this folder using ~/Developer/studyos-core", act as a small setup wizard:

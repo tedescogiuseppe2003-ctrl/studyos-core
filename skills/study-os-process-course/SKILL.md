@@ -17,6 +17,26 @@ Process batches sequentially from the existing batch plan. For each batch, use t
 
 Keep v1.1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Model routing and efficiency
+
+Use the cheapest sufficient model. Start with a lower tier and escalate only when the task requires deeper reasoning. Do not sacrifice precision for speed when exam relevance is high, but do not use deep reasoning for mechanical tasks.
+
+Tiers:
+
+- `fast`: setup questions, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
+- `balanced`: batch plan repair, digest creation, normal concept explanation, normal output generation, flashcards, exam questions.
+- `deep`: formulas, derivations, technical finance/statistics/econometrics explanations, difficult conceptual synthesis, essential visual analysis, formula screenshots, definition screenshots, complex charts/tables/diagrams.
+- `audit`: validation, source-grounding review, hallucination detection, final synthesis review.
+- `script`: deterministic execution, import execution, hashing, inventory script, validation scripts, sync/install.
+
+For this skill:
+
+- Use `balanced` for course orchestration, queue construction, progress tracking, and normal per-batch coordination.
+- Each batch follows `study-os-process-batch` routing.
+- Do not use a `deep` model for every batch automatically. Escalate only for batches or artifacts with formula-heavy, visual-essential, technically difficult, or exam-critical triggers.
+- Use `audit` for validation decisions and source-grounding review before moving to the next batch.
+- Use `script` for deterministic checks, validation scripts, state updates, and run-log mechanics.
+
 ## Preflight
 
 Before processing remaining batches, confirm:

@@ -18,6 +18,25 @@ Import intake files only. Do not process course material, generate study outputs
 
 Keep v1.1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Model routing and efficiency
+
+Use the cheapest sufficient model. Start with a lower tier and escalate only when the task requires deeper reasoning. Do not sacrifice precision for speed when exam relevance is high, but do not use deep reasoning for mechanical tasks.
+
+Tiers:
+
+- `fast`: setup questions, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
+- `balanced`: batch plan repair, digest creation, normal concept explanation, normal output generation, flashcards, exam questions.
+- `deep`: formulas, derivations, technical finance/statistics/econometrics explanations, difficult conceptual synthesis, essential visual analysis, formula screenshots, definition screenshots, complex charts/tables/diagrams.
+- `audit`: validation, source-grounding review, hallucination detection, final synthesis review.
+- `script`: deterministic execution, import execution, hashing, inventory script, validation scripts, sync/install.
+
+For this skill:
+
+- Proposal mode is `fast` when filenames, folder names, and extensions make the import destination obvious.
+- Escalate proposal mode to `balanced` only when filenames are ambiguous and minimal content skimming is needed to classify course files.
+- Execute mode is `script` only. Use deterministic checks and file operations, not reasoning-heavy review.
+- Never use `deep` for import mechanics.
+
 ## Preflight
 
 Before doing any import work, confirm:

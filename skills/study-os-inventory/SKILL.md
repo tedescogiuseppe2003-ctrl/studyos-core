@@ -13,6 +13,25 @@ Inventory is metadata-only. It prepares batches for later processing.
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Model routing and efficiency
+
+Use the cheapest sufficient model. Start with a lower tier and escalate only when the task requires deeper reasoning. Do not sacrifice precision for speed when exam relevance is high, but do not use deep reasoning for mechanical tasks.
+
+Tiers:
+
+- `fast`: setup questions, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
+- `balanced`: batch plan repair, digest creation, normal concept explanation, normal output generation, flashcards, exam questions.
+- `deep`: formulas, derivations, technical finance/statistics/econometrics explanations, difficult conceptual synthesis, essential visual analysis, formula screenshots, definition screenshots, complex charts/tables/diagrams.
+- `audit`: validation, source-grounding review, hallucination detection, final synthesis review.
+- `script`: deterministic execution, import execution, hashing, inventory script, validation scripts, sync/install.
+
+For this skill:
+
+- Run the inventory script as `script`.
+- Use `fast` for straightforward inventory review and filename-based grouping.
+- Use `balanced` for batch plan repair, difficult classification, ambiguous source roles, or when deciding whether exercise material should be primary or supporting.
+- Do not use `deep` for hashing, metadata scanning, or routine batch-plan formatting.
+
 ## Preflight
 
 Before inventory, confirm:

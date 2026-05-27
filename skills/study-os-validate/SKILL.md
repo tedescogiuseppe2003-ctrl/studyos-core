@@ -13,6 +13,26 @@ Validate by batch, not across the full course, unless the user explicitly asks f
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Model routing and efficiency
+
+Use the cheapest sufficient model. Start with a lower tier and escalate only when the task requires deeper reasoning. Do not sacrifice precision for speed when exam relevance is high, but do not use deep reasoning for mechanical tasks.
+
+Tiers:
+
+- `fast`: setup questions, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
+- `balanced`: batch plan repair, digest creation, normal concept explanation, normal output generation, flashcards, exam questions.
+- `deep`: formulas, derivations, technical finance/statistics/econometrics explanations, difficult conceptual synthesis, essential visual analysis, formula screenshots, definition screenshots, complex charts/tables/diagrams.
+- `audit`: validation, source-grounding review, hallucination detection, final synthesis review.
+- `script`: deterministic execution, import execution, hashing, inventory script, validation scripts, sync/install.
+
+For this skill:
+
+- Run deterministic checks as `script`.
+- Use `audit` or `balanced` for normal validation, depending on configured validation depth and exam relevance.
+- Use `audit` plus `deep` for formula issues, visual issues, source-grounding issues, hallucination detection, inconsistent derivations, or exam-critical validation failures.
+- Use `balanced` for ordinary clarity, formatting, active-recall quality, and output-completeness review when source grounding is straightforward.
+- Do not use `deep` for mechanical report formatting or script output summarization.
+
 ## Preflight
 
 Before validation, confirm:

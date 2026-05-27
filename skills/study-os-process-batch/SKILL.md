@@ -17,6 +17,27 @@ Process one batch at a time. The output order is mandatory:
 
 Keep v1 lean. Do not add Graphify, hooks, subagents, Anki export, Obsidian export, dashboards, or web apps.
 
+## Model routing and efficiency
+
+Use the cheapest sufficient model. Start with a lower tier and escalate only when the task requires deeper reasoning. Do not sacrifice precision for speed when exam relevance is high, but do not use deep reasoning for mechanical tasks.
+
+Tiers:
+
+- `fast`: setup questions, config filling, filename-based classification, simple formatting, import proposal when obvious, inventory review.
+- `balanced`: batch plan repair, digest creation, normal concept explanation, normal output generation, flashcards, exam questions.
+- `deep`: formulas, derivations, technical finance/statistics/econometrics explanations, difficult conceptual synthesis, essential visual analysis, formula screenshots, definition screenshots, complex charts/tables/diagrams.
+- `audit`: validation, source-grounding review, hallucination detection, final synthesis review.
+- `script`: deterministic execution, import execution, hashing, inventory script, validation scripts, sync/install.
+
+For this skill:
+
+- Use `balanced` for a normal batch: digest creation, learning core creation, normal explanations, and normal output generation.
+- Use `deep` for formula-heavy batches, derivations, technical finance/statistics/econometrics material, difficult conceptual synthesis, and any exam-critical precision issue.
+- Use `deep` only for affected visuals in visual-essential batches, such as formula screenshots, definition screenshots, or complex charts/tables/diagrams. Do not escalate the entire batch automatically when only one visual needs deeper analysis.
+- Use `fast` or `balanced` for flashcards depending on conceptual difficulty and exam relevance.
+- Use `balanced` for normal exam questions and `deep` for difficult, formula-heavy, or high-stakes exam questions.
+- Use `script` for deterministic validation scripts or status updates run during the workflow.
+
 ## Preflight
 
 Before processing a batch, confirm:
