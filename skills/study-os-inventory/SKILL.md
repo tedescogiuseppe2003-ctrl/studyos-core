@@ -32,27 +32,25 @@ For this skill:
 - Use `balanced` for batch plan repair, difficult classification, ambiguous source roles, or when deciding whether exercise material should be primary or supporting.
 - Do not use `deep` for hashing, metadata scanning, or routine batch-plan formatting.
 
-## Preflight
+## Preflight Checks
 
 Before inventory, confirm:
 
-- `subject.yaml` exists;
-- `study-os/` exists;
 - `inputs/` exists;
-- at least one approved `inputs/` subfolder contains course files, unless the user explicitly wants an empty inventory check;
-- `study-os/scripts/inventory.py` exists or the equivalent core script is available.
+- at least one file exists somewhere inside `inputs/`;
+- `study-os/scripts/inventory.py` exists;
+- `study-os/state/` exists.
 
-If any preflight item is missing, stop and report:
+If any preflight item is missing, stop immediately and warn:
 
-- what is missing;
-- why inventory cannot continue;
-- which skill to run first.
+`Cannot run inventory yet. Import/copy source files into inputs/ first using study-os-import-sources.`
 
-Use this guidance:
+Also explain:
 
-- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
-- Empty `inputs/` with a configured raw source folder: run `study-os-import-sources` first.
-- Missing inventory script: run the core repo sync or reinstall StudyOS before inventory.
+- Missing: name the missing folder, file, script, state path, or empty `inputs/` condition.
+- Why blocked: inventory is metadata-only and must scan already imported input files while writing state to `study-os/state/`; without these prerequisites it cannot create a trustworthy course inventory or batch plan.
+- Run first: run `study-os-import-sources` to import or copy source files into `inputs/`; run `study-os-install` or sync/reinstall StudyOS first if `study-os/scripts/inventory.py` or `study-os/state/` is missing.
+- Expected afterward: `inputs/` should contain at least one course file, `study-os/scripts/inventory.py` should exist, and `study-os/state/` should exist.
 
 ## May Read
 

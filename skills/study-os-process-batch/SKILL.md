@@ -44,29 +44,32 @@ Apply the configured quality mode from `output-standards.yaml` when deciding out
 - `standard`: use the normal balanced output budgets.
 - `rigorous`: expand only where completeness, exam risk, formulas, or dense source material require it.
 
-## Preflight
+## Preflight Checks
 
 Before processing a batch, confirm:
 
-- `subject.yaml` exists;
-- `study-os/` exists;
 - `working/inventory/course_inventory.md` exists;
 - `working/inventory/batch_plan.md` exists;
-- the requested batch exists in `batch_plan.md`;
-- every assigned source for the requested batch exists under `inputs/`.
+- `working/inventory/batch_plan.md` contains at least one planned batch;
+- `inputs/` contains files;
+- the selected batch exists in `working/inventory/batch_plan.md`;
+- every assigned source for the selected batch exists under `inputs/`.
 
-If any preflight item is missing, stop and report:
+If any required preflight item is missing, stop immediately and warn:
 
-- what is missing;
-- why batch processing cannot continue;
-- which skill to run first.
+`Cannot process a batch yet. Run study-os-inventory first.`
 
-Use this guidance:
+Also explain:
 
-- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
-- Missing or empty `inputs/`: run `study-os-import-sources` first.
-- Missing inventory or batch plan: run `study-os-inventory` first.
-- Missing assigned source files: repair the import plan or rerun import before processing.
+- Missing: name the missing inventory file, batch plan, planned batch, input files, selected batch, or assigned source path.
+- Why blocked: batch processing must be grounded in the inventory and batch plan, and it cannot safely read or cite sources that are absent from `inputs/`.
+- Run first: run `study-os-inventory` after importing files; run `study-os-import-sources` first if `inputs/` is empty or assigned source files are missing.
+- Expected afterward: `working/inventory/course_inventory.md`, `working/inventory/batch_plan.md`, at least one planned batch, and the selected batch source files under `inputs/` should exist.
+
+Also warn before processing, without hard-blocking unless the user chooses to stop:
+
+- If `working/inventory/batch_plan.md` has an `Unassigned / needs review` section with files, warn that some sources have not been confidently attached to a conceptual batch and may need inventory review before processing.
+- If the selected batch has only exercise sources and is not explicitly marked tutorial, conceptual, or equivalent course instruction, warn that normal master notes should not be created by default and that the batch lacks a primary conceptual source.
 
 ## May Read
 

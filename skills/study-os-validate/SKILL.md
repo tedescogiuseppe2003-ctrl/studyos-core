@@ -34,30 +34,25 @@ For this skill:
 - Do not use `deep` for mechanical report formatting or script output summarization.
 - Check output length and rigor against the configured quality mode in `output-standards.yaml`.
 
-## Preflight
+## Preflight Checks
 
 Before validation, confirm:
 
-- `subject.yaml` exists;
-- `working/inventory/batch_plan.md` exists;
-- the batch to validate is identifiable;
-- the batch digest exists in `working/digests/`;
-- the batch learning core exists in `working/learning-cores/`;
-- expected batch outputs exist under `outputs/`, or the user explicitly asks to validate a partial run;
-- assigned sources for the batch still exist under `inputs/`.
+- `outputs/` contains generated files, or both `working/digests/` and `working/learning-cores/` contain processed batch files;
+- `study-os/scripts/validate_outputs.py` exists;
+- `study-os/scripts/validate_citations.py` exists;
+- `study-os/scripts/validate_formulas.py` exists.
 
-If any preflight item is missing, stop and report:
+If any required preflight item is missing, stop immediately and warn:
 
-- what is missing;
-- why validation cannot continue;
-- which skill to run first.
+`Cannot validate yet. Process at least one batch first.`
 
-Use this guidance:
+Also explain:
 
-- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
-- Missing batch plan: run `study-os-inventory` first.
-- Missing digest, learning core, or outputs: run `study-os-process-batch` first.
-- Missing assigned source files: repair the import or inventory before validation.
+- Missing: name the missing generated outputs, processed digest/core files, or validation script.
+- Why blocked: validation needs generated batch artifacts to inspect and deterministic scripts to check structure, citations, and formulas.
+- Run first: run `study-os-process-batch` for at least one planned batch; run `study-os-install` or sync/reinstall StudyOS first if validation scripts are missing.
+- Expected afterward: `outputs/` should contain generated batch outputs, or `working/digests/` and `working/learning-cores/` should contain processed batch files, and all three validation scripts should exist under `study-os/scripts/`.
 
 ## May Read
 

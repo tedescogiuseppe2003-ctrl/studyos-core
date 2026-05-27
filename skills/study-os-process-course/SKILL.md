@@ -38,31 +38,31 @@ For this skill:
 - Use `script` for deterministic checks, validation scripts, state updates, and run-log mechanics.
 - Apply the configured quality mode from `output-standards.yaml` consistently across batches so output length and rigor remain predictable.
 
-## Preflight
+## Preflight Checks
 
 Before processing remaining batches, confirm:
 
-- `subject.yaml` exists;
-- `study-os/` exists;
-- `working/inventory/course_inventory.md` exists;
 - `working/inventory/batch_plan.md` exists;
-- `inputs/` contains the sources referenced by planned batches;
-- at least one batch has already been processed and validated, unless the user explicitly wants the course runner to start from the first planned batch;
-- validation reports exist for any batch being treated as complete.
+- `working/inventory/batch_plan.md` contains planned or unprocessed batches;
+- `inputs/` contains files;
+- every source referenced by the selected planned or unprocessed batches exists under `inputs/`.
 
-If any preflight item is missing, stop and report:
+If any required preflight item is missing, stop immediately and warn:
 
-- what is missing;
-- why course processing cannot continue;
-- which skill to run first.
+`Cannot process course yet. Run study-os-inventory and review batch_plan.md first.`
 
-Use this guidance:
+Also explain:
 
-- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
-- Missing or empty `inputs/`: run `study-os-import-sources` first.
-- Missing inventory or batch plan: run `study-os-inventory` first.
-- No tested processed batch: run `study-os-process-batch`, then `study-os-validate`, before processing the rest of the course.
-- Missing validation for completed batches: run `study-os-validate` first.
+- Missing: name the missing batch plan, missing planned/unprocessed batches, empty `inputs/` condition, or missing source path.
+- Why blocked: course processing advances through the existing batch plan one batch at a time and cannot safely infer batches or read missing source files.
+- Run first: run `study-os-inventory` and review `working/inventory/batch_plan.md`; run `study-os-import-sources` first if `inputs/` is empty or referenced source files are missing.
+- Expected afterward: `working/inventory/batch_plan.md` should exist with planned or unprocessed batches, and all referenced source files should exist under `inputs/`.
+
+Also warn, but do not hard-block:
+
+`No validated batch found yet. Recommended: process and validate one batch manually before full course processing.`
+
+Show this warning when no batch validation report or progress state indicates that at least one batch has passed validation. The user may still explicitly continue with course processing, but the recommendation is to run `study-os-process-batch` and then `study-os-validate` for one batch first.
 
 ## May Read
 

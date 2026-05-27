@@ -37,29 +37,65 @@ For this skill:
 - Execute mode is `script` only. Use deterministic checks and file operations, not reasoning-heavy review.
 - Never use `deep` for import mechanics.
 
-## Preflight
+## Preflight Checks
 
-Before doing any import work, confirm:
+Run these checks before doing any import work. If a required item is missing, stop immediately and show a warning that includes what is missing, why the current step cannot safely run, which skill or command to run first, and which file or path should exist afterward.
+
+### Proposal mode
+
+Proposal mode requires:
 
 - `subject.yaml` exists;
 - `subject.yaml` contains `raw_source.path`;
-- `raw_source.path` exists and is a directory;
-- `study-os/` exists;
-- `working/inventory/` exists or can be created.
+- `subject.yaml` has `raw_source.mode: read_only`;
+- `raw_source.path` exists;
+- `raw_source.path` is readable;
+- `working/inventory/` exists;
+- these `inputs/` folders exist:
+  - `inputs/slides/`
+  - `inputs/readings/`
+  - `inputs/notes/`
+  - `inputs/exercises/`
+  - `inputs/exams/`
+  - `inputs/transcripts/`
+  - `inputs/miscellaneous/`
 
-If any preflight item is missing, stop and report:
+If any proposal-mode requirement is missing, stop and warn:
 
-- what is missing;
-- why import cannot continue;
-- which skill to run first.
+`Cannot create import plan yet. Configure raw_source.path in subject.yaml first.`
 
-Use this guidance:
+Also explain:
 
-- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
-- Missing or invalid `raw_source.path`: fill `subject.yaml` from setup answers before importing.
-- Missing `working/inventory/`: create it only if the StudyOS workspace is otherwise installed.
+- Missing: name the missing or invalid file, folder, field, mode, or readability check.
+- Why blocked: proposal mode scans original raw files read-only and cannot safely plan imports until the raw source and destination folders are configured.
+- Run first: run `study-os-install` if `subject.yaml`, `study-os/`, `working/inventory/`, or `inputs/` folders are missing; otherwise complete setup in `subject.yaml` so `raw_source.path` points to a readable raw source folder and `raw_source.mode` is `read_only`.
+- Expected afterward: `subject.yaml`, `working/inventory/`, all `inputs/` subfolders above, and the readable folder named by `raw_source.path` should exist.
 
-In execute mode, also confirm `working/inventory/import_plan.md` exists. If it is missing, stop and tell the user to run `study-os-import-sources` in proposal mode first.
+### Execute mode
+
+Execute mode requires:
+
+- `working/inventory/import_plan.md` exists;
+- `working/inventory/import_plan.md` contains at least one approved copy action, meaning a row with `Action` set to `copy` that is not marked `needs review`, `skip`, or otherwise unapproved;
+- these `inputs/` folders exist:
+  - `inputs/slides/`
+  - `inputs/readings/`
+  - `inputs/notes/`
+  - `inputs/exercises/`
+  - `inputs/exams/`
+  - `inputs/transcripts/`
+  - `inputs/miscellaneous/`
+
+If any execute-mode requirement is missing, stop and warn:
+
+`Cannot execute import yet. Run study-os-import-sources in proposal mode first.`
+
+Also explain:
+
+- Missing: name the missing import plan, missing approved copy actions, or missing `inputs/` folder.
+- Why blocked: execute mode copies only user-reviewed planned files and cannot safely infer copy actions or destinations on its own.
+- Run first: run `study-os-import-sources` in proposal mode, review `working/inventory/import_plan.md`, and approve the intended `copy` rows.
+- Expected afterward: `working/inventory/import_plan.md` should exist with approved `copy` rows, and all `inputs/` subfolders above should exist.
 
 ## Source Location
 

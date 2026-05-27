@@ -33,30 +33,25 @@ For this skill:
 - Use `balanced` for routine consolidation, deduplication, and normal final review packs when validation is clean.
 - Use `script` only for deterministic status checks or file/state updates.
 
-## Preflight
+## Preflight Checks
 
 Before synthesis, confirm:
 
-- `subject.yaml` exists;
-- `working/inventory/batch_plan.md` exists;
-- included batches have digests in `working/digests/`;
-- included batches have learning cores in `working/learning-cores/`;
-- included batches have requested outputs under `outputs/`;
-- validation reports exist under `review/`;
-- unresolved questions and weak points have been reviewed.
+- `working/learning-cores/` contains learning core files;
+- `outputs/` contains batch outputs;
+- `review/validation-report.md` exists;
+- at least one validation pass appears to have been run, such as a validation report decision of `pass` or `pass with warnings`, a timestamped validation report entry, or an equivalent validation status in StudyOS state.
 
-If any preflight item is missing, stop and report:
+If any required preflight item is missing, stop immediately and warn:
 
-- what is missing;
-- why synthesis cannot continue;
-- which skill to run first.
+`Cannot synthesize yet. Process and validate batches first.`
 
-Use this guidance:
+Also explain:
 
-- Missing `subject.yaml` or `study-os/`: run `study-os-install` first.
-- Missing batch plan: run `study-os-inventory` first.
-- Missing digests, learning cores, or batch outputs: run `study-os-process-batch` or `study-os-process-course` first.
-- Missing validation reports: run `study-os-validate` first.
+- Missing: name the missing learning cores, batch outputs, validation report, or validation-pass evidence.
+- Why blocked: synthesis is a final-stage operation and must be based on processed learning cores, generated batch outputs, and validation results rather than raw or unvalidated material.
+- Run first: run `study-os-process-batch` or `study-os-process-course`, then run `study-os-validate`.
+- Expected afterward: `working/learning-cores/` should contain learning core files, `outputs/` should contain batch outputs, `review/validation-report.md` should exist, and at least one validation pass should be recorded.
 
 ## May Read
 
