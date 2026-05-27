@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 FORMULA_DIR = Path("outputs/formulas")
-REPORT_PATH = Path("review/formula_validation_report.md")
+REPORT_PATH = Path("analysis/validation/formula-validation-report.md")
 TEXT_SUFFIXES = {".md", ".text", ".txt"}
 REQUIRED_FIELDS = (
     "Formula:",
@@ -229,11 +229,8 @@ def main() -> int:
         print(f"StudyOS formula validation failed: {error}", file=sys.stderr)
         return 2
 
-    has_errors = (
-        not (root / FORMULA_DIR).is_dir()
-        or not files
-        or any(result.file_errors for result in results)
-        or any(entry.missing_fields for result in results for entry in result.entries)
+    has_errors = any(result.file_errors for result in results) or any(
+        entry.missing_fields for result in results for entry in result.entries
     )
     print(f"Wrote formula validation report: {report}")
     return 1 if has_errors else 0

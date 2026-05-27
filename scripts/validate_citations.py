@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate StudyOS source references in working files and outputs."""
+"""Validate StudyOS source references in analysis files and outputs."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from pathlib import Path
 
 REPORT_PATH = Path("review/source-coverage.md")
 
-SCAN_FOLDERS = ("analysis", "outputs")
+SCAN_FOLDERS = ("analysis/batches", "analysis/visual", "outputs")
 TEXT_SUFFIXES = {
     ".csv",
     ".json",
@@ -249,7 +249,7 @@ def write_report(
         "## Summary",
         "",
         f"- Source files in inputs: {len(source_index.relative_paths)}",
-        f"- Working/output text files checked: {len(scan_files)}",
+        f"- Analysis/output text files checked: {len(scan_files)}",
         f"- Files with no source references: {len(no_reference)}",
         f"- Files with missing cited source files: {len(missing)}",
         f"- Files with suspicious source references: {len(suspicious)}",
@@ -295,7 +295,7 @@ def write_report(
                 )
             )
     else:
-        lines.append("No working or output text files were found.")
+        lines.append("No analysis or output text files were found.")
 
     lines.append("")
     report.write_text("\n".join(lines), encoding="utf-8")

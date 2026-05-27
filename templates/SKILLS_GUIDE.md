@@ -82,11 +82,18 @@ Run `studyos-validate` after each processed batch.
 
 Use after batch processing, course-level processing, repairs, or merging.
 
-- Runs deterministic structure, citation, and formula checks where available.
-- Reviews grounding, source coverage, visual coverage, clarity, and exam usefulness according to configured depth.
-- Writes reports under `review/` and `analysis/validation/`.
+- Requires processed batch outputs under `analysis/batches/` or generated outputs under `outputs/`.
+- Requires validation scripts under `study-os/scripts/`.
+- Runs deterministic structural checks, citation/source checks, and formula field checks where applicable.
+- Reviews grounding, unsupported claims, source coverage, visual coverage, clarity, flashcard usefulness, exam-question answer quality, exercise integration, weak points, and unresolved questions according to configured depth.
+- Confirms `review/source-coverage.md` exists after validation.
+- Checks Visual Coverage for any batch with slide, PDF, or image sources.
+- Writes reports under `review/` and detailed notes under `analysis/validation/`.
+- Writes or updates `review/visual-issues.md` and `review/unresolved-questions.md` when relevant.
 
-Validation should lead to targeted repair before regeneration. It must not silently rewrite outputs.
+Validation severity levels are `low`, `medium`, `high`, and `blocking`. Blocking issues stop downstream work. Validation should lead to targeted repair before regeneration: repair affected sections, preserve valid content, avoid regenerating unrelated outputs, and rerun validation after repair.
+
+Completion reports include validation status, blocking issues, high-priority fixes, minor fixes, files written, and the recommended next skill.
 
 ## studyos-course
 

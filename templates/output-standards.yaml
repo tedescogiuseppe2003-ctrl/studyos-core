@@ -156,10 +156,47 @@ outputs:
       - "Common Pitfalls"
       - "Source References"
 
+  validation_report:
+    file: "review/validation-report.md"
+    required_sections:
+      - "Summary"
+      - "Required Output Categories"
+      - "Findings"
+    severity_levels:
+      - "low"
+      - "medium"
+      - "high"
+      - "blocking"
+
+  source_coverage:
+    file: "review/source-coverage.md"
+    required_sections:
+      - "Summary"
+      - "File Coverage"
+
+  validation_details:
+    folder: "analysis/validation/"
+    required_for: "studyos-validate deterministic and LLM audit notes"
+
+  visual_issues:
+    file: "review/visual-issues.md"
+    condition: "required when essential visuals are unresolved or visually grounded claims need repair"
+
+  unresolved_questions:
+    file: "review/unresolved-questions.md"
+    condition: "required when validation leaves unanswered source, formula, or visual questions"
+
 rules:
   require_source_references: true
   final_outputs_must_use_learning_cores: true
   unresolved_questions_must_be_flagged: true
   weak_points_must_be_carried_forward: true
   visual_screening_integrated_in_batch: true
+  visual_coverage_required_for_slide_pdf_image_batches: true
+  essential_visuals_must_be_analyzed_or_unresolved: true
+  flashcards_must_be_active_recall: true
+  exam_questions_must_include_expected_answers: true
+  exercises_must_be_integrated_as_practice: true
+  unsupported_claims_must_be_flagged: true
+  validation_repair_policy: "targeted repair; preserve valid content; do not regenerate unrelated outputs; rerun validation after repair"
   separate_visual_skill_required: false

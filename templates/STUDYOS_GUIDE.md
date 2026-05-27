@@ -86,6 +86,7 @@ Review `analysis/inventory/import_plan.md` before import execute. Do not continu
 - Batch digests: `analysis/batches/<batch>_digest.md`
 - Batch learning cores: `analysis/batches/<batch>_learning_core.md`
 - Batch visual notes: `analysis/visual/<batch>_visual_notes.md` when visual findings exist
+- Validation notes: `analysis/validation/`
 - Notes: `outputs/notes/`
 - Formula sheets: `outputs/formulas/`
 - Flashcards: `outputs/flashcards/`
@@ -110,6 +111,21 @@ Batch output files use these names:
 Visual screening is part of `studyos-batch`, `studyos-course`, and `studyos-validate`. There is no separate visual skill.
 
 Every batch with slides, PDFs, or images must include Visual Coverage in the digest. If no essential visuals exist, the digest says so explicitly. Essential visuals include formulas, definitions, charts, tables, rankings, benchmark values, model diagrams, process diagrams, and summary visual slides.
+
+`studyos-validate` checks Visual Coverage again. Essential visuals must be analyzed in `analysis/visual/` or explicitly carried into `review/visual-issues.md` or `review/unresolved-questions.md`.
+
+## Validation Outputs
+
+`studyos-validate` reads `analysis/batches/`, `analysis/visual/`, `outputs/`, `review/`, `inputs/`, and `subject.yaml`. It writes validation detail under `analysis/validation/` and review reports under `review/`.
+
+Expected validation reports:
+
+- `review/validation-report.md`
+- `review/source-coverage.md`
+- `review/visual-issues.md` when visual issues exist
+- `review/unresolved-questions.md` when unresolved questions remain
+
+Validation uses severity levels `low`, `medium`, `high`, and `blocking`. Blocking issues stop downstream merge or export until repaired.
 
 ## Repair Before Regenerate
 
