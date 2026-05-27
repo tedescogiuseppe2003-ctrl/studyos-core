@@ -45,6 +45,9 @@ DEPRECATED_RELATIVE_PATHS = (
     ".claude/skills/study-os-sort-inputs",
 )
 
+SKILLS_GUIDE_DESTINATION = Path("study-os/config/SKILLS_GUIDE.md")
+STUDYOS_GUIDE_DESTINATION = Path("STUDYOS_GUIDE.md")
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -202,14 +205,12 @@ def sync_guides(source_root: Path, target: Path) -> tuple[int, int, tuple[str, .
     templates_source = source_root / "templates"
 
     skills_guide_source = templates_source / "SKILLS_GUIDE.md"
-    if copy_file_replace(
-        skills_guide_source, target / "study-os/config/SKILLS_GUIDE.md"
-    ):
+    if copy_file_replace(skills_guide_source, target / SKILLS_GUIDE_DESTINATION):
         replaced += 1
     copied += 1
-    synced_paths.append("study-os/config/SKILLS_GUIDE.md")
+    synced_paths.append(str(SKILLS_GUIDE_DESTINATION))
 
-    studyos_guide_destination = target / "STUDYOS_GUIDE.md"
+    studyos_guide_destination = target / STUDYOS_GUIDE_DESTINATION
     if (
         not studyos_guide_destination.exists()
         and not studyos_guide_destination.is_symlink()
@@ -217,7 +218,7 @@ def sync_guides(source_root: Path, target: Path) -> tuple[int, int, tuple[str, .
         studyos_guide_destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(templates_source / "STUDYOS_GUIDE.md", studyos_guide_destination)
         copied += 1
-        synced_paths.append("STUDYOS_GUIDE.md")
+        synced_paths.append(str(STUDYOS_GUIDE_DESTINATION))
 
     return copied, replaced, tuple(synced_paths)
 

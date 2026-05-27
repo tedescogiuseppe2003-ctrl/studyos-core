@@ -61,6 +61,8 @@ Use this to process one planned batch from `working/inventory/batch_plan.md`.
 - Creates a source digest in `working/digests/`.
 - Creates a learning core in `working/learning-cores/`.
 - Creates configured batch outputs under `outputs/`.
+- Includes source coverage so outputs can be traced back to assigned batch sources.
+- Includes visual screening when implemented and when diagrams, charts, tables, screenshots, or other visual material are relevant.
 - Updates weak points and unresolved questions under `review/`.
 - Is best for testing quality one topic at a time before running the rest of the course.
 
@@ -83,6 +85,8 @@ Use this after a batch has digest, learning core, and outputs.
 - Runs deterministic structure checks.
 - Checks citations when configured.
 - Checks formula fields and formula sources when configured.
+- Checks source grounding so claims can be traced to imported material.
+- Checks visual coverage when relevant source material includes diagrams, charts, tables, screenshots, or other visuals.
 - Performs LLM review if requested in `subject.yaml`.
 - Reviews grounding, clarity, active recall quality, exam usefulness, weak points, and unresolved questions.
 - Writes validation reports under `review/`.

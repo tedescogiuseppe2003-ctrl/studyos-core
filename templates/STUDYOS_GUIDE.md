@@ -12,7 +12,20 @@ Normal request:
 
 The installing agent runs the external core installer, runs core sync, confirms the database exists, asks setup questions, fills `subject.yaml`, creates or updates this guide, and stops.
 
-The setup questions cover subject name, course level, material language, exam type, original/raw course folder path, desired outputs, quality/depth mode, visual handling depth, formula handling depth, validation depth, confirmation that original files are read-only, and confirmation that StudyOS copies files into `inputs/`.
+The setup questions the agent should ask are:
+
+- Subject name.
+- Course level: Bachelor, Master, PhD, or Other.
+- Language of the course material.
+- Exam type: written, oral, project, mixed, or unknown.
+- Raw/original course folder path.
+- Whether original files are read-only, default yes.
+- Whether StudyOS should copy files into `inputs/`, default yes.
+- Desired outputs: master notes, formula sheets, flashcards, exam questions, cheat sheets, study plan, and final review pack.
+- Quality/depth mode: `economy`, `standard`, or `rigorous`.
+- Visual handling depth: minimal, standard, or rigorous.
+- Formula handling depth: normal or rigorous.
+- Validation depth: structural only, standard, or rigorous audit.
 
 The user should not manually edit `subject.yaml` unless desired. Installation/setup does not import files, run inventory, or process course material.
 
@@ -26,25 +39,25 @@ Quality mode controls analysis depth, output size, and rigor.
 
 Visual handling depth, formula handling depth, and validation depth further adjust rigor. Higher depth means more careful source screening and validation, especially for diagrams, charts, tables, formulas, assumptions, and exam-critical details.
 
+## subject.yaml
+
+`subject.yaml` stores the course setup answers and processing configuration. It contains the subject name, course level, material language, exam type, requested outputs, quality/depth mode, visual handling depth, formula handling depth, validation depth, model routing, and `raw_source.path` for the original course folder.
+
+The user normally does not edit this file manually. The installing agent fills it from the setup answers before import, inventory, or processing.
+
 ## Folder Structure
 
-- `subject.yaml` stores the course setup: subject name, level, language, exam type, raw source path, processing settings, requested outputs, validation settings, and model routing.
 - `inputs/` contains copied course files after import. Treat these files as read-only.
-- `working/inventory/` contains the import plan, course inventory, and batch plan.
-- `working/digests/` contains source digests for processed batches.
-- `working/learning-cores/` contains the learning core for each processed batch.
-- `working/visual-notes/` contains visual-analysis notes only when charts, diagrams, tables, or images matter.
-- `working/validation/` contains validation handoff notes when needed.
+- `working/` contains intermediate artifacts, including import plans, course inventory, batch plans, source digests, learning cores, visual-analysis notes, and validation handoff notes.
 - `outputs/` contains generated study outputs.
 - `review/` contains validation reports, weak points, unresolved questions, and progress tracking.
-- `study-os/config/` contains StudyOS reference guides and configuration files.
-- `study-os/scripts/` contains local scripts used by the skills.
-- `study-os/skills/`, `.agents/skills/`, and `.claude/skills/` contain the installed skill instructions.
-- `study-os/state/` contains local state such as the SQLite database and run logs.
+- `study-os/` contains installed StudyOS scripts, skills, config guides, local state such as the SQLite database, and run logs.
 
 ## Protected Files
 
-The original raw course folder configured at `subject.yaml` -> `raw_source.path` is read-only. StudyOS must never move, rename, delete, or modify anything there.
+The original raw course folder configured at `subject.yaml` -> `raw_source.path` is read-only. StudyOS must never move, rename, delete, overwrite, or modify anything there.
+
+Import copies approved files into `inputs/`. Original raw files stay where they are and are never changed.
 
 Files under `inputs/` are imported copies. After import, StudyOS treats them as read-only and processes them by reading only.
 
@@ -76,13 +89,14 @@ Generated files live under `working/`, `outputs/`, `review/`, and `study-os/stat
 After installation/setup, call skills manually one step at a time:
 
 1. Run `study-os-import-sources` in proposal mode.
-2. Review `working/inventory/import_plan.md`.
-3. Run `study-os-import-sources` in execute mode when the import plan is acceptable.
-4. Run `study-os-inventory`.
-5. Run `study-os-process-batch` for one batch to test quality.
-6. Run `study-os-validate` for that batch.
-7. Repeat `study-os-process-batch` and `study-os-validate` for additional batches, or explicitly ask for `study-os-process-course`.
-8. Run `study-os-synthesize` when the course is processed and validated.
+2. Run `study-os-import-sources` in execute mode when the import plan is acceptable.
+3. Run `study-os-inventory`.
+4. Run `study-os-process-batch` for one batch to test quality.
+5. Run `study-os-validate` for that batch.
+6. Run `study-os-process-course` if you want remaining batches processed sequentially.
+7. Run `study-os-synthesize` when the course is processed and validated.
+
+Review `working/inventory/import_plan.md` before import execute. Do not continue with execute mode unless the proposed copies are acceptable.
 
 ## If A Skill Warns That A Previous Step Is Missing
 

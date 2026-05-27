@@ -24,6 +24,11 @@ COURSE_LOCAL_SCRIPTS = (
     "export_final_pack.py",
 )
 
+TEMPLATE_DESTINATIONS = {
+    "SKILLS_GUIDE.md": Path("study-os/config/SKILLS_GUIDE.md"),
+    "STUDYOS_GUIDE.md": Path("STUDYOS_GUIDE.md"),
+}
+
 SUBJECT_DIRECTORIES = (
     "inputs/slides",
     "inputs/readings",
@@ -139,10 +144,10 @@ def copy_templates(source_root: Path, target: Path) -> tuple[int, int]:
     templates_source = source_root / "templates"
 
     for template_source in sorted(templates_source.iterdir()):
-        if template_source.name == "SKILLS_GUIDE.md":
-            destination = target / "study-os/config/SKILLS_GUIDE.md"
-        else:
-            destination = target / template_source.name
+        relative_destination = TEMPLATE_DESTINATIONS.get(
+            template_source.name, Path(template_source.name)
+        )
+        destination = target / relative_destination
 
         if template_source.is_dir():
             copied_count, skipped_count = copy_tree_without_overwrite(
