@@ -37,14 +37,14 @@ Proposal mode:
 
 - Scans `subject.yaml` -> `raw_source.path` read-only.
 - Classifies raw course files by filename, folder, metadata, and minimal skimming only when needed.
-- Writes `working/inventory/import_plan.md`.
+- Writes `analysis/inventory/import_plan.md`.
 - Does not copy, move, rename, delete, modify, summarize, or process files.
 
 Execute mode:
 
-- Reads the approved `working/inventory/import_plan.md`.
+- Reads the approved `analysis/inventory/import_plan.md`.
 - Copies approved rows into `inputs/`.
-- Writes `working/inventory/import_log.md`.
+- Writes `analysis/inventory/import_log.md`.
 - Never modifies original files.
 - Never overwrites destination files.
 
@@ -55,8 +55,8 @@ Run this before `study-os-inventory` unless `inputs/` already contains approved 
 Use this after source files exist under `inputs/`.
 
 - Scans only approved `inputs/` folders.
-- Creates `working/inventory/course_inventory.md`.
-- Creates `working/inventory/batch_plan.md`.
+- Creates `analysis/inventory/course_inventory.md`.
+- Creates `analysis/inventory/batch_plan.md`.
 - Groups files into conceptual batches such as topics, lectures, modules, or tutorial sessions.
 - Treats exercises as supporting sources unless they are explicitly tutorial or conceptual material.
 - Does not summarize, process, validate, or generate study outputs.
@@ -65,12 +65,12 @@ Run this before `study-os-process-batch`. Use `study-os-process-course` only whe
 
 ## study-os-process-batch
 
-Use this to process one planned batch from `working/inventory/batch_plan.md`.
+Use this to process one planned batch from `analysis/inventory/batch_plan.md`.
 
 - Processes one batch at a time.
 - Reads every assigned source for that batch.
-- Creates a source digest in `working/digests/`.
-- Creates a learning core in `working/learning-cores/`.
+- Creates a source digest in `analysis/batches/`.
+- Creates a learning core in `analysis/batches/`.
 - Creates configured batch outputs under `outputs/`.
 - Includes source coverage so outputs can be traced back to assigned batch sources.
 - Includes visual screening when implemented and when diagrams, charts, tables, screenshots, or other visual material are relevant.
@@ -101,7 +101,7 @@ Use this after a batch has digest, learning core, and outputs.
 - Performs LLM review if requested in `subject.yaml`.
 - Reviews grounding, clarity, active recall quality, exam usefulness, weak points, and unresolved questions.
 - Writes validation reports under `review/`.
-- May write additional handoff notes under `working/validation/`.
+- May write additional handoff notes under `analysis/validation/`.
 
 Validation does not rewrite outputs unless the user explicitly asks for fixes.
 
@@ -111,7 +111,7 @@ When fixes are in scope, validation should lead to targeted repair before regene
 
 Use this after one batch has been processed and validated successfully.
 
-- Reads `working/inventory/batch_plan.md`.
+- Reads `analysis/inventory/batch_plan.md`.
 - Processes remaining planned or stale batches sequentially.
 - Uses the `study-os-process-batch` workflow for each batch.
 - Validates each batch before continuing.

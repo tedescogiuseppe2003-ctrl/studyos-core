@@ -33,7 +33,7 @@ quality_modes:
 
 outputs:
   digest:
-    file: "outputs/digest.md"
+    file: "analysis/batches/digest.md"
     required_sections:
       - "Scope"
       - "Source List"
@@ -49,7 +49,7 @@ outputs:
       - "Source References"
 
   learning_core:
-    file: "outputs/learning-core.md"
+    file: "analysis/batches/learning-core.md"
     required_sections:
       - "Learning Objectives"
       - "Core Concepts"
@@ -63,7 +63,7 @@ outputs:
       - "Source References"
 
   formula_sheet:
-    file: "outputs/formula-sheet.md"
+    file: "outputs/formulas/formula-sheet.md"
     required_sections:
       - "Notation"
       - "Formula Index"
@@ -74,7 +74,7 @@ outputs:
       - "Source References"
 
   flashcards:
-    file: "outputs/flashcards.md"
+    file: "outputs/flashcards/flashcards.md"
     required_sections:
       - "Deck Scope"
       - "Concept Cards"
@@ -85,7 +85,7 @@ outputs:
       - "Source References"
 
   exam_questions:
-    file: "outputs/exam-questions.md"
+    file: "outputs/questions/exam-questions.md"
     required_sections:
       - "Exam Scope"
       - "Question Set"

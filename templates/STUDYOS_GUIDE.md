@@ -58,8 +58,9 @@ The user normally does not edit this file manually. The installing agent fills i
 ## Folder Structure
 
 - `inputs/` contains copied course files after import. Treat these files as read-only.
-- `working/` contains intermediate artifacts, including import plans, course inventory, batch plans, source digests, learning cores, visual-analysis notes, and validation handoff notes.
+- `analysis/` contains intermediate artifacts, including import plans, course inventory, batch plans, source digests, learning cores, visual-analysis notes, and validation handoff notes.
 - `outputs/` contains generated study outputs.
+- `exports/pdf/unmerged/` and `exports/pdf/merged/` contain PDF exports.
 - `review/` contains validation reports, weak points, unresolved questions, and progress tracking.
 - `study-os/` contains installed StudyOS scripts, skills, config guides, local state such as the SQLite database, and run logs.
 
@@ -71,16 +72,16 @@ Import copies approved files into `inputs/`. Original raw files stay where they 
 
 Files under `inputs/` are imported copies. After import, StudyOS treats them as read-only and processes them by reading only.
 
-Generated files live under `working/`, `outputs/`, `review/`, and `study-os/state/`.
+Generated files live under `analysis/`, `outputs/`, `exports/`, `review/`, and `study-os/state/`.
 
 ## Skill Commands
 
 - `python3 study-os/scripts/studyos.py status` reports the current StudyOS workspace state and the next recommended manual skill. It does not import, inventory, process, validate, synthesize, or modify files.
 - `python3 study-os/scripts/studyos.py doctor` checks local readiness, installed folders/scripts/skills/config, and obvious stale setup issues. It does not modify files.
-- `study-os-import-sources` scans the configured raw source folder read-only. In proposal mode it writes `working/inventory/import_plan.md`. In execute mode it copies approved files into `inputs/` and writes `working/inventory/import_log.md`.
-- `study-os-inventory` scans `inputs/`, creates `working/inventory/course_inventory.md`, and creates `working/inventory/batch_plan.md`.
+- `study-os-import-sources` scans the configured raw source folder read-only. In proposal mode it writes `analysis/inventory/import_plan.md`. In execute mode it copies approved files into `inputs/` and writes `analysis/inventory/import_log.md`.
+- `study-os-inventory` scans `inputs/`, creates `analysis/inventory/course_inventory.md`, and creates `analysis/inventory/batch_plan.md`.
 - `study-os-process-batch` processes one planned batch. It creates a digest, a learning core, and the configured batch outputs.
-- `study-os-validate` validates a processed batch with deterministic checks and, when configured, LLM review. It writes reports under `review/` and `working/validation/`.
+- `study-os-validate` validates a processed batch with deterministic checks and, when configured, LLM review. It writes reports under `review/` and `analysis/validation/`.
 - `study-os-process-course` processes remaining planned batches sequentially only when the user explicitly asks for that skill. It validates each batch before moving to the next and stops on severe issues.
 - `study-os-synthesize` creates final course-level outputs after batches have been processed and validated.
 
@@ -109,7 +110,7 @@ After installation/setup, call skills manually one step at a time:
 7. Run `study-os-process-course` if you want remaining batches processed sequentially.
 8. Run `study-os-synthesize` when the course is processed and validated.
 
-Review `working/inventory/import_plan.md` before import execute. Do not continue with execute mode unless the proposed copies are acceptable.
+Review `analysis/inventory/import_plan.md` before import execute. Do not continue with execute mode unless the proposed copies are acceptable.
 
 ## If A Skill Warns That A Previous Step Is Missing
 
@@ -127,20 +128,20 @@ Common examples:
 
 ## Output Locations
 
-- Master notes: `outputs/master-notes/`
-- Formula sheets: `outputs/formula-sheets/`
+- Master notes: `outputs/notes/`
+- Formula sheets: `outputs/formulas/`
 - Flashcards: `outputs/flashcards/`
-- Exam questions: `outputs/exam-questions/`
+- Exam questions: `outputs/questions/`
 - Cheat sheets: `outputs/cheat-sheets/`
 - Study plans: `outputs/study-plan/`
-- Final review packs: `outputs/final-review-pack/`
+- Final review packs: `outputs/final-pack/`
 
 ## Validation Report Locations
 
 - Main validation report: `review/validation-report.md`
 - Source coverage report: `review/source-coverage.md`
 - Formula validation report: `review/formula_validation_report.md`
-- Additional validation notes: `working/validation/`
+- Additional validation notes: `analysis/validation/`
 
 ## Restarting Or Rerunning Safely
 
@@ -148,7 +149,7 @@ Rerun steps in order from the earliest stale or missing artifact. Do not edit or
 
 Safe reruns:
 
-- Rerun import proposal to refresh `working/inventory/import_plan.md`.
+- Rerun import proposal to refresh `analysis/inventory/import_plan.md`.
 - Rerun import execute to copy approved files that are not already present. Existing destination files are not overwritten.
 - Rerun inventory after new files are copied into `inputs/`.
 - Rerun one batch when its sources or outputs are stale.

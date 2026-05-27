@@ -122,7 +122,7 @@ Sync updates course-local scripts in `study-os/scripts/` and replaces installed 
 
 Sync also updates `study-os/config/SKILLS_GUIDE.md`. If root `STUDYOS_GUIDE.md` exists, sync leaves it unchanged; if it is missing, sync copies the current guide template.
 
-Sync does not touch raw course files or generated study work in `inputs/`, `outputs/`, `working/`, `review/`, `subject.yaml`, or `.git/`. It writes a sync log to `study-os/state/sync-log.md`.
+Sync does not touch raw course files or generated study work in `inputs/`, `outputs/`, `analysis/`, `review/`, `subject.yaml`, or `.git/`. It writes a sync log to `study-os/state/sync-log.md`.
 
 Never run an old installed copy such as `study-os/scripts/install_studyos.py`. If one exists from an earlier install, `sync_studyos.py` removes it.
 

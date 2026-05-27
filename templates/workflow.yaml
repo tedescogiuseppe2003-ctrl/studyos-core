@@ -17,8 +17,10 @@ workflow:
       - "output-standards.yaml"
       - "model-routing.yaml"
       - "inputs/"
-      - "working/"
+      - "analysis/"
       - "outputs/"
+      - "exports/pdf/unmerged/"
+      - "exports/pdf/merged/"
       - "review/"
       - "study-os/"
       - ".agents/"
@@ -40,7 +42,7 @@ workflow:
       - "subject.yaml"
       - "subject.yaml raw_source.path"
     outputs:
-      - "working/inventory/import_plan.md"
+      - "analysis/inventory/import_plan.md"
     checks:
       - "raw_source_is_read_only"
       - "no_files_are_copied"
@@ -54,7 +56,7 @@ workflow:
     inputs:
       - "subject.yaml"
       - "subject.yaml raw_source.path"
-      - "working/inventory/import_plan.md"
+      - "analysis/inventory/import_plan.md"
     outputs:
       - "inputs/slides/"
       - "inputs/readings/"
@@ -63,7 +65,7 @@ workflow:
       - "inputs/exams/"
       - "inputs/transcripts/"
       - "inputs/miscellaneous/"
-      - "working/inventory/import_log.md"
+      - "analysis/inventory/import_log.md"
     checks:
       - "only_rows_marked_copy_are_copied"
       - "destination_files_are_not_overwritten"
@@ -77,8 +79,8 @@ workflow:
     inputs:
       - "inputs/"
     outputs:
-      - "working/inventory/course_inventory.md"
-      - "working/inventory/batch_plan.md"
+      - "analysis/inventory/course_inventory.md"
+      - "analysis/inventory/batch_plan.md"
       - "study-os/state/studyos.sqlite"
     checks:
       - "inventory_scans_only_inputs"
@@ -90,16 +92,16 @@ workflow:
     skill: "study-os-process-batch"
     purpose: "Process one planned conceptual batch before attempting the rest of the course."
     inputs:
-      - "working/inventory/course_inventory.md"
-      - "working/inventory/batch_plan.md"
+      - "analysis/inventory/course_inventory.md"
+      - "analysis/inventory/batch_plan.md"
       - "inputs/"
     outputs:
-      - "working/digests/"
-      - "working/learning-cores/"
-      - "outputs/master-notes/"
-      - "outputs/formula-sheets/"
+      - "analysis/batches/*-digest.md"
+      - "analysis/batches/*-learning-core.md"
+      - "outputs/notes/"
+      - "outputs/formulas/"
       - "outputs/flashcards/"
-      - "outputs/exam-questions/"
+      - "outputs/questions/"
       - "outputs/cheat-sheets/"
       - "outputs/study-plan/"
       - "review/weak-points.md"
@@ -114,16 +116,16 @@ workflow:
     skill: "study-os-validate"
     purpose: "Validate the first processed batch before continuing."
     inputs:
-      - "working/inventory/batch_plan.md"
-      - "working/digests/"
-      - "working/learning-cores/"
+      - "analysis/inventory/batch_plan.md"
+      - "analysis/batches/*-digest.md"
+      - "analysis/batches/*-learning-core.md"
       - "outputs/"
       - "inputs/"
     outputs:
       - "review/validation-report.md"
       - "review/source-coverage.md"
       - "review/formula_validation_report.md"
-      - "working/validation/"
+      - "analysis/validation/"
     checks:
       - "deterministic_structure_citation_and_formula_checks_run"
       - "llm_review_checks_grounding_clarity_exam_usefulness_and_missing_sources"
@@ -133,13 +135,13 @@ workflow:
     skill: "study-os-process-course"
     purpose: "Process remaining planned batches sequentially, validating each batch before continuing."
     inputs:
-      - "working/inventory/course_inventory.md"
-      - "working/inventory/batch_plan.md"
+      - "analysis/inventory/course_inventory.md"
+      - "analysis/inventory/batch_plan.md"
       - "inputs/"
       - "review/validation-report.md"
     outputs:
-      - "working/digests/"
-      - "working/learning-cores/"
+      - "analysis/batches/*-digest.md"
+      - "analysis/batches/*-learning-core.md"
       - "outputs/"
       - "review/validation-report.md"
       - "review/source-coverage.md"
@@ -155,8 +157,8 @@ workflow:
     skill: "study-os-synthesize"
     purpose: "Create final course-level outputs from validated learning cores and validated batch outputs."
     inputs:
-      - "working/inventory/batch_plan.md"
-      - "working/learning-cores/"
+      - "analysis/inventory/batch_plan.md"
+      - "analysis/batches/*-learning-core.md"
       - "outputs/"
       - "review/validation-report.md"
       - "review/source-coverage.md"
@@ -164,7 +166,7 @@ workflow:
       - "review/weak-points.md"
       - "review/unresolved-questions.md"
     outputs:
-      - "outputs/final-review-pack/"
+      - "outputs/final-pack/"
     checks:
       - "final_outputs_are_based_on_learning_cores"
       - "synthesis_integrates_across_batches_instead_of_concatenating_only"
@@ -174,8 +176,8 @@ workflow:
     skill: "study-os-validate"
     purpose: "Validate final synthesis after course-level outputs are created."
     inputs:
-      - "outputs/final-review-pack/"
-      - "working/learning-cores/"
+      - "outputs/final-pack/"
+      - "analysis/batches/*-learning-core.md"
       - "review/"
       - "inputs/"
     outputs:
@@ -187,3 +189,16 @@ workflow:
       - "citations_resolve_to_inputs"
       - "formula_fields_are_complete"
       - "unresolved_questions_remain_visible"
+
+  export:
+    skill: "study-os-export"
+    purpose: "Export unmerged and merged study outputs to PDF."
+    inputs:
+      - "outputs/"
+      - "outputs/final-pack/"
+    outputs:
+      - "exports/pdf/unmerged/"
+      - "exports/pdf/merged/"
+    checks:
+      - "unmerged_exports_preserve_individual_outputs"
+      - "merged_exports_use_final_pack_outputs"

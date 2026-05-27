@@ -38,19 +38,20 @@ SUBJECT_DIRECTORIES = (
     "inputs/exams",
     "inputs/transcripts",
     "inputs/miscellaneous",
-    "working/inventory",
-    "working/digests",
-    "working/learning-cores",
-    "working/visual-notes",
-    "working/validation",
-    "outputs/master-notes",
-    "outputs/formula-sheets",
+    "analysis/inventory",
+    "analysis/batches",
+    "analysis/visual",
+    "analysis/validation",
+    "analysis/state",
+    "outputs/notes",
+    "outputs/formulas",
     "outputs/flashcards",
-    "outputs/exam-questions",
+    "outputs/questions",
     "outputs/cheat-sheets",
     "outputs/study-plan",
-    "outputs/final-review-pack",
-    "outputs/assets",
+    "outputs/final-pack",
+    "exports/pdf/unmerged",
+    "exports/pdf/merged",
     "review",
     "study-os/config",
     "study-os/state",
@@ -58,6 +59,15 @@ SUBJECT_DIRECTORIES = (
     "study-os/skills",
     ".agents/skills",
     ".claude/skills",
+)
+
+REVIEW_FILES = (
+    "review/weak-points.md",
+    "review/unresolved-questions.md",
+    "review/visual-issues.md",
+    "review/source-coverage.md",
+    "review/validation-report.md",
+    "review/progress-tracker.md",
 )
 
 
@@ -86,6 +96,20 @@ def ensure_directories(target: Path) -> int:
         if not directory.exists():
             created += 1
         directory.mkdir(parents=True, exist_ok=True)
+
+    return created
+
+
+def ensure_review_files(target: Path) -> int:
+    created = 0
+
+    for relative_path in REVIEW_FILES:
+        path = target / relative_path
+        if path.exists() or path.is_symlink():
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("", encoding="utf-8")
+        created += 1
 
     return created
 
@@ -255,6 +279,7 @@ def main() -> int:
     try:
         validate_sources(source_root)
         created_dirs = ensure_directories(target)
+        created_review_files = ensure_review_files(target)
         copied_templates, skipped_templates = copy_templates(source_root, target)
         copied_scripts, skipped_scripts = copy_scripts(source_root, target)
         copied_skills, skipped_skills = copy_skills(source_root, target)
@@ -271,6 +296,7 @@ def main() -> int:
 
     print(f"StudyOS installed at: {target}")
     print(f"Directories created: {created_dirs}")
+    print(f"Review files created: {created_review_files}")
     print(f"Files copied: {copied_files}")
     print(f"Existing files preserved: {skipped_files}")
     print(f"Database initialized: {db_path}")

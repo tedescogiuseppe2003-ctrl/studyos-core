@@ -20,8 +20,8 @@ SKILL_DESTINATIONS = (
 
 INTENTIONALLY_NOT_TOUCHED = (
     "inputs/",
+    "analysis/",
     "outputs/",
-    "working/",
     "review/",
     "subject.yaml",
     "STUDYOS_GUIDE.md (when already present)",
@@ -40,6 +40,7 @@ COURSE_LOCAL_SCRIPTS = (
 )
 
 DEPRECATED_RELATIVE_PATHS = (
+    "study-os/scripts/install_studyos.py",
     "study-os/scripts/sort_inputs.py",
     "study-os/skills/study-os-sort-inputs",
     ".agents/skills/study-os-sort-inputs",
