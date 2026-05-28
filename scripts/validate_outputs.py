@@ -116,6 +116,7 @@ SOURCE_PATH_SUFFIX_PATTERN = re.compile(
     r"[\w ./()@+\-]+?\.(?:csv|docx?|html?|jpe?g|md|pdf|png|pptx?|txt|xlsx?)",
     re.IGNORECASE,
 )
+MARKDOWN_HEADING_PATTERN = re.compile(r"^\s*(?P<marks>#{1,6})[ \t]+(?P<title>.*?)[ \t]*$")
 
 
 @dataclass(frozen=True)
@@ -170,6 +171,11 @@ class SourceCoverageResult:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Validate StudyOS output folder structure and non-empty files."
+    )
+    parser.add_argument(
+        "--self-check",
+        action="store_true",
+        help="Run internal parser sanity checks and exit.",
     )
     parser.add_argument(
         "--root",
@@ -237,10 +243,32 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
+def markdown_heading(line: str) -> tuple[int, str] | None:
+    match = MARKDOWN_HEADING_PATTERN.match(line)
+    if not match:
+        return None
+
+    title = match.group("title").strip()
+    title = re.sub(r"[ \t]+#+[ \t]*$", "", title).strip()
+    return len(match.group("marks")), title
+
+
+def normalized_heading_title(title: str) -> str:
+    return " ".join(title.split()).casefold()
+
+
 def has_section(text: str, section: str) -> bool:
     escaped = re.escape(section)
+    target = normalized_heading_title(section)
+    markdown_match = False
+    for line in text.splitlines():
+        heading = markdown_heading(line)
+        if heading is not None and normalized_heading_title(heading[1]) == target:
+            markdown_match = True
+            break
+
     return (
-        re.search(rf"(?im)^\s*#{1,6}\s+{escaped}\s*$", text) is not None
+        markdown_match
         or re.search(rf"(?im)^\s*(?:[-*]\s*)?\*\*{escaped}\*\*\s*:?\s*$", text)
         is not None
         or section.lower() in text.lower()
@@ -248,11 +276,60 @@ def has_section(text: str, section: str) -> bool:
 
 
 def section_body(text: str, section: str) -> str:
-    pattern = re.compile(
-        rf"(?ims)^\s*#{1,6}\s+{re.escape(section)}\s*$\n(?P<body>.*?)(?=^\s*#{1,6}\s+\S|\Z)"
-    )
-    match = pattern.search(text)
-    return match.group("body").strip() if match else ""
+    target = normalized_heading_title(section)
+    lines = text.splitlines(keepends=True)
+
+    for index, line in enumerate(lines):
+        heading = markdown_heading(line)
+        if heading is None:
+            continue
+
+        section_level, title = heading
+        if normalized_heading_title(title) != target:
+            continue
+
+        body_lines: list[str] = []
+        for body_line in lines[index + 1 :]:
+            next_heading = markdown_heading(body_line)
+            if next_heading is not None and next_heading[0] <= section_level:
+                break
+            body_lines.append(body_line)
+        return "".join(body_lines).strip()
+
+    return ""
+
+
+def run_self_check() -> None:
+    sample = """
+# Scope
+Scope body.
+
+## Core Notes
+Core body.
+
+### Model Setup
+Nested body.
+
+## Definitions
+Definitions body.
+
+### Term A
+Nested definition.
+
+## Examples
+Examples body.
+"""
+    core = section_body(sample, "Core Notes")
+    definitions = section_body(sample, "Definitions")
+    level_three = section_body("### Definitions\nLevel-three body.\n## Next\nStop.", "Definitions")
+
+    assert "Core body." in core
+    assert "Nested body." in core
+    assert "Definitions body." not in core
+    assert "Definitions body." in definitions
+    assert "Nested definition." in definitions
+    assert "Examples body." not in definitions
+    assert level_three == "Level-three body."
 
 
 def flexible_section_body(text: str, section: str) -> str:
@@ -1688,6 +1765,11 @@ def write_report(
 
 def main() -> int:
     args = parse_args()
+    if args.self_check:
+        run_self_check()
+        print("validate_outputs.py self-check passed.")
+        return 0
+
     root = args.root.expanduser().resolve()
 
     try:
