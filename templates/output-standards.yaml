@@ -115,6 +115,9 @@ outputs:
       - "Source references"
     standards:
       - "Cover every assigned primary and supporting source."
+      - "Every assigned source from analysis/inventory/batch_plan.md must appear in the Source Coverage table."
+      - "Allowed source coverage statuses are used, partially used, unreadable, irrelevant, duplicate, and deferred."
+      - "Unreadable, irrelevant, duplicate, and deferred sources require a concrete reason."
       - "Separate extracted source facts from interpretation."
       - "Record visual findings, tables, charts, diagrams, and unresolved visual issues when present."
       - "Capture exercise and exam material primarily as signals for the question output."
@@ -357,6 +360,14 @@ outputs:
     required_sections:
       - "Summary"
       - "File Coverage"
+      - "Assigned Source Coverage"
+    deterministic_checks:
+      - "Read analysis/inventory/batch_plan.md."
+      - "For each batch, compare primary and supporting sources against analysis/batches/<batch>_digest.md Source Coverage."
+      - "Flag assigned sources missing from Source Coverage."
+      - "Require allowed status: used, partially used, unreadable, irrelevant, duplicate, or deferred."
+      - "Require a reason for unreadable, irrelevant, duplicate, and deferred."
+      - "Write batch, source, role, severity, and recommended repair."
 
   validation_details:
     folder: "analysis/validation/"
@@ -419,6 +430,8 @@ rules:
   visual_coverage_required_for_slide_pdf_image_batches: true
   essential_visuals_must_be_analyzed_or_unresolved: true
   source_coverage_required_for_all_assigned_sources: true
+  source_coverage_must_compare_batch_plan_assignments_to_digest: true
+  source_coverage_non_use_status_requires_reason: true
   unsupported_claims_must_be_flagged: true
   validation_repair_policy: "targeted repair; preserve valid content; do not regenerate unrelated outputs; rerun validation after repair"
   separate_visual_skill_required: false

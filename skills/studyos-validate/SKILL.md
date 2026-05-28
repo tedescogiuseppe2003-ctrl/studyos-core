@@ -94,6 +94,9 @@ Do not require or validate removed final outputs: flashcards, cheat sheets, stud
 ## Internal support
 
 - Digest exists for processed batches and includes Source Coverage.
+- Deterministically compare assigned primary and supporting sources in `analysis/inventory/batch_plan.md` against each batch digest Source Coverage table.
+- Every assigned source must appear in Source Coverage with status `used`, `partially used`, `unreadable`, `irrelevant`, `duplicate`, or `deferred`.
+- Sources marked `unreadable`, `irrelevant`, `duplicate`, or `deferred` require a concrete reason.
 - Digest includes Visual Coverage when assigned sources include slides, PDFs, images, charts, tables, diagrams, or screenshots. If no essential visuals exist, it says so explicitly.
 - Learning core exists and is not over-compressed relative to the digest.
 - Source references are meaningful and resolve to `inputs/`.
@@ -115,6 +118,8 @@ For a selected batch, inspect the batch digest and outputs together:
 - `outputs/questions/<batch>_questions.md`
 
 The digest must include Source Coverage. If assigned sources include slides, PDFs, or images, the digest must also include Visual Coverage. If no essential visuals exist, that must be stated explicitly.
+
+Source Coverage validation must identify the batch, source path, source role, status, missing reason when applicable, severity, and recommended repair. Missing primary source coverage is high or blocking. Missing supporting source coverage is medium or high depending on role and exam relevance. Deferred without a reason is high. Duplicate or irrelevant with a clear reason is low or medium and should remain visible in `review/source-coverage.md`.
 
 # Model routing and efficiency
 

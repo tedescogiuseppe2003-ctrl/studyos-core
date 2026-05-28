@@ -104,6 +104,8 @@ Use after batch processing, course-level processing, repairs, or merging.
 - Checks formula sheets for Formula Index, Notation, display LaTeX, non-ASCII-only formula formatting, and required fields per formula.
 - Checks questions for expected answers, topic/concept grouping, conceptual and exam-style prompts, formula/application practice when relevant, exercise-derived practice, and source or topic references.
 - Checks internal quality-support files: digest Source Coverage, digest Visual Coverage when relevant, learning core depth relative to the digest, and tracked unresolved visual/formula issues.
+- Compares assigned primary and supporting sources in `analysis/inventory/batch_plan.md` against each batch digest Source Coverage table.
+- Flags missing assigned sources and sources marked `unreadable`, `irrelevant`, `duplicate`, or `deferred` without a concrete reason.
 - Reviews grounding, unsupported claims, source coverage, visual coverage, clarity, exam-question answer quality, exercise integration, weak points, and unresolved questions according to configured depth.
 - Confirms `review/source-coverage.md` exists after validation.
 - Checks Visual Coverage for any batch with slide, PDF, or image sources.

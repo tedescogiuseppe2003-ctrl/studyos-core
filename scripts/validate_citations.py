@@ -216,6 +216,17 @@ def table_row(values: list[str]) -> str:
     return "| " + " | ".join(escaped) + " |"
 
 
+def existing_assigned_source_coverage(report: Path) -> str:
+    if not report.is_file():
+        return ""
+    text = report.read_text(encoding="utf-8", errors="replace")
+    match = re.search(
+        r"(?ms)^## Assigned Source Coverage\s*$.*?(?=^##\s+\S|\Z)",
+        text,
+    )
+    return match.group(0).strip() if match else ""
+
+
 def format_list(values: list[str]) -> str:
     if not values:
         return ""
@@ -230,6 +241,7 @@ def write_report(
 ) -> Path:
     report = root / REPORT_PATH
     report.parent.mkdir(parents=True, exist_ok=True)
+    assigned_source_coverage = existing_assigned_source_coverage(report)
 
     no_reference = [result for result in results if result.reference_count == 0]
     missing = [result for result in results if result.missing_references]
@@ -296,6 +308,9 @@ def write_report(
             )
     else:
         lines.append("No analysis or output text files were found.")
+
+    if assigned_source_coverage:
+        lines.extend(["", assigned_source_coverage])
 
     lines.append("")
     report.write_text("\n".join(lines), encoding="utf-8")

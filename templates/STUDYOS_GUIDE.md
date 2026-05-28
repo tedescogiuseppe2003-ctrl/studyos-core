@@ -223,7 +223,7 @@ For formulas, validation checks that relevant formula sheets exist, Formula Inde
 
 For questions, validation checks expected answers, topic or concept grouping, conceptual and exam-style prompts, formula/application questions for formula-heavy batches, exercise-derived practice where assigned, and source or topic references.
 
-For internal support, validation checks Source Coverage in digests, Visual Coverage when relevant, learning cores that preserve enough digest depth, and unresolved visual/formula issues tracked in review files.
+For internal support, validation checks Source Coverage in digests, Visual Coverage when relevant, learning cores that preserve enough digest depth, and unresolved visual/formula issues tracked in review files. It also compares assigned primary and supporting sources in `analysis/inventory/batch_plan.md` against each batch digest Source Coverage table. Every assigned source must be listed with status `used`, `partially used`, `unreadable`, `irrelevant`, `duplicate`, or `deferred`; non-use statuses require a concrete reason.
 
 Expected validation reports:
 

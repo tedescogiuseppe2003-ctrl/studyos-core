@@ -13,6 +13,7 @@ from pathlib import Path
 
 REPORT_PATH = Path("review/validation-report.md")
 DETAIL_REPORT_PATH = Path("analysis/validation/output-structure.md")
+SOURCE_COVERAGE_REPORT_PATH = Path("review/source-coverage.md")
 SEVERITIES = ("low", "medium", "high", "blocking")
 
 REQUIRED_FOLDERS = (
@@ -94,6 +95,27 @@ REMOVED_OUTPUT_MARKERS = (
     "review-packs",
     "review_packs",
 )
+SOURCE_COVERAGE_STATUSES = {
+    "used",
+    "partially used",
+    "unreadable",
+    "irrelevant",
+    "duplicate",
+    "deferred",
+}
+SOURCE_COVERAGE_STATUS_ORDER = (
+    "partially used",
+    "used",
+    "unreadable",
+    "irrelevant",
+    "duplicate",
+    "deferred",
+)
+SOURCE_COVERAGE_REASON_REQUIRED = {"unreadable", "irrelevant", "duplicate", "deferred"}
+SOURCE_PATH_SUFFIX_PATTERN = re.compile(
+    r"[\w ./()@+\-]+?\.(?:csv|docx?|html?|jpe?g|md|pdf|png|pptx?|txt|xlsx?)",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -115,6 +137,34 @@ class BatchContext:
     formula_relevant: bool
     visual_relevant: bool
     exercise_relevant: bool
+
+
+@dataclass(frozen=True)
+class AssignedSource:
+    batch: str
+    path: str
+    role: str
+
+
+@dataclass(frozen=True)
+class SourceCoverageEntry:
+    batch: str
+    source: str
+    status: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class SourceCoverageResult:
+    batch: str
+    digest: str
+    source: str
+    role: str
+    status: str
+    reason: str
+    severity: str
+    issue: str
+    recommended_repair: str
 
 
 def parse_args() -> argparse.Namespace:
@@ -203,6 +253,39 @@ def section_body(text: str, section: str) -> str:
     )
     match = pattern.search(text)
     return match.group("body").strip() if match else ""
+
+
+def flexible_section_body(text: str, section: str) -> str:
+    body = section_body(text, section)
+    if body:
+        return body
+
+    lines = text.splitlines()
+    start_index: int | None = None
+    section_pattern = re.compile(rf"(?i)\b{re.escape(section)}\b")
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if section_pattern.search(stripped) and (
+            stripped.startswith("#")
+            or stripped.startswith("**")
+            or stripped.endswith(":")
+        ):
+            start_index = index + 1
+            break
+
+    if start_index is None:
+        return ""
+
+    body_lines: list[str] = []
+    for line in lines[start_index:]:
+        stripped = line.strip()
+        if body_lines and (
+            re.match(r"^#{1,6}\s+\S", stripped)
+            or re.match(r"^\*\*[^*]+\*\*\s*:?\s*$", stripped)
+        ):
+            break
+        body_lines.append(line)
+    return "\n".join(body_lines).strip()
 
 
 def word_count(text: str) -> int:
@@ -409,6 +492,476 @@ def source_references_present(text: str) -> bool:
             is not None
         )
     )
+
+
+def normalize_source_path(value: str) -> str:
+    cleaned = value.strip()
+    cleaned = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", cleaned)
+    cleaned = cleaned.strip("`*_ \t\r\n'\".,;:)]}")
+    cleaned = cleaned.lstrip("./")
+    cleaned = cleaned.replace("\\", "/")
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned.lower()
+
+
+def source_display_path(value: str) -> str:
+    cleaned = value.strip()
+    path_match = SOURCE_PATH_SUFFIX_PATTERN.search(cleaned)
+    if path_match:
+        return path_match.group(0).strip("`*_ \t\r\n'\".,;:)]}")
+    return cleaned.strip("`*_ \t\r\n'\".,;:)]}")
+
+
+def normalize_coverage_status(value: str) -> str:
+    cleaned = re.sub(r"[_-]+", " ", value.lower())
+    cleaned = re.sub(r"[^a-z ]+", " ", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if cleaned in {"partial", "partially", "partly used", "part used"}:
+        return "partially used"
+    for status in SOURCE_COVERAGE_STATUS_ORDER:
+        if re.search(rf"\b{re.escape(status)}\b", cleaned):
+            return status
+    return cleaned
+
+
+def markdown_heading_level(line: str) -> int | None:
+    match = re.match(r"^(#{1,6})\s+\S", line.strip())
+    return len(match.group(1)) if match else None
+
+
+def extract_sources_from_line(line: str) -> list[str]:
+    if re.search(r"\bnone\b", line, re.IGNORECASE):
+        return []
+    backtick_sources = [
+        source_display_path(match.group(1))
+        for match in re.finditer(r"`([^`]+)`", line)
+        if source_display_path(match.group(1))
+    ]
+    if backtick_sources:
+        return backtick_sources
+    return [
+        source_display_path(match.group(0))
+        for match in SOURCE_PATH_SUFFIX_PATTERN.finditer(line)
+        if source_display_path(match.group(0))
+    ]
+
+
+def parse_batch_plan_assignments(path: Path) -> list[AssignedSource]:
+    if not path.is_file():
+        return []
+
+    assignments: list[AssignedSource] = []
+    current_batch: str | None = None
+    current_role: str | None = None
+    current_role_level: int | None = None
+
+    for line in read_text(path).splitlines():
+        heading_level = markdown_heading_level(line)
+        stripped = line.strip()
+
+        if heading_level == 2:
+            heading = stripped.lstrip("#").strip()
+            current_batch = heading.split()[0]
+            if current_batch.lower().startswith("unassigned"):
+                current_batch = None
+            current_role = None
+            current_role_level = None
+            continue
+
+        if heading_level is not None:
+            heading = stripped.lstrip("#").strip().lower()
+            if "primary source" in heading:
+                current_role = "primary"
+                current_role_level = heading_level
+            elif "supporting source" in heading:
+                current_role = "supporting"
+                current_role_level = heading_level
+            elif current_role_level is not None and heading_level <= current_role_level:
+                current_role = None
+                current_role_level = None
+            continue
+
+        if current_batch is None or current_role is None:
+            continue
+
+        for source in extract_sources_from_line(line):
+            assignments.append(
+                AssignedSource(batch=current_batch, path=source, role=current_role)
+            )
+
+    deduped: dict[tuple[str, str, str], AssignedSource] = {}
+    for assignment in assignments:
+        key = (
+            assignment.batch,
+            normalize_source_path(assignment.path),
+            assignment.role,
+        )
+        deduped[key] = assignment
+    return list(deduped.values())
+
+
+def split_markdown_table_row(line: str) -> list[str]:
+    stripped = line.strip()
+    if stripped.startswith("|"):
+        stripped = stripped[1:]
+    if stripped.endswith("|"):
+        stripped = stripped[:-1]
+    cells: list[str] = []
+    current: list[str] = []
+    escaped = False
+    for character in stripped:
+        if escaped:
+            current.append(character)
+            escaped = False
+            continue
+        if character == "\\":
+            escaped = True
+            current.append(character)
+            continue
+        if character == "|":
+            cells.append("".join(current).strip())
+            current = []
+            continue
+        current.append(character)
+    cells.append("".join(current).strip())
+    return cells
+
+
+def is_markdown_separator_row(cells: list[str]) -> bool:
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell.strip()) for cell in cells)
+
+
+def header_index(headers: list[str], *needles: str) -> int | None:
+    normalized = [re.sub(r"[^a-z]+", " ", header.lower()).strip() for header in headers]
+    for needle in needles:
+        for index, header in enumerate(normalized):
+            if needle in header:
+                return index
+    return None
+
+
+def parse_source_coverage_entries(
+    digest_text: str,
+    batch: str,
+) -> list[SourceCoverageEntry]:
+    body = flexible_section_body(digest_text, "Source Coverage")
+    if not body:
+        return []
+
+    entries: list[SourceCoverageEntry] = []
+    table_lines = [line for line in body.splitlines() if line.strip().startswith("|")]
+    if len(table_lines) >= 2:
+        headers = split_markdown_table_row(table_lines[0])
+        source_index = header_index(headers, "source", "file")
+        status_index = header_index(headers, "status", "use")
+        reason_index = header_index(headers, "reason", "explanation", "notes", "detail")
+
+        for line in table_lines[1:]:
+            cells = split_markdown_table_row(line)
+            if is_markdown_separator_row(cells):
+                continue
+            if source_index is None or source_index >= len(cells):
+                continue
+            source = source_display_path(cells[source_index])
+            if not source or re.search(r"\bnone\b", source, re.IGNORECASE):
+                continue
+            status = ""
+            if status_index is not None and status_index < len(cells):
+                status = normalize_coverage_status(cells[status_index])
+            if not status:
+                status = normalize_coverage_status(" ".join(cells))
+            reason = ""
+            if reason_index is not None and reason_index < len(cells):
+                reason = cells[reason_index].strip()
+            if not reason:
+                non_source_cells = [
+                    cell
+                    for index, cell in enumerate(cells)
+                    if index != source_index
+                    and (status_index is None or index != status_index)
+                    and cell.strip()
+                ]
+                reason = " ".join(non_source_cells).strip()
+            if not reason and status in SOURCE_COVERAGE_REASON_REQUIRED:
+                status_cell = (
+                    cells[status_index].strip()
+                    if status_index is not None and status_index < len(cells)
+                    else ""
+                )
+                status_without_keyword = re.sub(
+                    rf"(?i)\b{re.escape(status)}\b\s*[:\-–—]?\s*",
+                    "",
+                    status_cell,
+                    count=1,
+                ).strip()
+                if status_without_keyword and status_without_keyword != status_cell:
+                    reason = status_without_keyword
+            entries.append(
+                SourceCoverageEntry(
+                    batch=batch,
+                    source=source,
+                    status=status,
+                    reason=reason,
+                )
+            )
+
+    if entries:
+        return entries
+
+    for line in body.splitlines():
+        sources = extract_sources_from_line(line)
+        if not sources:
+            continue
+        status = normalize_coverage_status(line)
+        reason_match = re.search(
+            r"(?i)\b(?:reason|because|notes?|explanation)\s*:?\s*(.+)$", line
+        )
+        reason = reason_match.group(1).strip() if reason_match else ""
+        for source in sources:
+            entries.append(
+                SourceCoverageEntry(
+                    batch=batch,
+                    source=source,
+                    status=status,
+                    reason=reason,
+                )
+            )
+
+    return entries
+
+
+def source_basename(value: str) -> str:
+    return Path(normalize_source_path(value)).name
+
+
+def coverage_entry_for_assignment(
+    assignment: AssignedSource,
+    entries: list[SourceCoverageEntry],
+    batch_assignments: list[AssignedSource],
+) -> SourceCoverageEntry | None:
+    assigned_normalized = normalize_source_path(assignment.path)
+    for entry in entries:
+        if normalize_source_path(entry.source) == assigned_normalized:
+            return entry
+
+    basename = source_basename(assignment.path)
+    if not basename:
+        return None
+    assigned_basename_count = sum(
+        1 for item in batch_assignments if source_basename(item.path) == basename
+    )
+    matching_entries = [
+        entry for entry in entries if source_basename(entry.source) == basename
+    ]
+    if assigned_basename_count == 1 and len(matching_entries) == 1:
+        return matching_entries[0]
+    return None
+
+
+def source_coverage_severity(
+    assignment: AssignedSource,
+    status: str,
+    has_reason: bool,
+    missing: bool,
+) -> str:
+    if missing:
+        return "high" if assignment.role == "primary" else "medium"
+    if status == "deferred" and not has_reason:
+        return "high"
+    if status in {"unreadable", "irrelevant"} and not has_reason:
+        return "high" if assignment.role == "primary" else "medium"
+    if status == "duplicate" and not has_reason:
+        return "medium"
+    if status in {"irrelevant", "duplicate"} and has_reason:
+        return "medium" if assignment.role == "primary" else "low"
+    if status == "unreadable" and has_reason:
+        return "medium"
+    if status == "deferred" and has_reason:
+        return "medium"
+    return "low"
+
+
+def validate_assigned_source_coverage(
+    findings: list[Finding],
+    root: Path,
+    contexts: dict[str, BatchContext],
+) -> list[SourceCoverageResult]:
+    assignments = parse_batch_plan_assignments(
+        root / "analysis" / "inventory" / "batch_plan.md"
+    )
+    results: list[SourceCoverageResult] = []
+    if not assignments:
+        return results
+
+    assignments_by_batch: dict[str, list[AssignedSource]] = {}
+    for assignment in assignments:
+        assignments_by_batch.setdefault(assignment.batch, []).append(assignment)
+
+    for batch, batch_assignments in sorted(assignments_by_batch.items()):
+        context = contexts.get(batch)
+        digest = context.digest if context else None
+        digest_rel = (
+            relative(digest, root)
+            if digest is not None
+            else f"analysis/batches/{batch}_digest.md"
+        )
+        if digest is None:
+            for assignment in batch_assignments:
+                severity = "high" if assignment.role == "primary" else "medium"
+                detail = (
+                    f"Assigned {assignment.role} source `{assignment.path}` cannot be checked "
+                    f"because digest `{digest_rel}` is missing."
+                )
+                append_finding(findings, severity, "source coverage assigned source", digest_rel, detail)
+                results.append(
+                    SourceCoverageResult(
+                        batch=batch,
+                        digest=digest_rel,
+                        source=assignment.path,
+                        role=assignment.role,
+                        status="missing digest",
+                        reason="",
+                        severity=severity,
+                        issue=detail,
+                        recommended_repair=(
+                            "Create or repair the batch digest and include this source in the Source Coverage table."
+                        ),
+                    )
+                )
+            continue
+
+        entries = parse_source_coverage_entries(read_text(digest), batch)
+        for assignment in batch_assignments:
+            entry = coverage_entry_for_assignment(
+                assignment, entries, batch_assignments
+            )
+            if entry is None:
+                severity = source_coverage_severity(
+                    assignment, "", False, missing=True
+                )
+                detail = (
+                    f"Assigned {assignment.role} source `{assignment.path}` is missing from "
+                    "the digest Source Coverage table. Recommended repair: update Source Coverage "
+                    "with status used, partially used, unreadable, irrelevant, duplicate, or deferred."
+                )
+                append_finding(
+                    findings,
+                    severity,
+                    "source coverage missing assigned source",
+                    digest_rel,
+                    detail,
+                )
+                results.append(
+                    SourceCoverageResult(
+                        batch=batch,
+                        digest=digest_rel,
+                        source=assignment.path,
+                        role=assignment.role,
+                        status="missing",
+                        reason="",
+                        severity=severity,
+                        issue=detail,
+                        recommended_repair=(
+                            "Add the assigned source to Source Coverage with an explicit status and reason when not used."
+                        ),
+                    )
+                )
+                continue
+
+            status = normalize_coverage_status(entry.status)
+            has_reason = bool(entry.reason.strip())
+            if status not in SOURCE_COVERAGE_STATUSES:
+                detail = (
+                    f"Assigned {assignment.role} source `{assignment.path}` has unsupported "
+                    f"Source Coverage status `{entry.status or 'missing'}`. Use one of: "
+                    "used, partially used, unreadable, irrelevant, duplicate, deferred."
+                )
+                append_finding(
+                    findings,
+                    "medium",
+                    "source coverage status",
+                    digest_rel,
+                    detail,
+                )
+                results.append(
+                    SourceCoverageResult(
+                        batch=batch,
+                        digest=digest_rel,
+                        source=assignment.path,
+                        role=assignment.role,
+                        status=entry.status or "missing",
+                        reason=entry.reason,
+                        severity="medium",
+                        issue=detail,
+                        recommended_repair="Replace the status with one of the allowed Source Coverage statuses.",
+                    )
+                )
+                continue
+
+            if status in SOURCE_COVERAGE_REASON_REQUIRED and not has_reason:
+                severity = source_coverage_severity(
+                    assignment, status, has_reason, missing=False
+                )
+                detail = (
+                    f"Assigned {assignment.role} source `{assignment.path}` is marked `{status}` "
+                    "but Source Coverage does not give a reason."
+                )
+                append_finding(
+                    findings,
+                    severity,
+                    "source coverage missing reason",
+                    digest_rel,
+                    detail,
+                )
+                results.append(
+                    SourceCoverageResult(
+                        batch=batch,
+                        digest=digest_rel,
+                        source=assignment.path,
+                        role=assignment.role,
+                        status=status,
+                        reason=entry.reason,
+                        severity=severity,
+                        issue=detail,
+                        recommended_repair=(
+                            "Add a concrete reason explaining why this assigned source was not fully used."
+                        ),
+                    )
+                )
+                continue
+
+            if status in {"irrelevant", "duplicate", "unreadable", "deferred"}:
+                severity = source_coverage_severity(
+                    assignment, status, has_reason, missing=False
+                )
+                detail = (
+                    f"Assigned {assignment.role} source `{assignment.path}` is marked `{status}` "
+                    f"with reason: {entry.reason}."
+                )
+                append_finding(
+                    findings,
+                    severity,
+                    "source coverage explained non-use",
+                    digest_rel,
+                    detail,
+                )
+                results.append(
+                    SourceCoverageResult(
+                        batch=batch,
+                        digest=digest_rel,
+                        source=assignment.path,
+                        role=assignment.role,
+                        status=status,
+                        reason=entry.reason,
+                        severity=severity,
+                        issue=detail,
+                        recommended_repair=(
+                            "No structural repair required if the explanation is accurate; review if this source should be processed."
+                        ),
+                    )
+                )
+
+    return results
 
 
 def looks_like_compressed_summary(text: str) -> bool:
@@ -790,8 +1343,9 @@ def validate_internal_support(
             )
 
 
-def validate(root: Path) -> tuple[list[Finding], list[Path]]:
+def validate(root: Path) -> tuple[list[Finding], list[Path], list[SourceCoverageResult]]:
     findings: list[Finding] = []
+    source_coverage_results: list[SourceCoverageResult] = []
     mode = quality_mode(root)
 
     if not (root / "subject.yaml").is_file():
@@ -858,6 +1412,9 @@ def validate(root: Path) -> tuple[list[Finding], list[Path]]:
             )
 
     contexts = batch_contexts(root)
+    source_coverage_results = validate_assigned_source_coverage(
+        findings, root, contexts
+    )
     for context in contexts.values():
         validate_internal_support(findings, context, root)
 
@@ -914,16 +1471,6 @@ def validate(root: Path) -> tuple[list[Finding], list[Path]]:
         if path.name == "full_formula_sheet.md":
             validate_formula_file_basic(findings, path, root)
 
-    digest_files = [context.digest for context in contexts.values() if context.digest]
-    if digest_files and not (root / "review" / "source-coverage.md").is_file():
-        append_finding(
-            findings,
-            "high",
-            "source coverage report",
-            "review/source-coverage.md",
-            "Source Coverage report is missing.",
-        )
-
     for marker in REMOVED_OUTPUT_MARKERS:
         removed = root / "outputs" / marker
         if removed.exists():
@@ -935,7 +1482,7 @@ def validate(root: Path) -> tuple[list[Finding], list[Path]]:
                 "Removed/deprecated output type exists but is not required by validation.",
             )
 
-    return findings, files
+    return findings, files, source_coverage_results
 
 
 def table_row(values: list[str]) -> str:
@@ -1047,10 +1594,95 @@ def write_markdown_report(
     return report
 
 
-def write_report(root: Path, findings: list[Finding], files: list[Path]) -> Path:
+def write_source_coverage_report(
+    root: Path,
+    source_coverage_results: list[SourceCoverageResult],
+) -> Path:
+    report = root / SOURCE_COVERAGE_REPORT_PATH
+    report.parent.mkdir(parents=True, exist_ok=True)
+    generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    issues = [
+        result
+        for result in source_coverage_results
+        if result.status != "used" and result.status != "partially used"
+    ]
+    severity_counts = {
+        severity: sum(1 for result in source_coverage_results if result.severity == severity)
+        for severity in SEVERITIES
+    }
+
+    lines = [
+        "# StudyOS Source Coverage",
+        "",
+        f"Generated: {generated_at}",
+        f"Root: `{root}`",
+        "",
+        "## Summary",
+        "",
+        f"- Assigned-source coverage findings: {len(source_coverage_results)}",
+        f"- Assigned-source issues needing review: {len(issues)}",
+        *(
+            f"- {severity.title()}: {severity_counts[severity]}"
+            for severity in SEVERITIES
+        ),
+        "",
+        "## Assigned Source Coverage",
+        "",
+    ]
+
+    if source_coverage_results:
+        lines.extend(
+            [
+                table_row(
+                    [
+                        "Severity",
+                        "Batch",
+                        "Role",
+                        "Source",
+                        "Digest",
+                        "Status",
+                        "Reason",
+                        "Recommended repair",
+                    ]
+                ),
+                table_row(["---", "---", "---", "---", "---", "---", "---", "---"]),
+            ]
+        )
+        for result in source_coverage_results:
+            lines.append(
+                table_row(
+                    [
+                        result.severity,
+                        result.batch,
+                        result.role,
+                        f"`{result.source}`",
+                        f"`{result.digest}`",
+                        result.status,
+                        result.reason,
+                        result.recommended_repair,
+                    ]
+                )
+            )
+    else:
+        lines.append(
+            "No assigned-source coverage findings. If batches exist, ensure `analysis/inventory/batch_plan.md` lists primary and supporting sources."
+        )
+
+    lines.append("")
+    report.write_text("\n".join(lines), encoding="utf-8")
+    return report
+
+
+def write_report(
+    root: Path,
+    findings: list[Finding],
+    files: list[Path],
+    source_coverage_results: list[SourceCoverageResult],
+) -> Path:
     report = root / REPORT_PATH
     write_markdown_report(root, REPORT_PATH, findings, files)
     write_markdown_report(root, DETAIL_REPORT_PATH, findings, files)
+    write_source_coverage_report(root, source_coverage_results)
     return report
 
 
@@ -1059,8 +1691,8 @@ def main() -> int:
     root = args.root.expanduser().resolve()
 
     try:
-        findings, files = validate(root)
-        report = write_report(root, findings, files)
+        findings, files, source_coverage_results = validate(root)
+        report = write_report(root, findings, files, source_coverage_results)
     except OSError as error:
         print(f"StudyOS output validation failed: {error}", file=sys.stderr)
         return 2
