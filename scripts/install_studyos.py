@@ -23,7 +23,6 @@ COURSE_LOCAL_SCRIPTS = (
     "validate_citations.py",
     "validate_formulas.py",
     "export_outputs.py",
-    "export_final_pack.py",
 )
 
 INSTALLED_SKILL_NAMES = (
@@ -57,6 +56,7 @@ OLD_SKILL_DESTINATIONS = (
 
 DEPRECATED_RELATIVE_PATHS = (
     "study-os/scripts/install_studyos.py",
+    "study-os/scripts/export_final_pack.py",
     *(
         f"{destination}/{skill_name}"
         for destination in OLD_SKILL_DESTINATIONS

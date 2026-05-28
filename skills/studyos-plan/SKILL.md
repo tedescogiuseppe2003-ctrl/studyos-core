@@ -59,7 +59,7 @@ Do not write study outputs, digests, learning cores, summaries, formulas, questi
 2. Exercises usually support the closest conceptual batch.
 3. Readings usually support the closest conceptual batch.
 4. Notes and transcripts support the closest lecture or topic.
-5. Exams support final review or relevant conceptual batches.
+5. Exams support exam-preparation or relevant conceptual batches.
 6. Ordinary exercises should not become standalone master-note batches.
 7. Standalone exercise or tutorial batches are allowed only when explicitly tutorial/conceptual, such as a named lab, recitation, methods tutorial, case tutorial, or problem-solving session.
 8. Unclear files go under `Unassigned / needs review`.

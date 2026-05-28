@@ -199,6 +199,8 @@ Run:
 python3 study-os/scripts/export_outputs.py --root .
 ```
 
+`export_outputs.py` is the only normal export script installed in this workspace. The deprecated `export_final_pack.py` compatibility wrapper is not installed by default.
+
 The exporter preserves content and source references. It exports unmerged and merged PDFs for notes, formulas, and exam practice questions only; flashcards, cheat sheets, study plans, final review packs, internal analysis files, and review/debug files are skipped by default. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If those dependencies are unavailable, it writes print-ready HTML with MathJax support and reports the fallback in `study-os/state/export-log.md`.
 
 ## Integrated Visual Screening

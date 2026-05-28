@@ -66,6 +66,8 @@ The export script is:
 python3 study-os/scripts/export_outputs.py --root .
 ```
 
+`export_outputs.py` is the only normal export script installed into StudyOS workspaces. The legacy `export_final_pack.py` compatibility wrapper is kept only in the core repo for old direct callers and is not installed by default.
+
 PDF is preferred when `pandoc` and a LaTeX PDF engine are available. If PDF dependencies are unavailable, the exporter writes print-ready HTML and reports the fallback. Flashcards, cheat sheets, study plans, final review packs, internal `analysis/`, `review/`, validation, and debug files are not exported by default.
 
 Notes are complete study notes, not summaries. Formula sheets require readable display LaTeX. Exam practice questions replace flashcards as the active-recall and practice layer.
@@ -95,7 +97,7 @@ cd ~/Developer/studyos-core
 python3 scripts/install_studyos.py ~/StudyOS-Test/TestCourse
 ```
 
-The installer creates the subject folder structure, copies templates, copies course-local scripts into `study-os/scripts/`, installs final skills into `study-os/skills/`, `.agents/skills/`, and `.claude/skills/`, and initializes `study-os/state/studyos.sqlite`.
+The installer creates the subject folder structure, copies templates, copies course-local scripts into `study-os/scripts/`, installs final skills into `study-os/skills/`, `.agents/skills/`, and `.claude/skills/`, and initializes `study-os/state/studyos.sqlite`. Course-local scripts include `export_outputs.py`; they do not include the deprecated `export_final_pack.py` wrapper.
 
 `install_studyos.py` is core-only and is not copied into installed subject folders.
 

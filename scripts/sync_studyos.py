@@ -39,7 +39,6 @@ COURSE_LOCAL_SCRIPTS = (
     "validate_citations.py",
     "validate_formulas.py",
     "export_outputs.py",
-    "export_final_pack.py",
 )
 
 INSTALLED_SKILL_NAMES = (
@@ -71,6 +70,7 @@ OBSOLETE_SKILL_NAMES = (
 DEPRECATED_SCRIPT_PATHS = (
     "study-os/scripts/install_studyos.py",
     "study-os/scripts/sort_inputs.py",
+    "study-os/scripts/export_final_pack.py",
 )
 
 SKILLS_GUIDE_DESTINATION = Path("study-os/config/SKILLS_GUIDE.md")

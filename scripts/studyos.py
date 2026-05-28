@@ -52,7 +52,6 @@ REQUIRED_SCRIPTS = (
     "study-os/scripts/validate_citations.py",
     "study-os/scripts/validate_formulas.py",
     "study-os/scripts/export_outputs.py",
-    "study-os/scripts/export_final_pack.py",
 )
 
 REQUIRED_SKILLS = (

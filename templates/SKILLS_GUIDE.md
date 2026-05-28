@@ -176,6 +176,7 @@ Use after desired outputs exist and have acceptable validation status.
 - Preserves batch boundaries, content, LaTeX expressions, and source references.
 - Does not export flashcards, cheat sheets, study plans, final review packs, `analysis/`, `review/`, validation, debug, or internal files by default.
 - Uses `python3 study-os/scripts/export_outputs.py --root .`.
+- Does not install or use the deprecated `export_final_pack.py` compatibility wrapper.
 
 The exporter writes unmerged and merged PDFs for notes, formulas, and exam practice questions. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If PDF tooling is unavailable, it writes clean print-ready HTML in the same export folders and reports the fallback.
 
