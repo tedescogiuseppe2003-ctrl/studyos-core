@@ -53,13 +53,13 @@ The proposal must include:
 - whether original files are read-only, default yes
 - whether StudyOS should copy files into `inputs/`, default yes
 - desired outputs:
-  - master notes
-  - formula sheets
-  - flashcards
-  - exam questions
-  - cheat sheets
-  - study plan
-  - final review pack
+  - batch notes
+  - batch formula sheets
+  - batch exam practice questions
+  - merged full-course notes
+  - merged full-course formula sheet
+  - merged full-course exam practice questions
+  - exported PDFs for unmerged batch outputs and merged full-course outputs
 - quality/depth mode:
   - economy
   - standard
@@ -118,11 +118,7 @@ course-folder/
 ├── outputs/
 │   ├── notes/
 │   ├── formulas/
-│   ├── flashcards/
-│   ├── questions/
-│   ├── cheat-sheets/
-│   ├── study-plan/
-│   └── final-pack/
+│   └── questions/
 │
 ├── exports/
 │   └── pdf/
@@ -193,9 +189,21 @@ existing course folder opened in VS Code
 -> user manually calls `studyos-plan` to refine the conceptual batch plan
 -> user manually calls `studyos-batch` for one batch at a time
 -> user manually calls `studyos-validate` after each batch or repair pass
--> user manually calls `studyos-course` for course-level outputs
+-> user manually calls `studyos-course` to continue planned batch processing as needed
 -> user manually calls `studyos-merge` for merged full-course outputs
 -> user manually calls `studyos-export` for unmerged and merged PDF exports
+
+The final workflow stages are:
+
+1. install StudyOS
+2. approve setup
+3. `studyos-import`
+4. `studyos-plan`
+5. `studyos-batch`
+6. `studyos-validate`
+7. `studyos-course`
+8. `studyos-merge`
+9. `studyos-export`
 
 After setup, the user manually calls individual StudyOS skills step by step. StudyOS does not add a master orchestration skill or automatic course runner.
 
@@ -239,14 +247,50 @@ inputs/
 - `studyos-import` creates the first conceptual batch plan from the copied inputs and inventory.
 - `studyos-plan` refines the conceptual batch plan before batch processing.
 - Exercises, readings, transcripts, notes, and exams usually support conceptual batches.
-- Exercises should not normally become standalone master-note batches.
+- Exercises should not normally become standalone note batches.
 - Standalone exercise batches are only appropriate when they are explicitly tutorial/conceptual material or no related conceptual batch can be identified.
 
 ## Outputs and exports
 
+StudyOS focuses on fewer outputs with higher quality. The only default study-facing outputs are notes, formulas, and exam practice questions.
+
 Batch-level outputs are written under `outputs/` as unmerged material. These preserve the batch structure and are useful for review, repair, and incremental study.
 
-Course-level and merged outputs are also written under `outputs/`, including consolidated notes, formulas, flashcards, questions, cheat sheets, study plans, and the final review pack.
+Default student-facing outputs are:
+
+- batch notes
+- batch formula sheets
+- batch exam practice questions
+- merged full-course notes
+- merged full-course formula sheet
+- merged full-course exam practice questions
+- exported PDFs for both unmerged and merged versions
+
+Notes are complete study material, not summaries. They should preserve the concepts, explanations, examples, caveats, and source coverage needed to study the course.
+
+Formula sheets are the technical precision layer. They should emphasize correct notation, assumptions, definitions, derivations where useful, source provenance, and formula formatting quality.
+
+Exam practice questions are the main active-recall and practice layer. They should be exam-useful, grounded in source material, and designed to test understanding rather than fill space.
+
+StudyOS does not create filler outputs. The following artifacts are removed from the default workflow:
+
+- flashcards
+- cheat sheets
+- study plans
+- final review packs
+
+Internal quality-control files remain part of the process:
+
+- `analysis/batches/*_digest.md`
+- `analysis/batches/*_learning_core.md`
+- `analysis/visual/`
+- `analysis/validation/`
+- `review/weak-points.md`
+- `review/unresolved-questions.md`
+- `review/visual-issues.md`
+- `review/source-coverage.md`
+- `review/validation-report.md`
+- `review/progress-tracker.md`
 
 `studyos-export` exports both forms:
 
@@ -262,7 +306,7 @@ Unmerged exports should preserve batch boundaries. Merged exports should represe
 - external StudyOS core repo: source of installer, templates, skills, and scripts, usually `~/Developer/studyos-core`
 - `inputs/`: imported raw course material copied from the original source, read-only after import
 - `analysis/`: inventory, batch plans, visual analysis, validation records, and processing state
-- `outputs/`: batch-level, course-level, and merged study material
+- `outputs/`: batch-level and merged study material limited to notes, formulas, and exam practice questions
 - `exports/`: exported deliverables, including unmerged and merged PDFs
 - `review/`: weak points, unresolved questions, visual issues, source coverage, validation reports, and progress tracking
 - `study-os/`: scripts, skills, and config
@@ -286,10 +330,10 @@ Unmerged exports should preserve batch boundaries. Merged exports should represe
 - Process material by conceptual batch, not all at once.
 - Batches should represent topics, lectures, or modules.
 - Use exercises, readings, transcripts, notes, and exams as supporting sources when they belong to a conceptual batch.
-- Do not create separate master notes for exercise files attached to conceptual batches.
+- Do not create separate notes for exercise files attached to conceptual batches.
 - Create source analysis before final outputs.
-- Create learning-oriented batch outputs before merged course outputs.
-- Merged full-course outputs must be based on validated batch and course outputs.
+- Create learning-oriented batch outputs before merged full-course outputs.
+- Merged full-course outputs must be based on validated batch outputs and quality-control records.
 - Use source references.
 - Track weak points and unresolved questions.
 - Validate outputs after each batch.
@@ -297,6 +341,7 @@ Unmerged exports should preserve batch boundaries. Merged exports should represe
 - Use visual analysis according to the configured visual handling depth inside batch, course, and validation skills.
 - Use formula handling according to the configured formula handling depth.
 - Use validation according to the configured validation depth.
+- Repair existing outputs before regenerating them wholesale when targeted repair can resolve the issue.
 - Preserve the manual skill-by-skill workflow after setup.
 - Do not add a master orchestration skill.
 - Do not add Graphify yet.
