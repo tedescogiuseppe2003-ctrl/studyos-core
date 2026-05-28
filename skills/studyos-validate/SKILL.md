@@ -5,7 +5,7 @@ description: Validate StudyOS batch, course, or merged outputs for structure, gr
 
 # Purpose
 
-Validate generated StudyOS outputs before more work builds on them. The skill checks structure, source grounding, formulas, output usefulness, weak points, unresolved questions, and visual coverage, then identifies targeted repairs.
+Validate generated StudyOS material before more work builds on it. The final study-facing validation scope is limited to notes, formula sheets, and exam practice questions. Digest, learning core, source coverage, and visual coverage are checked as internal quality-support evidence.
 
 # When to use
 
@@ -41,7 +41,7 @@ Use after `studyos-batch`, after course-level output generation, after repairs, 
 # Workflow
 
 1. Identify the validation target: one batch, course-level outputs, repaired outputs, or merged outputs.
-2. Confirm preflight. Use `analysis/batches/` for batch-aware validation and `outputs/notes`, `outputs/formulas`, and `outputs/questions` for generated outputs.
+2. Confirm preflight. Use `analysis/batches/` for batch-aware validation and `outputs/notes`, `outputs/formulas`, and `outputs/questions` for the only final study-facing outputs.
 3. Run deterministic structural checks with `python3 study-os/scripts/validate_outputs.py`.
 4. Run citation/source checks with `python3 study-os/scripts/validate_citations.py`.
 5. Run formula field checks with `python3 study-os/scripts/validate_formulas.py` when formula outputs exist or the course is formula-heavy.
@@ -60,15 +60,46 @@ Use after `studyos-batch`, after course-level output generation, after repairs, 
 
 # Required checks
 
-- Required files and folders exist.
-- Outputs are not empty.
-- Formula entries include required fields.
+Do not require or validate removed final outputs: flashcards, cheat sheets, study plans, or final review packs.
+
+## Notes
+
+- Notes file exists when expected for a processed batch or merged course output.
+- Notes are not empty.
+- Required sections exist: Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References.
+- Standard and rigorous modes warn when notes are approximately too short for the batch.
+- Notes are complete study notes, not merely compressed summaries.
+- Source references are present and usable.
+- Exam-relevant visual findings are included when visual material is relevant.
+
+## Formulas
+
+- Formula sheet exists when formulas, notation, quantitative assumptions, or formula-like rules are relevant.
+- Display LaTeX exists.
+- Formulas are not only inline code or plain ASCII.
+- Formula Index exists.
+- Notation section exists.
+- Each formula entry includes Formula, Variables, Assumptions, Use when, Interpretation, Common mistake, and Source.
+
+## Questions
+
+- Question file exists when expected.
+- Expected answers, answer keys, or worked solutions are included.
+- Questions are grouped by topic or concept.
+- Questions include conceptual and exam-style prompts.
+- Formula-heavy batches include formula/application/calculation questions.
+- Assigned exercises are reflected as practice questions where relevant.
+- Source references or topic references exist.
+
+## Internal support
+
+- Digest exists for processed batches and includes Source Coverage.
+- Digest includes Visual Coverage when assigned sources include slides, PDFs, images, charts, tables, diagrams, or screenshots. If no essential visuals exist, it says so explicitly.
+- Learning core exists and is not over-compressed relative to the digest.
 - Source references are meaningful and resolve to `inputs/`.
 - `review/source-coverage.md` exists after validation.
-- Visual Coverage exists for batches with slide, PDF, or image inputs.
 - Essential visuals are either analyzed in `analysis/visual/` or explicitly listed as unresolved in `review/visual-issues.md` or `review/unresolved-questions.md`.
-- Exam questions include expected answers, answer keys, or worked solutions.
-- Exercises are integrated as practice, not rewritten as fake theory.
+- Unresolved visual or formula issues are tracked in review files.
 - Unsupported claims are flagged.
 - Weak points are captured and carried into `review/weak-points.md`.
 
@@ -111,4 +142,4 @@ The digest must include Source Coverage. If assigned sources include slides, PDF
 
 # Completion report
 
-Report validation status, blocking issues, high-priority fixes, minor fixes, files written, and the recommended next skill after repair or approval.
+Report notes status, formulas status, questions status, source coverage status, visual coverage status, blocking issues, high-priority fixes, minor fixes, files written, and the recommended repair target. Recommend the next skill only after blocking issues are repaired or explicitly carried as unresolved.

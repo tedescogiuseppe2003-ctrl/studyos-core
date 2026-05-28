@@ -24,6 +24,14 @@ REQUIRED_FIELDS = (
     "Source:",
 )
 FORMULA_HEADING_PATTERN = re.compile(r"(?im)^\s*(?:[-*]\s*)?Formula\s*:")
+DISPLAY_LATEX_PATTERN = re.compile(
+    r"(?s)(\$\$.*?\$\$|\\\[.*?\\\]|\\begin\{(?:align|aligned|equation|gather)\*?\}.*?\\end\{(?:align|aligned|equation|gather)\*?\})"
+)
+INLINE_CODE_PATTERN = re.compile(r"`[^`\n]+`")
+PLAIN_ASCII_FORMULA_PATTERN = re.compile(
+    r"(?im)^\s*(?:[-*]\s*)?Formula\s*:\s*([A-Za-z0-9_ ()+\-*/^=<>.,]+)\s*$"
+)
+REQUIRED_FILE_SECTIONS = ("Formula Index", "Notation")
 
 
 @dataclass(frozen=True)
@@ -32,6 +40,8 @@ class FormulaEntry:
     entry_number: int
     title: str
     missing_fields: list[str]
+    has_display_latex: bool
+    ascii_only_formula: bool
 
 
 @dataclass(frozen=True)
@@ -110,6 +120,18 @@ def validate_file(path: Path, root: Path) -> FormulaFileResult:
         return FormulaFileResult(relative(path, root), 0, [], errors)
 
     text = read_text(path)
+    for section in REQUIRED_FILE_SECTIONS:
+        section_heading = re.search(
+            rf"(?im)^\s*#{1,6}\s+{re.escape(section)}\s*$", text
+        )
+        if section_heading is None and section.lower() not in text.lower():
+            errors.append(f"Required formula sheet section is missing: {section}.")
+
+    if DISPLAY_LATEX_PATTERN.search(text) is None:
+        errors.append(
+            "No display LaTeX was found; formulas must not be inline-only or plain ASCII."
+        )
+
     entries_text = split_formula_entries(text)
     if not entries_text:
         errors.append("No formula entries beginning with `Formula:` were found.")
@@ -121,12 +143,25 @@ def validate_file(path: Path, root: Path) -> FormulaFileResult:
         missing = [
             field for field in REQUIRED_FIELDS if not field_present(entry_text, field)
         ]
+        has_display_latex = DISPLAY_LATEX_PATTERN.search(entry_text) is not None
+        ascii_only_formula = (
+            PLAIN_ASCII_FORMULA_PATTERN.search(entry_text) is not None
+            and not has_display_latex
+        )
+        if not has_display_latex:
+            missing.append("display LaTeX formula")
+        if ascii_only_formula or (
+            INLINE_CODE_PATTERN.search(entry_text) is not None and not has_display_latex
+        ):
+            missing.append("formula not inline code/plain ASCII only")
         entries.append(
             FormulaEntry(
                 file_path=relative_path,
                 entry_number=index,
                 title=entry_title(entry_text),
                 missing_fields=missing,
+                has_display_latex=has_display_latex,
+                ascii_only_formula=ascii_only_formula,
             )
         )
 
@@ -150,6 +185,18 @@ def write_report(root: Path, results: list[FormulaFileResult], files: list[Path]
         for entry in result.entries
         if entry.missing_fields
     ]
+    entries_without_display_latex = [
+        entry
+        for result in results
+        for entry in result.entries
+        if not entry.has_display_latex
+    ]
+    ascii_only_entries = [
+        entry
+        for result in results
+        for entry in result.entries
+        if entry.ascii_only_formula
+    ]
     file_errors = [
         (result.path, error)
         for result in results
@@ -168,11 +215,22 @@ def write_report(root: Path, results: list[FormulaFileResult], files: list[Path]
         f"- Formula sheet files checked: {len(files)}",
         f"- Formula entries checked: {total_entries}",
         f"- Entries with missing fields: {len(entries_with_missing)}",
+        f"- Entries missing display LaTeX: {len(entries_without_display_latex)}",
+        f"- Entries that appear inline/plain ASCII only: {len(ascii_only_entries)}",
         f"- File-level errors: {len(file_errors)}",
         "",
-        "## Required Fields",
+        "## Required File Sections",
         "",
     ]
+
+    lines.extend(f"- `{section}`" for section in REQUIRED_FILE_SECTIONS)
+    lines.extend(
+        [
+            "",
+            "## Required Fields",
+            "",
+        ]
+    )
 
     lines.extend(f"- `{field}`" for field in REQUIRED_FIELDS)
     lines.extend(["", "## File Results", ""])

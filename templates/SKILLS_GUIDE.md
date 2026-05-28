@@ -92,6 +92,12 @@ Use after batch processing, course-level processing, repairs, or merging.
 - Requires processed batch outputs under `analysis/batches/` or generated outputs under `outputs/`.
 - Requires validation scripts under `study-os/scripts/`.
 - Runs deterministic structural checks, citation/source checks, and formula field checks where applicable.
+- Validates only the final study-facing outputs: notes, formula sheets, and exam practice questions.
+- Does not require flashcards, cheat sheets, study plans, final review packs, or substitutes for those removed outputs.
+- Checks notes for existence, required sections, depth, source references, visual findings when relevant, and summary-like compression.
+- Checks formula sheets for Formula Index, Notation, display LaTeX, non-ASCII-only formula formatting, and required fields per formula.
+- Checks questions for expected answers, topic/concept grouping, conceptual and exam-style prompts, formula/application practice when relevant, exercise-derived practice, and source or topic references.
+- Checks internal quality-support files: digest Source Coverage, digest Visual Coverage when relevant, learning core depth relative to the digest, and tracked unresolved visual/formula issues.
 - Reviews grounding, unsupported claims, source coverage, visual coverage, clarity, exam-question answer quality, exercise integration, weak points, and unresolved questions according to configured depth.
 - Confirms `review/source-coverage.md` exists after validation.
 - Checks Visual Coverage for any batch with slide, PDF, or image sources.
@@ -100,7 +106,7 @@ Use after batch processing, course-level processing, repairs, or merging.
 
 Validation severity levels are `low`, `medium`, `high`, and `blocking`. Blocking issues stop downstream work. Validation should lead to targeted repair before regeneration: repair affected sections, preserve valid content, avoid regenerating unrelated outputs, and rerun validation after repair.
 
-Completion reports include validation status, blocking issues, high-priority fixes, minor fixes, files written, and the recommended next skill.
+Completion reports include notes status, formulas status, questions status, source coverage status, visual coverage status, blocking issues, high-priority fixes, minor fixes, files written, and the recommended repair target.
 
 ## studyos-course
 

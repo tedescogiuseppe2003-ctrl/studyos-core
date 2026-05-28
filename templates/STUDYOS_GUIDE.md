@@ -213,6 +213,16 @@ Every batch with slides, PDFs, or images must include Visual Coverage in the dig
 
 `studyos-validate` reads `analysis/batches/`, `analysis/visual/`, `outputs/`, `review/`, `inputs/`, and `subject.yaml`. It writes validation detail under `analysis/validation/` and review reports under `review/`.
 
+Validation focuses only on the final study-facing outputs: notes, formula sheets, and exam practice questions. It does not require flashcards, cheat sheets, study plans, or final review packs. It also checks internal quality-support files: each processed batch digest, learning core, source coverage, and visual coverage.
+
+For notes, validation checks file existence, non-empty content, required sections, approximate depth in standard or rigorous mode, source references, visual findings when relevant, and whether the file looks like complete study notes rather than a compressed summary.
+
+For formulas, validation checks that relevant formula sheets exist, Formula Index and Notation sections are present, display LaTeX is used, formulas are not inline-code/plain-ASCII only, and each formula has Formula, Variables, Assumptions, Use when, Interpretation, Common mistake, and Source fields.
+
+For questions, validation checks expected answers, topic or concept grouping, conceptual and exam-style prompts, formula/application questions for formula-heavy batches, exercise-derived practice where assigned, and source or topic references.
+
+For internal support, validation checks Source Coverage in digests, Visual Coverage when relevant, learning cores that preserve enough digest depth, and unresolved visual/formula issues tracked in review files.
+
 Expected validation reports:
 
 - `review/validation-report.md`
@@ -221,6 +231,8 @@ Expected validation reports:
 - `review/unresolved-questions.md` when unresolved questions remain
 
 Validation uses severity levels `low`, `medium`, `high`, and `blocking`. Blocking issues stop downstream merge or export until repaired.
+
+The completion report includes notes status, formulas status, questions status, source coverage status, visual coverage status, blocking issues, and a recommended repair target.
 
 ## Repair Before Regenerate
 
