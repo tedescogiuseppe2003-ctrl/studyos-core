@@ -429,15 +429,19 @@ def formula_sheet_likely(sources: list[SourceFile]) -> bool:
 
 
 def expected_output_lines(all_sources: list[SourceFile]) -> list[str]:
-    lines = ["- master notes"]
+    lines = [
+        "- source digest",
+        "- learning core",
+        "- batch notes",
+    ]
 
     if formula_sheet_likely(all_sources):
-        lines.append("- formula sheet")
+        lines.append("- batch formula sheet")
 
     lines.extend(
         [
-            "- exam questions",
-            "- weak points",
+            "- batch exam practice questions",
+            "- review weak points and unresolved questions",
         ]
     )
 
@@ -703,16 +707,24 @@ def write_batch_plan(root: Path, sources: list[SourceFile]) -> None:
     if not sources:
         lines.extend(["No source files found.", ""])
     else:
+        previous_heading: str | None = None
         for index, batch in enumerate(batches, start=1):
             title = title_slug(batch.title)
+            batch_heading = f"Batch_{index:02d}_{title}"
+            depends_on = (
+                previous_heading
+                if previous_heading and batch.lecture_number
+                else "none"
+            )
             all_batch_sources = [*batch.primary_sources, *batch.supporting_sources]
             lines.extend(
                 [
-                    f"## Batch_{index:02d}_{title}",
+                    f"## {batch_heading}",
                     "",
                     "Status: planned",
                     f"Difficulty: {difficulty_for_batch(batch)}",
                     f"Exam relevance: {exam_relevance_for_batch(batch)}",
+                    f"Depends on: {depends_on}",
                     "",
                     "### Primary sources",
                     "",
@@ -732,6 +744,7 @@ def write_batch_plan(root: Path, sources: list[SourceFile]) -> None:
                 ]
             )
             lines.append("")
+            previous_heading = batch_heading
 
         if unassigned:
             lines.extend(

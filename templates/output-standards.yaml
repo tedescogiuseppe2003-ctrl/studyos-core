@@ -3,8 +3,8 @@
 quality_modes:
   economy:
     notes:
-      depth: "concise but complete"
-      words_per_batch: "no fixed minimum; complete coverage is required"
+      depth: "complete coverage with less polish, never incomplete coverage"
+      words_per_batch: "as long as needed to cover all assigned inputs; no artificial brevity target"
     formula_sheet:
       depth: "essential formulas only"
     exam_questions:
@@ -12,8 +12,8 @@ quality_modes:
 
   standard:
     notes:
-      depth: "complete study notes with preserved digest and learning-core depth"
-      words_per_batch: "1200-2200 per meaningful batch unless genuinely small"
+      depth: "exhaustive study notes with preserved digest and learning-core depth"
+      words_per_batch: "as long as needed to cover all assigned inputs; 1200-2200 is only a rough lower-range expectation for meaningful batches"
     formula_sheet:
       depth: "all important formulas"
     exam_questions:
@@ -49,6 +49,49 @@ final_outputs:
     - "cheat_sheets"
     - "study_plans"
     - "final_review_packs"
+
+agent_quality_contract:
+  quality_target: "Output quality is the highest priority: exhaustive coverage of assigned inputs, source-grounded claims, internal consistency, and validation-clean deliverables."
+  priority_order:
+    - "1_output_quality_and_soundness"
+    - "2_complete_assigned_input_coverage"
+    - "3_validation_cleanliness"
+    - "4_time_and_token_efficiency"
+  length_policy:
+    - "Outputs may be long when the inputs require it."
+    - "Never shorten notes, formulas, or exam answers by dropping unique source-grounded concepts, examples, caveats, formulas, assumptions, visuals, or exam signals."
+    - "Optimize length by removing duplication and filler, not by reducing coverage."
+    - "If exhaustive coverage creates a long output, write the long output."
+  perfection_policy:
+    - "Do not promise impossible absolute perfection."
+    - "Treat perfect output as an operational target: complete assigned-source coverage, no known unsupported claims, display-quality formulas, visible unresolved uncertainty, and validation issues repaired or explicitly accepted."
+  coverage_requirements:
+    - "Every assigned primary and supporting source must be represented in Source Coverage before final outputs are written."
+    - "Every substantive concept in assigned sources must be captured in the digest or explicitly marked irrelevant, duplicate, unreadable, or deferred with a reason."
+    - "Every final notes file must trace back to digest and learning-core material."
+    - "Every assigned source marked used or partially used must materially contribute to at least one final output: notes, formulas when relevant, or exam practice questions when relevant."
+    - "If a source contains unique examples, caveats, assumptions, diagrams, formulas, or exam signals, those details must be preserved in the appropriate output even when that makes the output longer."
+    - "Exercises and exams must be reflected primarily in exam practice questions, worked-answer expectations, traps, and weak points."
+    - "Essential visuals must be analyzed or visibly tracked as unresolved."
+  token_and_time_budgeting:
+    - "Use scripts for deterministic work and agent reasoning for judgment-heavy work."
+    - "Use metadata-first reading to decide what deserves full reading."
+    - "Use full reading for primary sources and selective reading for supporting sources only when coverage can still be proven."
+    - "Prefer targeted repair over broad regeneration."
+    - "Do not create extra internal artifacts unless they reduce downstream uncertainty or validation risk."
+    - "Time and token optimization must never override exhaustive coverage or output soundness."
+  done_definition:
+    batch:
+      - "Digest covers every assigned source with allowed Source Coverage statuses."
+      - "Learning core preserves enough detail to generate complete notes."
+      - "Notes, formulas when relevant, and exam questions all exist and reference sources."
+      - "Final outputs preserve all unique assigned-input concepts, examples, caveats, formulas, visuals, and exam signals."
+      - "Validation has no blocking or high findings for the batch unless explicitly accepted as unresolved."
+    course:
+      - "All processable planned batches are processed or explicitly skipped with reasons."
+      - "Merged outputs are based on validated batch material."
+      - "Full-course notes, formula sheet, and exam practice questions preserve source references, weak points, unresolved issues, and exam-relevant visuals."
+      - "Merged outputs do not omit unique validated batch content for brevity."
 
 outputs:
   import_plan:
@@ -171,6 +214,8 @@ outputs:
       - "Must be complete study notes, not summaries."
       - "Must preserve depth from the digest and learning core."
       - "Must cover all assigned primary and supporting sources."
+      - "Must be exhaustive enough to study without reopening the assigned inputs except for optional verification."
+      - "May be long when needed; length is not a defect when it reflects source coverage."
       - "Must include visual findings when exam-relevant."
       - "Must connect to previous and future batches when useful."
       - "Must keep unsupported or unresolved claims visible instead of smoothing them over."
@@ -246,6 +291,7 @@ outputs:
       - "Merge validated batch notes into complete full-course study notes."
       - "Consolidate duplicate concepts instead of concatenating batches."
       - "Preserve repaired batch-note depth and batch-level completeness."
+      - "Preserve every unique source-grounded concept, example, caveat, formula intuition, exam signal, and visual finding from validated batch outputs."
       - "Add transitions and a progressive course-level learning flow."
       - "Preserve important source coverage, dependencies, weak points, unresolved issues, and exam-relevant visual findings."
       - "Do not compress full-course notes into a short summary."

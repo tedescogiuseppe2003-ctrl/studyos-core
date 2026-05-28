@@ -240,6 +240,10 @@ def has_files(directory: Path) -> bool:
     return count_files(directory) > 0
 
 
+def has_non_empty_file(path: Path) -> bool:
+    return path.is_file() and path.stat().st_size > 0
+
+
 def path_is_readable(path: Path) -> bool:
     return path.exists() and os.access(path, os.R_OK)
 
@@ -269,6 +273,12 @@ def next_recommended_skill(root: Path, config: dict[str, Any]) -> str:
     inputs_count = sum(
         count_files(root / "inputs" / folder) for folder in INPUT_SUBFOLDERS
     )
+    validation_report = root / "review/validation-report.md"
+    merged_outputs = (
+        root / "outputs/notes/full_course_notes.md",
+        root / "outputs/formulas/full_formula_sheet.md",
+        root / "outputs/questions/full_exam_practice_questions.md",
+    )
 
     if not studyos_installed(root):
         return "install StudyOS"
@@ -296,16 +306,9 @@ def next_recommended_skill(root: Path, config: dict[str, Any]) -> str:
         count_files(root / "analysis/batches") == 0
     ):
         return "studyos-plan, then studyos-batch"
-    if not (root / "review/validation-report.md").is_file():
+    if not has_non_empty_file(validation_report):
         return "studyos-validate"
-    if not any(
-        (root / relative_path).is_file()
-        for relative_path in (
-            "outputs/notes/full_course_notes.md",
-            "outputs/formulas/full_formula_sheet.md",
-            "outputs/questions/full_exam_practice_questions.md",
-        )
-    ):
+    if not all(path.is_file() for path in merged_outputs):
         return "studyos-course, then studyos-merge"
     return "review outputs"
 
@@ -355,12 +358,12 @@ def run_status(root: Path) -> int:
     print_row("output files count", count_files(root / "outputs"))
     print_row(
         "validation report exists",
-        yes_no((root / "review/validation-report.md").is_file()),
+        yes_no(has_non_empty_file(root / "review/validation-report.md")),
     )
     print_row(
         "merged reduced outputs exist",
         yes_no(
-            any(
+            all(
                 (root / relative_path).is_file()
                 for relative_path in (
                     "outputs/notes/full_course_notes.md",
@@ -410,6 +413,16 @@ def stale_setup_issues(root: Path, config: dict[str, Any]) -> list[str]:
         and count_files(root / "analysis/batches") == 0
     ):
         issues.append("outputs exist but no batch analysis files were found")
+    if has_non_empty_file(root / "review/validation-report.md"):
+        report_text = (root / "review/validation-report.md").read_text(
+            encoding="utf-8",
+            errors="replace",
+        )
+        if "StudyOS Validation Report" not in report_text:
+            issues.append(
+                "validation-report.md is non-empty but does not look like a "
+                "StudyOS validation report"
+            )
 
     return issues
 

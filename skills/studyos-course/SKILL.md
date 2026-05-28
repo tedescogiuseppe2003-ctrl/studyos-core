@@ -11,6 +11,8 @@ This skill is a controlled sequential runner for batch work. It must not process
 
 Final batch outputs are limited to batch notes, batch formula sheets, and batch exam practice questions. Digest, learning core, visual notes, validation files, and review files remain internal process evidence.
 
+The course runner prioritizes output quality and exhaustive assigned-input coverage over speed. Time and token optimization may reduce duplicated work, but it must not reduce source coverage, notes depth, formula completeness, visual handling, or exam-question quality.
+
 # When to use
 
 Use when the user wants remaining planned, unprocessed, stale, or previously failed batches handled in order after import and planning are complete.
@@ -85,6 +87,10 @@ Do not create merged final outputs. Full-course consolidation belongs to `studyo
 - Spend saved effort from the reduced output scope on notes depth, formula quality, exam-question quality, source coverage, and essential visual coverage.
 - Use targeted repair for affected files or sections instead of regenerating unrelated outputs.
 - Avoid processing the whole course as one giant context.
+- Maintain a per-batch processing ledger in `review/progress-tracker.md` with processed, skipped, repaired, validation status, unresolved issues, and next dependency.
+- For each batch, load only the selected batch sources plus prior validated dependency summaries unless cross-batch reasoning is required.
+- Prefer shallow rereads for already validated dependency batches and deep rereads only when notation, assumptions, formulas, or exam integration depend on them.
+- Stop and repair early when one batch fails validation instead of letting defects propagate to later batches.
 
 # Parallelism
 
@@ -103,6 +109,10 @@ Do not create merged final outputs. Full-course consolidation belongs to `studyo
 - Outputs must be grounded in validated batch material and assigned sources.
 - Do not modify protected raw files or files under `inputs/`.
 - Do not create merged final outputs; that belongs to `studyos-merge`.
+- The course run is complete only when every planned batch is processed, skipped with a concrete reason, or blocked with a visible unresolved issue.
+- Token and time optimization must never mean omitting an assigned source from Source Coverage or final output consideration.
+- Long batch outputs are acceptable when the planned source material requires them.
+- A batch is not complete if it is merely concise; it is complete only when all assigned inputs have been exhausted or explicitly justified as duplicate, irrelevant, unreadable, or deferred.
 
 # Stop conditions
 

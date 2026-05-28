@@ -5,6 +5,7 @@ You are working inside a StudyOS v1 course workspace.
 ## Standing Rules
 
 - Keep the implementation lean and course-focused.
+- Keep StudyOS agent-driven: scripts handle installation, import, inventory, deterministic validation, and export; the agent handles source judgment, extraction, repair, and merging.
 - Treat `raw_source.path` as an external read-only source folder.
 - Do not modify `inputs/`; treat raw course material as read-only.
 - Work batch by batch.
@@ -22,6 +23,18 @@ You are working inside a StudyOS v1 course workspace.
 - Record weak points and unresolved questions.
 - Validate after each batch before course-level and merged outputs.
 - Use integrated visual screening in `studyos-batch`, `studyos-course`, and `studyos-validate` when a chart, table, diagram, or image is important to understanding the material.
+
+## Agent Efficiency And Quality
+
+- Output quality is the highest priority. Time and token optimization are useful only when they preserve exhaustive coverage and soundness.
+- Optimize time and tokens by reading metadata, inventories, headings, slide titles, tables of contents, and obvious formula/exam signals before full source reads.
+- Fully cover every assigned primary source and every assigned supporting source. Use selective reading only when the Source Coverage table can justify that a source is duplicate, irrelevant, unreadable, or deferred.
+- Outputs may be long. Do not shorten notes, formulas, or exam answers by omitting unique input concepts, examples, caveats, assumptions, formulas, visuals, or exam signals.
+- Spend saved tokens on complete notes, formula correctness, essential visuals, exam-quality practice questions, and validation repair.
+- Use deeper reasoning only for hard concepts, formulas, notation conflicts, essential visuals, exam integration, and final merge decisions.
+- Prefer targeted repair over broad regeneration. Preserve valid digest, learning-core, and output sections.
+- Treat "perfect" as an operational target: no known unsupported claims, complete assigned-source coverage, display-quality formulas, clear expected answers, visible unresolved uncertainty, and no high or blocking validation findings.
+- Validation and final review must fail outputs that are short because they dropped assigned-input coverage.
 
 ## Installation Setup
 

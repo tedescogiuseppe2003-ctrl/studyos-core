@@ -141,11 +141,13 @@ course-folder/
 
 ## Quality and depth modes
 
-`economy` mode is faster, uses fewer tokens, creates lighter notes, performs minimal visual checks, and is suitable for low-stakes review.
+`economy` mode is faster and uses fewer tokens for low-stakes review, but it must still preserve complete assigned-input coverage. It may reduce polish and depth of explanation, not omit unique source-grounded concepts.
 
 `standard` mode is the default. It balances precision and efficiency, includes inventory, conceptual batch planning, source analysis, output generation, validation, and visual screening.
 
 `rigorous` mode is slower and more precise. It uses deeper formula handling, stronger validation, and deeper visual analysis when relevant. It is suitable for exam-critical technical courses.
+
+Across all modes, output quality and exhaustive assigned-input coverage outrank time and token savings. Outputs may be long when the course material requires long outputs. Optimization means avoiding duplicate work, removed outputs, and unnecessary rereads, not dropping unique concepts, examples, caveats, assumptions, formulas, visuals, or exam signals.
 
 Visual handling depth controls how aggressively StudyOS inspects diagrams, charts, tables, screenshots, and other visual course material.
 
@@ -266,7 +268,7 @@ Default student-facing outputs are:
 - merged full-course exam practice questions
 - exported PDFs for both unmerged and merged versions
 
-Notes are complete study material, not summaries. They should preserve the concepts, explanations, examples, caveats, and source coverage needed to study the course.
+Notes are exhaustive complete study material, not summaries. They should preserve the concepts, explanations, examples, caveats, and source coverage needed to study the course, even when that makes the notes long.
 
 Formula sheets are the technical precision layer. They should emphasize correct notation, assumptions, definitions, derivations where useful, source provenance, and formula formatting quality.
 

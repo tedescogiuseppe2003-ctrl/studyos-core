@@ -48,7 +48,9 @@ After setup approval, call the StudyOS skills manually one step at a time.
 
 `studyos-plan` refines the first batch plan into conceptual batches. `studyos-batch` processes one selected batch. `studyos-validate` checks outputs and guides targeted repair. `studyos-course` processes remaining planned batches with validation after each batch. Visual screening is integrated into batch, course, and validation work; it is not a separate skill.
 
-The default student-facing output scope is intentionally reduced to notes, formula sheets, and exam practice questions. Flashcards, cheat sheets, study plans, and final review packs are not default outputs anymore. The smaller output set is deliberate: saved effort should go into complete notes, stronger formula handling, better source coverage, visual coverage, and exam-quality practice questions.
+The default student-facing output scope is intentionally reduced to notes, formula sheets, and exam practice questions. Flashcards, cheat sheets, study plans, and final review packs are not default outputs anymore. The smaller output set is deliberate: saved effort should go into exhaustive notes, stronger formula handling, complete source coverage, visual coverage, and exam-quality practice questions.
+
+Output quality and exhaustive assigned-input coverage outrank time and token savings. StudyOS should optimize by avoiding duplicate work and removed outputs, not by shortening notes or dropping unique source-grounded concepts, examples, caveats, assumptions, formulas, visuals, or exam signals. Long outputs are acceptable when long outputs are needed to cover the inputs soundly.
 
 `studyos-merge` reads validated batch learning cores and batch outputs, then writes the final full-course structure:
 
@@ -70,7 +72,7 @@ python3 study-os/scripts/export_outputs.py --root .
 
 PDF is preferred when `pandoc` and a LaTeX PDF engine are available. If PDF dependencies are unavailable, the exporter writes print-ready HTML and reports the fallback. Flashcards, cheat sheets, study plans, final review packs, internal `analysis/`, `review/`, validation, and debug files are not exported by default.
 
-Notes are complete study notes, not summaries. Formula sheets require readable display LaTeX. Exam practice questions replace flashcards as the active-recall and practice layer.
+Notes are exhaustive complete study notes, not summaries. Formula sheets require readable display LaTeX. Exam practice questions replace flashcards as the active-recall and practice layer.
 
 ## Installed Course Folder
 
@@ -128,3 +130,13 @@ Never run an old installed copy such as `study-os/scripts/install_studyos.py`. I
 ## Install Stops Before Course Work
 
 During installation/setup, do not run any skill or script that imports, inventories, plans, summarizes, validates, processes, merges, or exports course material.
+
+## Core Smoke Test
+
+After editing core scripts, run:
+
+```sh
+python3 scripts/smoke_test.py
+```
+
+The smoke test creates a temporary course folder, installs and syncs StudyOS, checks readiness, writes an approved setup with an inline-commented `raw_source.path`, runs import proposal, import execution, and inventory, then confirms the batch plan and next-step status are coherent.

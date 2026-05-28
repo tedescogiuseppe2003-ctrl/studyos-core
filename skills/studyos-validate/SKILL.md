@@ -7,6 +7,8 @@ description: Validate StudyOS batch, course, or merged outputs for structure, gr
 
 Validate generated StudyOS material before more work builds on it. The final study-facing validation scope is limited to notes, formula sheets, and exam practice questions. Digest, learning core, source coverage, and visual coverage are checked as internal quality-support evidence.
 
+Validation is the quality gate. It must prioritize exhaustive assigned-input coverage and output soundness over brevity, speed, or token savings.
+
 # When to use
 
 Use after `studyos-batch`, after course-level output generation, after repairs, and after `studyos-merge` when merged outputs need audit.
@@ -69,6 +71,8 @@ Do not require or validate removed final outputs: flashcards, cheat sheets, stud
 - Required sections exist: Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References.
 - Standard and rigorous modes warn when notes are approximately too short for the batch.
 - Notes are complete study notes, not merely compressed summaries.
+- Notes may be long when the assigned inputs require it; length alone is not a validation problem.
+- Notes fail validation when they are short because unique assigned-source concepts, examples, caveats, formulas, assumptions, visuals, or exam signals were omitted.
 - Source references are present and usable.
 - Exam-relevant visual findings are included when visual material is relevant.
 
@@ -126,6 +130,9 @@ Source Coverage validation must identify the batch, source path, source role, st
 - Use scripts for deterministic checks.
 - Use fast reasoning for simple structural review.
 - Use deeper reasoning for grounding, unsupported-claim review, formula consistency, visual coverage, weak-point capture, and exam-usefulness audits.
+- Audit only the relevant batch or merged output when the target is scoped; avoid rereading unrelated batches.
+- Use the deterministic reports to focus LLM review on likely weak sections instead of reviewing every sentence equally.
+- Escalate to deep/audit reasoning for claims that cannot be traced to Source Coverage, formulas with notation conflicts, essential visuals, and exam-answer correctness.
 
 # Quality rules
 
@@ -136,6 +143,10 @@ Source Coverage validation must identify the batch, source path, source role, st
 - Preserve valid content.
 - Rerun validation after repair.
 - Remaining uncertainty must be visible in review files.
+- Validation should treat "perfect" as no known high or blocking issues, complete assigned-source coverage, display-quality formulas, visible unresolved uncertainty, and no unsupported claims detected by the current audit.
+- A validation pass is not clean if token savings caused skipped source coverage, missing formulas, shallow notes, or absent expected answers.
+- A validation pass is not clean if final outputs do not materially reflect every assigned source marked `used` or `partially used`.
+- Prefer a long validated output over a concise output that drops source-grounded material.
 
 # Stop conditions
 

@@ -9,6 +9,8 @@ Process one selected conceptual batch at a time using assigned sources, creating
 
 The study-facing output set is deliberately reduced. This skill generates only complete notes, a formula sheet when formulas exist or are relevant, and exam practice questions. It must not generate flashcards, cheat sheets, study plans, final review packs, or any substitute for those removed outputs.
 
+Output quality and exhaustive assigned-input coverage are the priority. Time and token optimization must never shorten or simplify outputs by omitting unique concepts, examples, caveats, assumptions, formulas, visuals, or exam signals from assigned sources. Long outputs are acceptable when long outputs are required for complete, sound study material.
+
 # When to use
 
 Use after `studyos-plan` when the user selects a specific planned batch to process.
@@ -61,18 +63,20 @@ Do not write:
 
 1. Run preflight checks.
 2. Read the selected batch definition, assigned sources, and relevant existing review files.
-3. Build a Source Coverage table before generating study outputs.
-4. Extract and organize text content from assigned sources.
-5. Perform visual screening internally for slides, PDFs, images, screenshots, diagrams, charts, and tables.
-6. Perform targeted visual analysis for essential visuals.
-7. Create `analysis/batches/<batch>_digest.md`.
-8. Create `analysis/batches/<batch>_learning_core.md`.
-9. Generate only the reduced study-facing outputs from the learning core:
+3. Build a source-by-source reading plan from filenames, inventory metadata, headings, slide titles, tables of contents, abstracts, and obvious formula or exam signals.
+4. Build a Source Coverage table before generating study outputs.
+5. Fully read assigned primary sources. Read supporting sources selectively first, then escalate to full reading when they contain unique concepts, formulas, exam signals, corrections, essential examples, caveats, assumptions, or visuals. If selective reading cannot prove coverage, fully read the supporting source.
+6. Extract and organize text content from assigned sources.
+7. Perform visual screening internally for slides, PDFs, images, screenshots, diagrams, charts, and tables.
+8. Perform targeted visual analysis for essential visuals.
+9. Create `analysis/batches/<batch>_digest.md`.
+10. Create `analysis/batches/<batch>_learning_core.md`.
+11. Generate only the reduced study-facing outputs from the learning core:
    - complete notes
    - formula sheet when formulas exist or are relevant
    - exam practice questions
-10. Update review files.
-11. Stop and recommend validation.
+12. Update review files.
+13. Stop and recommend validation.
 
 # Required digest sections
 
@@ -156,6 +160,8 @@ Every notes file must include:
 
 Write enough detail for a student to study from the notes without reopening every source, while preserving source references and unresolved uncertainty. Formula Intuition is required even when no standalone formula sheet is produced; say explicitly when the batch has no formulas and explain any conceptual quantitative relationships.
 
+Notes may be long. Do not compress them to fit an arbitrary length when assigned inputs contain distinct concepts, examples, caveats, assumptions, formulas, visuals, or exam signals that a student needs.
+
 # Formula sheet requirements
 
 Write `outputs/formulas/<batch>_formulas.md` when formulas, notation, quantitative assumptions, derivations, or formula-like rules exist or are relevant to the batch.
@@ -204,6 +210,11 @@ Questions should include a mix of:
 - Avoid rereading unrelated batches.
 - Spend saved effort from the reduced output set on deeper notes, better formula handling, stronger question quality, and source/visual coverage.
 - Do not spend tokens planning or producing removed outputs.
+- Use metadata-first reading to reduce wasted context, but do not let token savings reduce assigned-source coverage.
+- Keep the digest compact for obvious or duplicated facts and detailed for definitions, formulas, assumptions, worked examples, exam signals, visual findings, source conflicts, and weak points.
+- Escalate only the unclear section to deeper reasoning when possible.
+- Reuse current digest, learning core, and validation findings for repairs; do not regenerate valid sections.
+- Optimize by removing duplication and filler, not by omitting unique assigned-source content.
 
 # Quality rules
 
@@ -217,6 +228,9 @@ Questions should include a mix of:
 - Source Coverage and Visual Coverage are required in the digest.
 - All assigned sources must be used or explicitly explained in Source Coverage.
 - The reduced output set is fixed for this skill: notes, formulas when relevant, and questions.
+- Before completion, check the outputs against the Source Coverage table and ensure no assigned source with status `used` or `partially used` is absent from notes, formulas when relevant, or questions when exam-relevant.
+- If an output cannot be made sound from available evidence, mark the issue unresolved and stop before presenting it as complete.
+- If notes or questions feel short, explicitly verify that they are short because the assigned inputs are small or duplicated, not because coverage was reduced.
 
 # Stop conditions
 

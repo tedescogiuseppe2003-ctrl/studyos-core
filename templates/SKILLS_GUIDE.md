@@ -79,15 +79,15 @@ Every digest includes Batch Processing Plan, Source Coverage, Visual Coverage, C
 
 All assigned sources must be used or explicitly explained in Source Coverage. Slides supply theory, definitions, formulas, and visuals; notes supply emphasis, traps, and doubts; exercises supply exam practice questions and weak points; readings supply theory, assumptions, and definitions; exams supply exam style and expected answers; transcripts supply explanations and examples.
 
-Batch notes must be complete study notes, not summaries. Each notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. The learning core must preserve enough depth to support those complete notes and must not be over-compressed.
+Batch notes must be exhaustive complete study notes, not summaries. Each notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. The learning core must preserve enough depth to support those complete notes and must not be over-compressed. Long notes are acceptable when the assigned inputs require them; do not omit unique concepts, examples, caveats, assumptions, formulas, visuals, or exam signals to make an output shorter.
 
 Formula sheets use readable display LaTeX and include variable definitions, assumptions, intuition, common mistakes, and source references. Exam practice questions replace flashcards as the active-recall and practice layer, including exercise-derived practice, exam-style prompts, common-mistake traps, and expected answers or solution outlines.
 
-The reduced output scope is intentional: spend the saved effort on complete notes, display-LaTeX formulas, stronger question quality, source coverage, and visual coverage.
+The reduced output scope is intentional: spend the saved effort on exhaustive notes, display-LaTeX formulas, stronger question quality, source coverage, and visual coverage. Output quality and assigned-input coverage outrank time and token savings.
 
 If the batch has slides, PDFs, or images, Visual Coverage is required. If no essential visuals exist, the digest says so explicitly. Essential visuals include formulas in images, definitions in images, charts, tables, rankings, benchmark values, model diagrams, process diagrams, and summary visual slides.
 
-Use model routing from `subject.yaml` and `study-os/config/model-routing.yaml` when available: balanced for normal batches, deep for formula-heavy batches, deep only for affected essential visuals, and balanced or deep for exam questions depending on difficulty. Repair affected sections before regenerating entire outputs. Spend saved effort from the reduced output set on notes, formulas, questions, source coverage, and visual coverage; do not spend tokens on removed outputs.
+Use model routing from `subject.yaml` and `study-os/config/model-routing.yaml` when available: balanced for normal batches, deep for formula-heavy batches, deep only for affected essential visuals, and balanced or deep for exam questions depending on difficulty. Repair affected sections before regenerating entire outputs. Spend saved effort from the reduced output set on notes, formulas, questions, source coverage, and visual coverage; do not spend tokens on removed outputs. Never save tokens by dropping unique assigned-source content.
 
 Run `studyos-validate` after each processed batch.
 
@@ -101,6 +101,7 @@ Use after batch processing, course-level processing, repairs, or merging.
 - Validates only the final study-facing outputs: notes, formula sheets, and exam practice questions.
 - Does not require flashcards, cheat sheets, study plans, final review packs, or substitutes for those removed outputs.
 - Checks notes for existence, required sections, depth, source references, visual findings when relevant, and summary-like compression.
+- Fails notes that are short because they dropped assigned-source concepts, examples, caveats, formulas, assumptions, visuals, or exam signals.
 - Checks formula sheets for Formula Index, Notation, display LaTeX, non-ASCII-only formula formatting, and required fields per formula.
 - Checks questions for expected answers, topic/concept grouping, conceptual and exam-style prompts, formula/application practice when relevant, exercise-derived practice, and source or topic references.
 - Checks internal quality-support files: digest Source Coverage, digest Visual Coverage when relevant, learning core depth relative to the digest, and tracked unresolved visual/formula issues.
@@ -112,7 +113,7 @@ Use after batch processing, course-level processing, repairs, or merging.
 - Writes reports under `review/` and detailed notes under `analysis/validation/`.
 - Writes or updates `review/visual-issues.md` and `review/unresolved-questions.md` when relevant.
 
-Validation severity levels are `low`, `medium`, `high`, and `blocking`. Blocking issues stop downstream work. Validation should lead to targeted repair before regeneration: repair affected sections, preserve valid content, avoid regenerating unrelated outputs, and rerun validation after repair.
+Validation severity levels are `low`, `medium`, `high`, and `blocking`. Blocking issues stop downstream work. Validation should lead to targeted repair before regeneration: repair affected sections, preserve valid content, avoid regenerating unrelated outputs, and rerun validation after repair. A validation pass is not clean when brevity or token savings caused incomplete input coverage.
 
 Completion reports include notes status, formulas status, questions status, source coverage status, visual coverage status, blocking issues, high-priority fixes, minor fixes, files written, and the recommended repair target.
 

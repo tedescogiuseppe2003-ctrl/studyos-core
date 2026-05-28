@@ -30,6 +30,14 @@ INTENTIONALLY_NOT_TOUCHED = (
     ".git/",
 )
 
+ROOT_CONFIG_TEMPLATES = (
+    "workflow.yaml",
+    "output-standards.yaml",
+    "model-routing.yaml",
+    "AGENTS.md",
+    "CLAUDE.md",
+)
+
 COURSE_LOCAL_SCRIPTS = (
     "studyos.py",
     "init_db.py",
@@ -137,6 +145,7 @@ def validate_sources(source_root: Path) -> None:
     required_templates = (
         source_root / "templates/STUDYOS_GUIDE.md",
         source_root / "templates/SKILLS_GUIDE.md",
+        *(source_root / "templates" / name for name in ROOT_CONFIG_TEMPLATES),
     )
     missing_templates = [path for path in required_templates if not path.is_file()]
     if missing_templates:
@@ -286,6 +295,12 @@ def sync_guides(source_root: Path, target: Path) -> tuple[int, int, tuple[str, .
         replaced += 1
     copied += 1
     synced_paths.append(str(SKILLS_GUIDE_DESTINATION))
+
+    for template_name in ROOT_CONFIG_TEMPLATES:
+        if copy_file_replace(templates_source / template_name, target / template_name):
+            replaced += 1
+        copied += 1
+        synced_paths.append(template_name)
 
     studyos_guide_destination = target / STUDYOS_GUIDE_DESTINATION
     if (

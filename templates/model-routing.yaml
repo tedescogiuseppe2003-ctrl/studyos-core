@@ -66,6 +66,44 @@ defaults:
   validation: "audit"
   merge: "deep"
 
+agent_execution_policy:
+  primary_mode: "agent_driven_with_scripted_preflight_validation_and_export"
+  objective: "Maximize source-grounded output quality and exhaustive assigned-input coverage; optimize tokens only after those are protected."
+  priority_order:
+    - "output_quality"
+    - "complete_assigned_input_coverage"
+    - "validation_cleanliness"
+    - "time_and_token_efficiency"
+  context_strategy:
+    - "Read planning files and source inventories before raw source content."
+    - "Process one conceptual batch at a time; never load the whole course when a batch is sufficient."
+    - "Start with file metadata, headings, tables of contents, slide titles, abstracts, summaries, and visible formulas to build a reading plan."
+    - "Read full source content only for assigned batch sources and only after the Source Coverage checklist is prepared."
+    - "Prefer targeted rereads of uncertain sections over broad rereads of already-covered material."
+    - "Reuse existing digests, learning cores, visual notes, and validation reports when current."
+  token_optimization:
+    - "Spend minimal tokens on setup, import, inventory, formatting, and mechanical classification."
+    - "Spend most tokens on digest completeness, learning-core depth, formula correctness, visual essentials, exam-quality questions, and validation repair."
+    - "Do not spend tokens producing removed outputs or ornamental summaries."
+    - "Use concise internal notes for obvious facts and detailed internal notes for hard, examinable, formula-heavy, or visually grounded material."
+    - "Escalate only the affected section to deeper reasoning instead of rerunning an entire batch."
+    - "Never save tokens by dropping unique assigned-source content from final outputs."
+    - "Long outputs are acceptable when long outputs are necessary for exhaustive coverage."
+  escalation_rules:
+    use_deep_when:
+      - "Formula notation, assumptions, or derivations are ambiguous."
+      - "A visual contains examinable definitions, formulas, tables, charts, or model structure."
+      - "Multiple sources conflict or use different notation."
+      - "Exam questions require integration across concepts."
+      - "Merged outputs require cross-batch deduplication or dependency reasoning."
+    use_audit_when:
+      - "Validating coverage, citations, formulas, unsupported claims, visual handling, or stale outputs."
+      - "Deciding whether a blocking issue can be carried as unresolved."
+  stopping_rules:
+    - "Stop instead of guessing when assigned source material is unreadable, missing, contradictory, or too ambiguous to ground an output."
+    - "Stop before downstream work when validation has blocking findings."
+    - "Carry uncertainty visibly in review files and final outputs only when the user explicitly accepts the unresolved risk."
+
 output_scope:
   student_facing_defaults:
     - "notes"

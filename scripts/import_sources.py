@@ -106,10 +106,42 @@ def normalize_action(value: str) -> str:
 
 
 def unquote_yaml_scalar(value: str) -> str:
-    stripped = value.strip()
-    if len(stripped) >= 2 and stripped[0] == stripped[-1] and stripped[0] in {"'", '"'}:
+    stripped = strip_inline_comment(value).strip()
+    if (
+        len(stripped) >= 2
+        and stripped[0] == stripped[-1]
+        and stripped[0] in {"'", '"'}
+    ):
         return stripped[1:-1]
     return stripped
+
+
+def strip_inline_comment(value: str) -> str:
+    in_quote: str | None = None
+    escaped = False
+    result: list[str] = []
+
+    for character in value:
+        if escaped:
+            result.append(character)
+            escaped = False
+            continue
+        if character == "\\":
+            result.append(character)
+            escaped = True
+            continue
+        if character in ("'", '"'):
+            if in_quote == character:
+                in_quote = None
+            elif in_quote is None:
+                in_quote = character
+            result.append(character)
+            continue
+        if character == "#" and in_quote is None:
+            break
+        result.append(character)
+
+    return "".join(result)
 
 
 def read_raw_source_path(root: Path) -> Path:

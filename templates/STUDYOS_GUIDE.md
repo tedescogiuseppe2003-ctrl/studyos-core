@@ -91,6 +91,22 @@ Model routing is configured in `study-os/config/model-routing.yaml`.
 
 Use the deeper tier only for the affected section when repairing validation issues. Do not regenerate unrelated outputs just to fix one finding.
 
+## Agent-Driven Optimization
+
+StudyOS is intentionally agent-driven. Scripts handle safe mechanical work: install, sync, import proposal, approved copy, inventory, deterministic validation, and export. The agent handles the judgment-heavy work: reading sources, deciding what matters, extracting concepts, analyzing formulas and visuals, writing notes, creating exam practice, repairing validation findings, and merging the course.
+
+The agent should optimize time and tokens only after output quality and exhaustive assigned-input coverage are protected:
+
+- read inventory, batch plan, filenames, headings, slide titles, tables of contents, and obvious formula/exam signals before full source reads
+- fully cover every assigned primary source and every assigned supporting source
+- use selective reading only when Source Coverage can justify a source as duplicate, irrelevant, unreadable, or deferred
+- spend saved effort on complete notes, formula correctness, essential visuals, exam-quality questions, and validation repair
+- use deeper reasoning only for difficult concepts, formulas, notation conflicts, essential visuals, exam integration, and final merge decisions
+- repair affected sections instead of regenerating unrelated valid work
+- write long outputs when long outputs are required to preserve all unique concepts, examples, caveats, assumptions, formulas, visuals, and exam signals
+
+StudyOS treats "perfect output" as an operational quality target, not a promise of impossible certainty: complete assigned-source coverage, no known unsupported claims, display-quality formulas, clear expected answers, visible unresolved uncertainty, and no high or blocking validation findings.
+
 ## Common Missing-Step Warnings
 
 - Missing `subject.yaml` or `study-os/`: install StudyOS first.
@@ -131,7 +147,7 @@ Merged full-course output files use these names:
 
 `studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
 
-Batch notes are complete study notes, not summaries. Each batch notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. Formula sheets require readable display LaTeX and include assumptions, intuition, common mistakes, and source references. Exam practice questions replace flashcards as the active-recall and practice layer, using exercises for practice prompts and weak-point discovery rather than fake theory summaries.
+Batch notes are exhaustive complete study notes, not summaries. Each batch notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. Formula sheets require readable display LaTeX and include assumptions, intuition, common mistakes, and source references. Exam practice questions replace flashcards as the active-recall and practice layer, using exercises for practice prompts and weak-point discovery rather than fake theory summaries. Outputs may be long; length is acceptable when it reflects complete assigned-input coverage.
 
 `studyos-batch` does not create flashcards, cheat sheets, study plans, final review packs, or deprecated output folders for those formats. Fewer outputs should mean deeper attention to notes, formulas, questions, source coverage, and visual coverage.
 
@@ -217,7 +233,7 @@ Every batch with slides, PDFs, or images must include Visual Coverage in the dig
 
 Validation focuses only on the final study-facing outputs: notes, formula sheets, and exam practice questions. It does not require flashcards, cheat sheets, study plans, or final review packs. It also checks internal quality-support files: each processed batch digest, learning core, source coverage, and visual coverage.
 
-For notes, validation checks file existence, non-empty content, required sections, approximate depth in standard or rigorous mode, source references, visual findings when relevant, and whether the file looks like complete study notes rather than a compressed summary.
+For notes, validation checks file existence, non-empty content, required sections, approximate depth in standard or rigorous mode, source references, visual findings when relevant, and whether the file looks like complete study notes rather than a compressed summary. Validation should fail notes that are short because they omit assigned-source concepts, examples, caveats, formulas, assumptions, visuals, or exam signals.
 
 For formulas, validation checks that relevant formula sheets exist, Formula Index and Notation sections are present, display LaTeX is used, formulas are not inline-code/plain-ASCII only, and each formula has Formula, Variables, Assumptions, Use when, Interpretation, Common mistake, and Source fields.
 

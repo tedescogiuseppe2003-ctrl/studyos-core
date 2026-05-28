@@ -9,6 +9,8 @@ Merge validated batch outputs into cleaned, consolidated full-course notes, form
 
 Merge does not mean concatenate. The skill consolidates overlapping material, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, and carries weak points and unresolved questions into the final study material.
 
+Merged output quality is more important than brevity. Full-course outputs may be long when the validated batch material requires it. Save length by deduplicating repeated explanations, not by dropping unique validated concepts, examples, caveats, assumptions, formulas, visuals, weak points, or exam signals.
+
 # When to use
 
 Use after relevant batches have been processed and validated, their learning cores exist, and the course is ready for the reduced full-course output set.
@@ -71,6 +73,10 @@ Use after relevant batches have been processed and validated, their learning cor
 - Use balanced or deep reasoning for standard mode, escalating to deep for formula consistency, dependencies, and exam-critical prioritization.
 - Audit review is recommended for the merged outputs.
 - Do not reread raw sources unless validated intermediates are insufficient.
+- Use validated learning cores and batch outputs as the main context to save tokens.
+- Reread raw sources only for unresolved conflicts, missing provenance, formula ambiguity, visual uncertainty, or validation findings that cannot be repaired from intermediates.
+- Merge in passes: dependency map first, duplicate concepts second, notation/formulas third, exam practice fourth, source-reference audit last.
+- Prefer targeted repair of the affected merged section over regenerating all merged outputs.
 
 # Quality rules
 
@@ -84,6 +90,9 @@ Use after relevant batches have been processed and validated, their learning cor
 - Final outputs should be cohesive full-course deliverables, not batch files pasted together.
 - Preserve the repaired depth and batch-level completeness of batch notes.
 - Do not compress the merged notes into a short summary.
+- Completeness beats brevity in merged outputs; save tokens by avoiding duplicated explanations, not by dropping unique source-grounded concepts.
+- Do not mark the merge complete until every included batch has a visible contribution, a deduplicated counterpart, or an explicit reason for exclusion.
+- Do not compress the full course into an executive summary or high-level review when the validated batch material contains detailed examinable content.
 
 # Merged notes requirements
 
