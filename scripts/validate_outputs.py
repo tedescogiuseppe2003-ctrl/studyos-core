@@ -1405,7 +1405,13 @@ def validate_internal_support(
         if path and path.is_file():
             unresolved_text += "\n" + read_text(path)
     lowered = unresolved_text.lower()
-    if "unresolved" in lowered and ("visual" in lowered or "formula" in lowered):
+    unresolved_visual_or_formula = (
+        re.search(r"\bunresolved\b.{0,120}\b(?:visual|formula)\b", lowered, re.S)
+        is not None
+        or re.search(r"\b(?:visual|formula)\b.{0,120}\bunresolved\b", lowered, re.S)
+        is not None
+    )
+    if unresolved_visual_or_formula:
         issue_files = [
             root / "review" / "visual-issues.md",
             root / "review" / "unresolved-questions.md",

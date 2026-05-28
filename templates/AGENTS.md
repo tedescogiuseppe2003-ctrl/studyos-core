@@ -68,7 +68,7 @@ After installation, point the user to `STUDYOS_GUIDE.md` and continue only when 
 
 ## Workflow
 
-Use the v1 workflow in `templates/workflow.yaml`:
+Use the v1 workflow in `workflow.yaml`:
 
 1. Install StudyOS.
 2. Approve setup.

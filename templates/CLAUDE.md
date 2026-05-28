@@ -68,7 +68,7 @@ After installation, point the user to `STUDYOS_GUIDE.md` and continue only when 
 
 ## Expected Flow
 
-Follow `templates/workflow.yaml`:
+Follow `workflow.yaml`:
 
 1. Install StudyOS.
 2. Approve setup.
