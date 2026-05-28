@@ -48,15 +48,11 @@ After the setup proposal is approved and written to `subject.yaml`, use skills m
 
 - `outputs/notes/full_course_notes.md`
 - `outputs/formulas/full_formula_sheet.md`
-- `outputs/flashcards/full_flashcards.md`
 - `outputs/questions/full_question_bank.md`
-- `outputs/cheat-sheets/final_cheat_sheet.md`
-- `outputs/study-plan/full_course_study_plan.md`
-- `outputs/final-pack/final_review_pack.md`
 
 Merge does not mean concatenate: it consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, and carries exam-relevant visual findings.
 
-`studyos-export` converts study-facing Markdown outputs into polished student deliverables. It exports unmerged batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md` into category folders under `exports/pdf/unmerged/`. It exports merged full-course outputs into `exports/pdf/merged/`.
+`studyos-export` converts study-facing Markdown outputs into polished student deliverables. It exports unmerged batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md` into category folders under `exports/pdf/unmerged/`. It exports merged full-course outputs into `exports/pdf/merged/`.
 
 The export script is:
 
@@ -72,7 +68,7 @@ A StudyOS course folder is self-explaining after install:
 
 - `inputs/` contains approved copied course files. Originals stay protected at `subject.yaml` -> `raw_source.path`; import is copy-only and never moves, deletes, renames, overwrites, or edits raw files.
 - `analysis/` contains working evidence: import plans, inventory, conceptual batch plans, batch digests, learning cores, visual notes, validation details, and processing state.
-- `outputs/` contains study-facing Markdown outputs: notes, formulas, flashcards, questions, cheat sheets, study plans, and final packs.
+- `outputs/` contains reduced-scope study-facing Markdown outputs: notes, formula sheets, and exam practice questions.
 - `exports/pdf/unmerged/` contains batch-level exports by category.
 - `exports/pdf/merged/` contains consolidated full-course exports.
 - `review/` contains weak points, unresolved questions, source coverage, visual issues, validation reports, and progress tracking.

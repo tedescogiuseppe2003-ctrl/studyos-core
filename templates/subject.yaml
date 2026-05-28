@@ -40,11 +40,7 @@ analysis_depth:
 outputs:
   master_notes: true
   formula_sheets: true
-  flashcards: true
   exam_questions: true
-  cheat_sheets: true
-  study_plan: true
-  final_review_pack: true
 
 multimodal:
   enabled: true

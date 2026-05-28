@@ -76,6 +76,14 @@ DEPRECATED_SCRIPT_PATHS = (
 SKILLS_GUIDE_DESTINATION = Path("study-os/config/SKILLS_GUIDE.md")
 STUDYOS_GUIDE_DESTINATION = Path("STUDYOS_GUIDE.md")
 
+DEPRECATED_OUTPUT_FOLDERS = (
+    "outputs/flashcards",
+    "outputs/cheat-sheets",
+    "outputs/study-plan",
+    "outputs/final-pack",
+    "exports/pdf/unmerged/flashcards",
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -214,6 +222,20 @@ def remove_obsolete_studyos_files(
             removed_skills.append(f"{relative_destination}/{skill_name}")
 
     return tuple(removed_scripts), tuple(removed_skills)
+
+
+def deprecated_output_warnings(target: Path) -> tuple[str, ...]:
+    warnings: list[str] = []
+
+    for relative_path in DEPRECATED_OUTPUT_FOLDERS:
+        path = target / relative_path
+        if path.exists() or path.is_symlink():
+            warnings.append(
+                f"`{relative_path}` is deprecated in the reduced StudyOS output scope. "
+                "Sync leaves it untouched; review or archive it manually if it contains old generated work."
+            )
+
+    return tuple(warnings)
 
 
 def sync_scripts(source_root: Path, target: Path) -> tuple[int, int, tuple[str, ...]]:
@@ -399,6 +421,7 @@ def main() -> int:
         removed_deprecated_scripts, removed_obsolete_skills = (
             remove_obsolete_studyos_files(target)
         )
+        warnings = deprecated_output_warnings(target)
         log_path = write_sync_log(
             target,
             copied_scripts,
@@ -412,6 +435,7 @@ def main() -> int:
             synced_guide_paths,
             removed_deprecated_scripts,
             removed_obsolete_skills,
+            warnings=warnings,
         )
     except OSError as error:
         print(f"StudyOS sync failed: {error}", file=sys.stderr)
@@ -443,6 +467,12 @@ def main() -> int:
     if removed_obsolete_skills:
         for removed_path in removed_obsolete_skills:
             print(f"  - {removed_path}")
+    else:
+        print("  - None")
+    print("Warnings:")
+    if warnings:
+        for warning in warnings:
+            print(f"  - {warning}")
     else:
         print("  - None")
     print(f"Sync log: {log_path}")

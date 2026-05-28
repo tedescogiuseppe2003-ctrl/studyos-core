@@ -436,7 +436,6 @@ def expected_output_lines(all_sources: list[SourceFile]) -> list[str]:
 
     lines.extend(
         [
-            "- flashcards",
             "- exam questions",
             "- weak points",
         ]

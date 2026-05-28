@@ -30,11 +30,7 @@ REQUIRED_FOLDERS = (
 REQUIRED_OUTPUT_CATEGORIES = (
     "notes",
     "formulas",
-    "flashcards",
     "questions",
-    "cheat-sheets",
-    "study-plan",
-    "final-pack",
 )
 
 IGNORED_NAMES = {".DS_Store"}
@@ -163,31 +159,6 @@ def visual_coverage_is_resolved(text: str) -> bool:
             "unresolved",
             "review/visual-issues.md",
         )
-    )
-
-
-def flashcards_are_active_recall(text: str) -> bool:
-    lowered = text.lower()
-    if "source references" not in lowered:
-        return False
-    active_markers = (
-        "front:",
-        "back:",
-        "q:",
-        "a:",
-        "question:",
-        "answer:",
-        "?",
-    )
-    passive_markers = (
-        "summary:",
-        "note:",
-        "definition:",
-    )
-    return any(marker in lowered for marker in active_markers) and not (
-        lowered.count("card") > 0
-        and sum(lowered.count(marker) for marker in passive_markers)
-        > sum(lowered.count(marker) for marker in active_markers)
     )
 
 
@@ -345,16 +316,6 @@ def validate(root: Path) -> tuple[list[Finding], list[Path]]:
             "review/source-coverage.md",
             "Source Coverage report is missing.",
         )
-
-    for path in text_output_files(root, "outputs/flashcards"):
-        if path.stat().st_size > 0 and not flashcards_are_active_recall(read_text(path)):
-            append_finding(
-                findings,
-                "medium",
-                "flashcards",
-                relative(path, root),
-                "Flashcards do not clearly use active-recall question/answer prompts.",
-            )
 
     for path in text_output_files(root, "outputs/questions"):
         if path.stat().st_size > 0:

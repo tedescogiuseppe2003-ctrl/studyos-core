@@ -66,7 +66,6 @@ Use to process one selected conceptual batch.
 - Writes `analysis/visual/<batch>_visual_notes.md` when visual findings exist.
 - Writes `outputs/notes/<batch>.md`.
 - Writes `outputs/formulas/<batch>_formulas.md` when formulas exist.
-- Writes `outputs/flashcards/<batch>_flashcards.md`.
 - Writes `outputs/questions/<batch>_questions.md`.
 - Updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
 
@@ -74,7 +73,7 @@ Every digest includes Batch Processing Plan, Source Coverage, Visual Coverage, C
 
 If the batch has slides, PDFs, or images, Visual Coverage is required. If no essential visuals exist, the digest says so explicitly. Essential visuals include formulas in images, definitions in images, charts, tables, rankings, benchmark values, model diagrams, process diagrams, and summary visual slides.
 
-Use model routing from `subject.yaml` and `study-os/config/model-routing.yaml` when available: balanced for normal batches, deep for formula-heavy batches, deep only for affected essential visuals, fast or balanced for flashcards, and balanced or deep for exam questions depending on difficulty. Repair affected sections before regenerating entire outputs.
+Use model routing from `subject.yaml` and `study-os/config/model-routing.yaml` when available: balanced for normal batches, deep for formula-heavy batches, deep only for affected essential visuals, and balanced or deep for exam questions depending on difficulty. Repair affected sections before regenerating entire outputs.
 
 Run `studyos-validate` after each processed batch.
 
@@ -85,7 +84,7 @@ Use after batch processing, course-level processing, repairs, or merging.
 - Requires processed batch outputs under `analysis/batches/` or generated outputs under `outputs/`.
 - Requires validation scripts under `study-os/scripts/`.
 - Runs deterministic structural checks, citation/source checks, and formula field checks where applicable.
-- Reviews grounding, unsupported claims, source coverage, visual coverage, clarity, flashcard usefulness, exam-question answer quality, exercise integration, weak points, and unresolved questions according to configured depth.
+- Reviews grounding, unsupported claims, source coverage, visual coverage, clarity, exam-question answer quality, exercise integration, weak points, and unresolved questions according to configured depth.
 - Confirms `review/source-coverage.md` exists after validation.
 - Checks Visual Coverage for any batch with slide, PDF, or image sources.
 - Writes reports under `review/` and detailed notes under `analysis/validation/`.
@@ -109,7 +108,7 @@ Use after import and planning when the user wants remaining planned or unprocess
 - Uses `studyos-validate` semantics before moving to the next batch and does not skip validation.
 - Repairs minor localized issues when appropriate, then revalidates before continuing.
 - Stops on blocking validation issues, missing assigned sources, unsafe batch ordering, or unresolved essential visual content.
-- Writes to `analysis/batches/`, `analysis/visual/`, `analysis/validation/`, `outputs/notes/`, `outputs/formulas/`, `outputs/flashcards/`, `outputs/questions/`, `review/`, and optional processing state under `study-os/state/`.
+- Writes to `analysis/batches/`, `analysis/visual/`, `analysis/validation/`, `outputs/notes/`, `outputs/formulas/`, `outputs/questions/`, `review/`, and optional processing state under `study-os/state/`.
 - Includes integrated visual screening; no separate visual skill is needed.
 
 Parallelism is off by default. Use safe parallelism only when configured in `subject.yaml`; do not parallelize dependent batches, do not parallelize digest and learning core for the same batch, and require merged validation before downstream work continues.
@@ -123,27 +122,23 @@ This skill does not process the whole course as one giant batch and does not cre
 Use after relevant batch outputs are processed and validated.
 
 - Reads learning cores from `analysis/batches/*_learning_core.md`.
-- Reads validated batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md`.
+- Reads validated batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md`.
 - Reads `review/weak-points.md`, `review/unresolved-questions.md`, and `review/validation-report.md`.
 - Merges by consolidating duplicate concepts, harmonizing notation, deduplicating formulas, identifying dependencies, and preserving source references.
 - Prioritizes weak points, unresolved questions, likely exam questions, and exam-relevant visual findings.
 - Writes `outputs/notes/full_course_notes.md`.
 - Writes `outputs/formulas/full_formula_sheet.md`.
-- Writes `outputs/flashcards/full_flashcards.md`.
 - Writes `outputs/questions/full_question_bank.md`.
-- Writes `outputs/cheat-sheets/final_cheat_sheet.md`.
-- Writes `outputs/study-plan/full_course_study_plan.md`, including a final 7-day plan and last-48-hour plan.
-- Writes `outputs/final-pack/final_review_pack.md`.
 
-Merge does not mean concatenate. Run audit validation on the final merged pack when validation depth or exam risk requires it.
+Merge does not mean concatenate. Run audit validation on the merged outputs when validation depth or exam risk requires it.
 
 ## studyos-export
 
 Use after desired outputs exist and have acceptable validation status.
 
-- Reads unmerged batch-level outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md`.
-- Writes unmerged exports to `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, `exports/pdf/unmerged/flashcards/`, and `exports/pdf/unmerged/questions/`.
-- Reads merged full-course outputs from `outputs/notes/full_course_notes.md`, `outputs/formulas/full_formula_sheet.md`, `outputs/flashcards/full_flashcards.md`, `outputs/questions/full_question_bank.md`, `outputs/cheat-sheets/final_cheat_sheet.md`, `outputs/study-plan/full_course_study_plan.md`, and `outputs/final-pack/final_review_pack.md`.
+- Reads unmerged batch-level outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md`.
+- Writes unmerged exports to `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, and `exports/pdf/unmerged/questions/`.
+- Reads merged full-course outputs from `outputs/notes/full_course_notes.md`, `outputs/formulas/full_formula_sheet.md`, and `outputs/questions/full_question_bank.md`.
 - Writes merged exports to `exports/pdf/merged/`.
 - Preserves batch boundaries, content, LaTeX expressions, and source references.
 - Does not export `analysis/`, `review/`, validation, debug, or internal files by default.

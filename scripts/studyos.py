@@ -28,12 +28,11 @@ REQUIRED_FOLDERS = (
     "outputs",
     "outputs/notes",
     "outputs/formulas",
-    "outputs/flashcards",
     "outputs/questions",
-    "outputs/cheat-sheets",
-    "outputs/study-plan",
-    "outputs/final-pack",
     "exports/pdf/unmerged",
+    "exports/pdf/unmerged/notes",
+    "exports/pdf/unmerged/formulas",
+    "exports/pdf/unmerged/questions",
     "exports/pdf/merged",
     "review",
     "study-os/config",
@@ -300,7 +299,14 @@ def next_recommended_skill(root: Path, config: dict[str, Any]) -> str:
         return "studyos-plan, then studyos-batch"
     if not (root / "review/validation-report.md").is_file():
         return "studyos-validate"
-    if not has_files(root / "outputs/final-pack"):
+    if not any(
+        (root / relative_path).is_file()
+        for relative_path in (
+            "outputs/notes/full_course_notes.md",
+            "outputs/formulas/full_formula_sheet.md",
+            "outputs/questions/full_question_bank.md",
+        )
+    ):
         return "studyos-course, then studyos-merge"
     return "review outputs"
 
@@ -353,8 +359,17 @@ def run_status(root: Path) -> int:
         yes_no((root / "review/validation-report.md").is_file()),
     )
     print_row(
-        "final review pack exists",
-        yes_no(has_files(root / "outputs/final-pack")),
+        "merged reduced outputs exist",
+        yes_no(
+            any(
+                (root / relative_path).is_file()
+                for relative_path in (
+                    "outputs/notes/full_course_notes.md",
+                    "outputs/formulas/full_formula_sheet.md",
+                    "outputs/questions/full_question_bank.md",
+                )
+            )
+        ),
     )
     print_row("next recommended skill", next_recommended_skill(root, config))
     return 0

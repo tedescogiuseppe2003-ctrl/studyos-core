@@ -164,7 +164,6 @@ workflow:
       - "analysis/validation/"
       - "outputs/notes/"
       - "outputs/formulas/"
-      - "outputs/flashcards/"
       - "outputs/questions/"
       - "review/"
       - "review/progress-tracker.md"
@@ -213,7 +212,6 @@ workflow:
       - "analysis/batches/*_learning_core.md"
       - "outputs/notes/Batch_*.md"
       - "outputs/formulas/Batch_*.md"
-      - "outputs/flashcards/Batch_*.md"
       - "outputs/questions/Batch_*.md"
       - "review/weak-points.md"
       - "review/unresolved-questions.md"
@@ -221,11 +219,7 @@ workflow:
     outputs:
       - "outputs/notes/full_course_notes.md"
       - "outputs/formulas/full_formula_sheet.md"
-      - "outputs/flashcards/full_flashcards.md"
       - "outputs/questions/full_question_bank.md"
-      - "outputs/cheat-sheets/final_cheat_sheet.md"
-      - "outputs/study-plan/full_course_study_plan.md"
-      - "outputs/final-pack/final_review_pack.md"
     checks:
       - "validated_batch_outputs_are_required"
       - "learning_cores_are_required"
@@ -240,7 +234,6 @@ workflow:
       - "source_references_and_unresolved_questions_are_preserved"
       - "weak_points_are_prioritized"
       - "likely_exam_questions_are_included"
-      - "final_7_day_and_last_48_hour_plans_are_included"
       - "exam_relevant_visual_findings_are_included"
 
   export:
@@ -249,19 +242,13 @@ workflow:
     inputs:
       - "outputs/notes/Batch_*.md"
       - "outputs/formulas/Batch_*.md"
-      - "outputs/flashcards/Batch_*.md"
       - "outputs/questions/Batch_*.md"
       - "outputs/notes/full_course_notes.md"
       - "outputs/formulas/full_formula_sheet.md"
-      - "outputs/flashcards/full_flashcards.md"
       - "outputs/questions/full_question_bank.md"
-      - "outputs/cheat-sheets/final_cheat_sheet.md"
-      - "outputs/study-plan/full_course_study_plan.md"
-      - "outputs/final-pack/final_review_pack.md"
     outputs:
       - "exports/pdf/unmerged/notes/"
       - "exports/pdf/unmerged/formulas/"
-      - "exports/pdf/unmerged/flashcards/"
       - "exports/pdf/unmerged/questions/"
       - "exports/pdf/merged/"
     checks:

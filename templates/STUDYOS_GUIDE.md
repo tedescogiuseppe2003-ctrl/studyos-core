@@ -28,7 +28,7 @@ The agent fills `subject.yaml` only after approval.
 
 - `inputs/` contains approved copied course files after import. Treat these files as read-only processing inputs, not as editable working files.
 - `analysis/` contains process evidence: import plans, inventory, first-pass and refined batch plans, repair logs, source digests, learning cores, visual notes, validation records, and processing state.
-- `outputs/` contains study-facing Markdown outputs: notes, formulas, flashcards, questions, cheat sheets, study plans, and final packs.
+- `outputs/` contains reduced-scope study-facing Markdown outputs: notes, formula sheets, and exam practice questions.
 - `exports/pdf/unmerged/` contains batch-level exports grouped by output category.
 - `exports/pdf/merged/` contains consolidated full-course exports.
 - `review/` contains validation reports, weak points, unresolved questions, source coverage, and progress tracking.
@@ -51,7 +51,7 @@ Import is copy-only. It never moves raw files, never deletes raw files, never re
 - `studyos-batch` processes one selected conceptual batch into digest, learning core, configured outputs, review updates, and integrated visual screening.
 - `studyos-validate` validates batch, course, repaired, or merged outputs.
 - `studyos-course` processes remaining planned or unprocessed batches sequentially, validates each batch before continuing, and reports processed, skipped, and stopped batches.
-- `studyos-merge` merges validated batch outputs into consolidated full-course outputs and the final review pack.
+- `studyos-merge` merges validated batch outputs into consolidated full-course notes, formula sheet, and exam practice questions.
 - `studyos-export` exports unmerged and merged study-facing deliverables to PDF when possible, with clean print-ready HTML fallback.
 
 ## Recommended Workflow
@@ -83,7 +83,7 @@ Quality mode is stored in `subject.yaml` and interpreted with `study-os/config/o
 Model routing is configured in `study-os/config/model-routing.yaml`.
 
 - `fast` is for metadata, inventory, classification, and formatting.
-- `balanced` is for normal digests, learning cores, explanations, and most flashcards.
+- `balanced` is for normal digests, learning cores, explanations, and standard question generation.
 - `deep` is for formulas, difficult concepts, exam questions, essential visual analysis, and merge work.
 - `audit` is for validation, citation checks, formula checks, coverage review, and unsupported-claim detection.
 
@@ -111,30 +111,21 @@ When a preflight warning appears, stop the current skill and do exactly the reco
 - Validation notes: `analysis/validation/`
 - Notes: `outputs/notes/`
 - Formula sheets: `outputs/formulas/`
-- Flashcards: `outputs/flashcards/`
 - Exam questions: `outputs/questions/`
-- Cheat sheets: `outputs/cheat-sheets/`
-- Study plans: `outputs/study-plan/`
-- Final review packs: `outputs/final-pack/`
-- Unmerged exports: `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, `exports/pdf/unmerged/flashcards/`, and `exports/pdf/unmerged/questions/`
+- Unmerged exports: `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, and `exports/pdf/unmerged/questions/`
 - Merged exports: `exports/pdf/merged/`
 
 Batch output files use these names:
 
 - Notes: `outputs/notes/<batch>.md`
 - Formula sheets: `outputs/formulas/<batch>_formulas.md` when formulas exist
-- Flashcards: `outputs/flashcards/<batch>_flashcards.md`
 - Exam questions: `outputs/questions/<batch>_questions.md`
 
 Merged full-course output files use these names:
 
 - Notes: `outputs/notes/full_course_notes.md`
 - Formula sheet: `outputs/formulas/full_formula_sheet.md`
-- Flashcards: `outputs/flashcards/full_flashcards.md`
 - Question bank: `outputs/questions/full_question_bank.md`
-- Cheat sheet: `outputs/cheat-sheets/final_cheat_sheet.md`
-- Study plan: `outputs/study-plan/full_course_study_plan.md`
-- Final review pack: `outputs/final-pack/final_review_pack.md`
 
 `studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
 
@@ -154,9 +145,9 @@ The completion report lists batches processed, batches skipped, stopped batch if
 
 ## Merge Outputs
 
-`studyos-merge` reads validated learning cores from `analysis/batches/*_learning_core.md`, batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, `outputs/flashcards/Batch_*.md`, and `outputs/questions/Batch_*.md`, plus `review/weak-points.md`, `review/unresolved-questions.md`, and `review/validation-report.md`.
+`studyos-merge` reads validated learning cores from `analysis/batches/*_learning_core.md`, batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md`, plus `review/weak-points.md`, `review/unresolved-questions.md`, and `review/validation-report.md`.
 
-Merge does not mean concatenate. The skill consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, carries exam-relevant visual findings, and creates a final 7-day plan plus a last-48-hour plan.
+Merge does not mean concatenate. The skill consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, and carries exam-relevant visual findings.
 
 The completion report lists merged outputs created, unresolved issues included, validation or audit recommendations, and the recommended next skill: `studyos-export`.
 
@@ -168,25 +159,19 @@ Unmerged batch-level inputs:
 
 - `outputs/notes/Batch_*.md`
 - `outputs/formulas/Batch_*.md`
-- `outputs/flashcards/Batch_*.md`
 - `outputs/questions/Batch_*.md`
 
 Unmerged exports are written by category under:
 
 - `exports/pdf/unmerged/notes/`
 - `exports/pdf/unmerged/formulas/`
-- `exports/pdf/unmerged/flashcards/`
 - `exports/pdf/unmerged/questions/`
 
 Merged full-course inputs:
 
 - `outputs/notes/full_course_notes.md`
 - `outputs/formulas/full_formula_sheet.md`
-- `outputs/flashcards/full_flashcards.md`
 - `outputs/questions/full_question_bank.md`
-- `outputs/cheat-sheets/final_cheat_sheet.md`
-- `outputs/study-plan/full_course_study_plan.md`
-- `outputs/final-pack/final_review_pack.md`
 
 Merged exports are written to `exports/pdf/merged/`.
 

@@ -14,7 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-UNMERGED_CATEGORIES = ("notes", "formulas", "flashcards", "questions")
+UNMERGED_CATEGORIES = ("notes", "formulas", "questions")
 EXPORT_BASE = Path("exports/pdf")
 STATE_LOG = Path("study-os/state/export-log.md")
 
@@ -50,29 +50,9 @@ MERGED_OUTPUTS = (
         "Full Formula Sheet",
     ),
     (
-        Path("outputs/flashcards/full_flashcards.md"),
-        "flashcards",
-        "Full Flashcards",
-    ),
-    (
         Path("outputs/questions/full_question_bank.md"),
         "questions",
         "Full Question Bank",
-    ),
-    (
-        Path("outputs/cheat-sheets/final_cheat_sheet.md"),
-        "cheat-sheet",
-        "Final Cheat Sheet",
-    ),
-    (
-        Path("outputs/study-plan/full_course_study_plan.md"),
-        "study-plan",
-        "Full Course Study Plan",
-    ),
-    (
-        Path("outputs/final-pack/final_review_pack.md"),
-        "final-pack",
-        "Final Review Pack",
     ),
 )
 
@@ -81,10 +61,6 @@ TEMPLATE_SUBTITLES = {
     "notes": "Readable sections, definitions, examples, and exam angles",
     "formulas": "Compact formula review with variables, assumptions, and mistakes",
     "questions": "Topic-grouped practice with difficulty and answer expectations",
-    "flashcards": "Clear active-recall question and answer formatting",
-    "cheat-sheet": "Compressed high-yield review layout",
-    "study-plan": "Calendar and task-oriented study structure",
-    "final-pack": "Polished exam-prep structure",
 }
 
 
@@ -222,13 +198,10 @@ th {
 }
 
 .formulas h2,
-.formulas h3,
-.cheat-sheet h2,
-.cheat-sheet h3 {
+.formulas h3 {
   break-after: avoid;
 }
 
-.flashcards h3,
 .questions h3 {
   border-left: 4px solid var(--accent);
   padding-left: 8px;
