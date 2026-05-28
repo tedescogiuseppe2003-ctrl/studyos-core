@@ -33,18 +33,13 @@ Unmerged batch-level outputs:
 
 - `outputs/notes/Batch_*.md`
 - `outputs/formulas/Batch_*.md`
-- `outputs/flashcards/Batch_*.md`
 - `outputs/questions/Batch_*.md`
 
 Merged full-course outputs:
 
 - `outputs/notes/full_course_notes.md`
 - `outputs/formulas/full_formula_sheet.md`
-- `outputs/flashcards/full_flashcards.md`
 - `outputs/questions/full_question_bank.md`
-- `outputs/cheat-sheets/final_cheat_sheet.md`
-- `outputs/study-plan/full_course_study_plan.md`
-- `outputs/final-pack/final_review_pack.md`
 
 # Writes
 
@@ -52,7 +47,6 @@ Unmerged exports:
 
 - `exports/pdf/unmerged/notes/`
 - `exports/pdf/unmerged/formulas/`
-- `exports/pdf/unmerged/flashcards/`
 - `exports/pdf/unmerged/questions/`
 
 Merged exports:
@@ -92,10 +86,6 @@ The exporter applies output-specific presentation styling without changing conte
 - notes: readable sections, definitions, examples, exam angles
 - formulas: compact formula review, variables, assumptions, common mistakes
 - questions: grouped practice, difficulty cues, expected answers
-- flashcards: clear Q/A formatting
-- cheat sheet: compressed high-yield layout
-- study plan: calendar/task style
-- final review pack: polished exam-prep structure
 
 # PDF dependency behavior
 

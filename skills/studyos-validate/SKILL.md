@@ -41,7 +41,7 @@ Use after `studyos-batch`, after course-level output generation, after repairs, 
 # Workflow
 
 1. Identify the validation target: one batch, course-level outputs, repaired outputs, or merged outputs.
-2. Confirm preflight. Use `analysis/batches/` for batch-aware validation and `outputs/notes`, `outputs/formulas`, `outputs/flashcards`, `outputs/questions`, `outputs/cheat-sheets`, `outputs/study-plan`, and `outputs/final-pack` for generated outputs.
+2. Confirm preflight. Use `analysis/batches/` for batch-aware validation and `outputs/notes`, `outputs/formulas`, and `outputs/questions` for generated outputs.
 3. Run deterministic structural checks with `python3 study-os/scripts/validate_outputs.py`.
 4. Run citation/source checks with `python3 study-os/scripts/validate_citations.py`.
 5. Run formula field checks with `python3 study-os/scripts/validate_formulas.py` when formula outputs exist or the course is formula-heavy.
@@ -67,7 +67,6 @@ Use after `studyos-batch`, after course-level output generation, after repairs, 
 - `review/source-coverage.md` exists after validation.
 - Visual Coverage exists for batches with slide, PDF, or image inputs.
 - Essential visuals are either analyzed in `analysis/visual/` or explicitly listed as unresolved in `review/visual-issues.md` or `review/unresolved-questions.md`.
-- Flashcards are active recall, not passive notes.
 - Exam questions include expected answers, answer keys, or worked solutions.
 - Exercises are integrated as practice, not rewritten as fake theory.
 - Unsupported claims are flagged.
@@ -82,7 +81,6 @@ For a selected batch, inspect the batch digest and outputs together:
 - `analysis/visual/<batch>_visual_notes.md` when visual findings exist
 - `outputs/notes/<batch>.md`
 - `outputs/formulas/<batch>_formulas.md` when formulas exist
-- `outputs/flashcards/<batch>_flashcards.md`
 - `outputs/questions/<batch>_questions.md`
 
 The digest must include Source Coverage. If assigned sources include slides, PDFs, or images, the digest must also include Visual Coverage. If no essential visuals exist, that must be stated explicitly.

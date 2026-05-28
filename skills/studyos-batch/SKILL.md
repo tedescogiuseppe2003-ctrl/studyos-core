@@ -42,7 +42,6 @@ There is no separate visual skill. Visual screening and targeted visual analysis
 - `analysis/visual/<batch>_visual_notes.md` if visual findings exist
 - `outputs/notes/<batch>.md`
 - `outputs/formulas/<batch>_formulas.md` if formulas exist
-- `outputs/flashcards/<batch>_flashcards.md`
 - `outputs/questions/<batch>_questions.md`
 - `review/weak-points.md`
 - `review/unresolved-questions.md`
@@ -113,7 +112,6 @@ Write `analysis/visual/<batch>_visual_notes.md` only when visual findings exist.
 - Use balanced reasoning for normal batches.
 - Use deep reasoning for formula-heavy batches.
 - Use deep reasoning only for the affected visual-essential sections when targeted visual analysis is required.
-- Use fast or balanced reasoning for flashcards.
 - Use balanced or deep reasoning for exam questions depending on difficulty and exam relevance.
 - Repair affected sections before regenerating entire outputs.
 - Avoid rereading unrelated batches.

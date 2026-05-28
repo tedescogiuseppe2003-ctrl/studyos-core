@@ -15,7 +15,7 @@ Use after relevant batches have been processed and validated, their learning cor
 
 # Preflight checks
 
-- Validated batch outputs exist under `outputs/notes/`, `outputs/formulas/`, `outputs/flashcards/`, and `outputs/questions/`.
+- Validated batch outputs exist under `outputs/notes/`, `outputs/formulas/`, and `outputs/questions/`.
 - Learning cores exist under `analysis/batches/*_learning_core.md`.
 - `review/validation-report.md` exists and covers the included material.
 - `review/weak-points.md` and `review/unresolved-questions.md` exist, even if empty.
@@ -29,7 +29,6 @@ Use after relevant batches have been processed and validated, their learning cor
 - `analysis/batches/*_learning_core.md`
 - `outputs/notes/Batch_*.md`
 - `outputs/formulas/Batch_*.md`
-- `outputs/flashcards/Batch_*.md`
 - `outputs/questions/Batch_*.md`
 - `review/weak-points.md`
 - `review/unresolved-questions.md`
@@ -41,11 +40,7 @@ Use after relevant batches have been processed and validated, their learning cor
 
 - `outputs/notes/full_course_notes.md`
 - `outputs/formulas/full_formula_sheet.md`
-- `outputs/flashcards/full_flashcards.md`
 - `outputs/questions/full_question_bank.md`
-- `outputs/cheat-sheets/final_cheat_sheet.md`
-- `outputs/study-plan/full_course_study_plan.md`
-- `outputs/final-pack/final_review_pack.md`
 
 # Workflow
 
@@ -54,15 +49,14 @@ Use after relevant batches have been processed and validated, their learning cor
 3. Harmonize notation, assumptions, dependencies, and prerequisites.
 4. Deduplicate formulas and keep formula provenance and source references.
 5. Prioritize weak points, unresolved questions, likely exam questions, and exam-relevant visual findings.
-6. Create the full-course notes, formula sheet, flashcards, question bank, cheat sheet, study plan, and final review pack.
-7. Include a final 7-day plan and a last-48-hour plan.
-8. Recommend audit review of the final merged pack when validation depth or exam risk warrants it.
+6. Create the full-course notes, formula sheet, and question bank.
+7. Recommend audit review of the merged outputs when validation depth or exam risk warrants it.
 
 # Model routing and efficiency
 
 - Use deep reasoning for rigorous mode.
 - Use balanced or deep reasoning for standard mode, escalating to deep for formula consistency, dependencies, and exam-critical prioritization.
-- Audit review is recommended for the final merged pack.
+- Audit review is recommended for the merged outputs.
 - Do not reread raw sources unless validated intermediates are insufficient.
 
 # Quality rules
@@ -71,7 +65,7 @@ Use after relevant batches have been processed and validated, their learning cor
 - Merged outputs are based on validated intermediates.
 - Preserve traceability to sources and batches.
 - Do not hide unresolved questions or weak points.
-- Include unresolved questions in the merged outputs and final review pack.
+- Include unresolved questions in the merged outputs.
 - Include likely exam questions and answer expectations.
 - Include key visual findings when exam-relevant.
 - Final outputs should be cohesive full-course deliverables, not batch files pasted together.

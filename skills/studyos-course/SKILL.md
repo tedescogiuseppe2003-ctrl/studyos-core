@@ -42,7 +42,6 @@ Stop before processing when `batch_plan.md` is missing, `inputs/` is empty, assi
 - validation details under `analysis/validation/`
 - notes under `outputs/notes/`
 - formula sheets under `outputs/formulas/`
-- flashcards under `outputs/flashcards/`
 - exam questions under `outputs/questions/`
 - review updates under `review/`
 - `review/progress-tracker.md`

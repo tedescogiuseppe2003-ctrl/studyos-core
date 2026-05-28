@@ -45,7 +45,7 @@ Stop and report the missing prerequisite if any required file is absent. Do not 
 - `analysis/inventory/batch_plan_repair_log.md`
 - `analysis/inventory/processing_queue.md`, if a separate execution order would make batch processing clearer
 
-Do not write study outputs, digests, learning cores, summaries, flashcards, formulas, questions, validation reports, or exports.
+Do not write study outputs, digests, learning cores, summaries, formulas, questions, validation reports, or exports.
 
 # Model routing
 
