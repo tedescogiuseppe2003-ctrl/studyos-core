@@ -127,7 +127,7 @@ Merged full-course output files use these names:
 
 - Notes: `outputs/notes/full_course_notes.md`
 - Formula sheet: `outputs/formulas/full_formula_sheet.md`
-- Question bank: `outputs/questions/full_question_bank.md`
+- Exam practice questions: `outputs/questions/full_exam_practice_questions.md`
 
 `studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
 
@@ -153,9 +153,19 @@ The completion report lists batches processed, batches skipped, blocking issues 
 
 ## Merge Outputs
 
-`studyos-merge` reads validated learning cores from `analysis/batches/*_learning_core.md`, batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md`, plus `review/weak-points.md`, `review/unresolved-questions.md`, and `review/validation-report.md`.
+`studyos-merge` reads validated learning cores from `analysis/batches/*_learning_core.md`, batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*_formulas.md`, and `outputs/questions/Batch_*_questions.md`, plus `review/weak-points.md`, `review/unresolved-questions.md`, `review/visual-issues.md`, and `review/validation-report.md`.
 
-Merge does not mean concatenate. The skill consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, and carries exam-relevant visual findings.
+Merge does not mean concatenate. The skill consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, preserves repaired batch-note depth, prioritizes weak points inside the relevant notes and questions, includes unresolved issues where relevant, includes likely exam questions, and carries exam-relevant visual findings.
+
+Merged full-course outputs are limited to:
+
+- `outputs/notes/full_course_notes.md`
+- `outputs/formulas/full_formula_sheet.md`
+- `outputs/questions/full_exam_practice_questions.md`
+
+`studyos-merge` must not create `full_flashcards.md`, `final_cheat_sheet.md`, `full_course_study_plan.md`, `final_review_pack.md`, or any substitute for those removed outputs.
+
+Merged notes should preserve batch-level completeness, add transitions, include a dependency map, and build a progressive course-level learning flow. Merged formula sheets should use display LaTeX, include notation and formula indexes, deduplicate formulas, and retain variables, assumptions, interpretation, mistakes, and sources. Merged exam practice questions should be grouped by topic and difficulty, include expected answers, and add integrated exam-style questions where useful.
 
 The completion report lists merged outputs created, unresolved issues included, validation or audit recommendations, and the recommended next skill: `studyos-export`.
 
@@ -179,7 +189,7 @@ Merged full-course inputs:
 
 - `outputs/notes/full_course_notes.md`
 - `outputs/formulas/full_formula_sheet.md`
-- `outputs/questions/full_question_bank.md`
+- `outputs/questions/full_exam_practice_questions.md`
 
 Merged exports are written to `exports/pdf/merged/`.
 

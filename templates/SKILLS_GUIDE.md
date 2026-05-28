@@ -132,13 +132,24 @@ This skill does not process the whole course as one giant batch, does not create
 Use after relevant batch outputs are processed and validated.
 
 - Reads learning cores from `analysis/batches/*_learning_core.md`.
-- Reads validated batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md`.
-- Reads `review/weak-points.md`, `review/unresolved-questions.md`, and `review/validation-report.md`.
-- Merges by consolidating duplicate concepts, harmonizing notation, deduplicating formulas, identifying dependencies, and preserving source references.
-- Prioritizes weak points, unresolved questions, likely exam questions, and exam-relevant visual findings.
+- Reads validated batch outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*_formulas.md`, and `outputs/questions/Batch_*_questions.md`.
+- Reads `review/weak-points.md`, `review/unresolved-questions.md`, `review/visual-issues.md`, and `review/validation-report.md`.
+- Requires validated batch outputs before merging.
+- Warns if some batches are missing notes, formula sheets, or exam practice questions.
+- Warns if validation has blocking issues.
+- Merges by consolidating duplicate concepts, harmonizing notation, deduplicating formulas, identifying dependencies, preserving source references, and building a progressive course-level learning flow.
+- Preserves the repaired depth of batch notes and does not compress full-course notes into a short summary.
+- Prioritizes weak points inside the relevant notes and questions, includes unresolved issues where relevant, includes likely exam questions, and carries exam-relevant visual findings.
 - Writes `outputs/notes/full_course_notes.md`.
 - Writes `outputs/formulas/full_formula_sheet.md`.
-- Writes `outputs/questions/full_question_bank.md`.
+- Writes `outputs/questions/full_exam_practice_questions.md`.
+- Does not write `full_flashcards.md`, `final_cheat_sheet.md`, `full_course_study_plan.md`, `final_review_pack.md`, or substitutes for those removed outputs.
+
+Merged notes are full-course study notes. They preserve batch-level completeness, add transitions, include a dependency map, consolidate duplicate concepts, harmonize notation, and preserve source references.
+
+Merged formula sheets consolidate all formulas, deduplicate equivalents, use display LaTeX, include notation and formula indexes, and retain variables, assumptions, interpretation, mistakes, and sources.
+
+Merged exam practice questions combine and organize batch questions by topic and difficulty, include expected answers, and add exam-style integrated questions where useful.
 
 Merge does not mean concatenate. Run audit validation on the merged outputs when validation depth or exam risk requires it.
 
@@ -148,7 +159,7 @@ Use after desired outputs exist and have acceptable validation status.
 
 - Reads unmerged batch-level outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md`.
 - Writes unmerged exports to `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, and `exports/pdf/unmerged/questions/`.
-- Reads merged full-course outputs from `outputs/notes/full_course_notes.md`, `outputs/formulas/full_formula_sheet.md`, and `outputs/questions/full_question_bank.md`.
+- Reads merged full-course outputs from `outputs/notes/full_course_notes.md`, `outputs/formulas/full_formula_sheet.md`, and `outputs/questions/full_exam_practice_questions.md`.
 - Writes merged exports to `exports/pdf/merged/`.
 - Preserves batch boundaries, content, LaTeX expressions, and source references.
 - Does not export `analysis/`, `review/`, validation, debug, or internal files by default.

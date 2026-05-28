@@ -37,7 +37,7 @@ final_outputs:
     merged:
       - "full_course_notes"
       - "full_formula_sheet"
-      - "full_question_bank"
+      - "full_exam_practice_questions"
   exportable_by_default:
     - "notes"
     - "formulas"
@@ -234,7 +234,10 @@ outputs:
     standards:
       - "Merge validated batch notes into complete full-course study notes."
       - "Consolidate duplicate concepts instead of concatenating batches."
-      - "Preserve important source coverage, dependencies, weak points, and visual findings."
+      - "Preserve repaired batch-note depth and batch-level completeness."
+      - "Add transitions and a progressive course-level learning flow."
+      - "Preserve important source coverage, dependencies, weak points, unresolved issues, and exam-relevant visual findings."
+      - "Do not compress full-course notes into a short summary."
 
   full_formula_sheet:
     file: "outputs/formulas/full_formula_sheet.md"
@@ -261,17 +264,19 @@ outputs:
     standards:
       - "Deduplicate formulas across batches."
       - "Harmonize notation across the full course."
-      - "Preserve assumptions, interpretation, common mistakes, and source provenance."
+      - "Include a notation section and formula index."
+      - "Preserve variables, assumptions, interpretation, common mistakes, and source provenance."
+      - "Flag unresolved notation conflicts where relevant."
 
-  full_question_bank:
-    file: "outputs/questions/full_question_bank.md"
+  full_exam_practice_questions:
+    file: "outputs/questions/full_exam_practice_questions.md"
     role: "final"
     required_sections:
       - "Exam Scope"
       - "Questions by Topic"
       - "Expected Answers"
       - "Common Traps"
-      - "Likely Exam Questions"
+      - "Integrated Exam-Style Questions"
       - "Source References"
     required_question_types:
       - "conceptual questions"
@@ -282,10 +287,13 @@ outputs:
       - "common-trap questions"
       - "exam-style open questions"
     question_standards:
-      - "Merge validated batch question sets into an exam-oriented full-course question bank."
-      - "Group questions by topic and preserve dependency order where useful."
+      - "Merge validated batch question sets into exam-oriented full-course practice questions."
+      - "Group questions by topic and difficulty."
+      - "Preserve dependency order where useful."
       - "Expected answers must be precise enough to study from."
       - "Prioritize exercise and exam source material here."
+      - "Include exam-style integrated questions where useful."
+      - "Carry weak points and unresolved issues into relevant questions."
 
   export_unmerged_notes:
     input_glob: "outputs/notes/Batch_*.md"
@@ -306,7 +314,7 @@ outputs:
     input_files:
       - "outputs/notes/full_course_notes.md"
       - "outputs/formulas/full_formula_sheet.md"
-      - "outputs/questions/full_question_bank.md"
+      - "outputs/questions/full_exam_practice_questions.md"
     output_folder: "exports/pdf/merged/"
     format: "pdf preferred; print-ready html fallback"
 
@@ -372,6 +380,14 @@ rules:
   merged_outputs_must_identify_dependencies: true
   merged_outputs_must_include_likely_exam_questions: true
   merged_outputs_must_include_exam_relevant_visual_findings: true
+  merged_outputs_must_preserve_repaired_depth: true
+  merged_notes_must_not_be_short_summary: true
+  merged_questions_file: "outputs/questions/full_exam_practice_questions.md"
+  removed_merged_outputs_must_not_be_generated:
+    - "full_flashcards.md"
+    - "final_cheat_sheet.md"
+    - "full_course_study_plan.md"
+    - "final_review_pack.md"
   export_internal_files_by_default: false
   export_review_or_debug_files_by_default: false
   export_preserve_content_and_source_references: true
