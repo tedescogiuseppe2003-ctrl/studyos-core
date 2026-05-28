@@ -17,13 +17,17 @@ These commands are read-only.
 
 ## Skill Order
 
-1. `studyos-import`
-2. `studyos-plan`
-3. `studyos-batch`
-4. `studyos-validate`
-5. `studyos-course`
-6. `studyos-merge`
-7. `studyos-export`
+1. Install StudyOS from the external core repo.
+2. Approve the setup proposal.
+3. `studyos-import`
+4. `studyos-plan`
+5. `studyos-batch`
+6. `studyos-validate`
+7. `studyos-course`
+8. `studyos-merge`
+9. `studyos-export`
+
+Only steps 3-9 are installed StudyOS skills. The default student-facing output scope is notes, formulas, and exam practice questions. Flashcards, cheat sheets, study plans, and final review packs are not default outputs anymore.
 
 ## studyos-import
 
@@ -77,7 +81,9 @@ All assigned sources must be used or explicitly explained in Source Coverage. Sl
 
 Batch notes must be complete study notes, not summaries. Each notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. The learning core must preserve enough depth to support those complete notes and must not be over-compressed.
 
-Formula sheets use readable display LaTeX and include variable definitions, assumptions, intuition, common mistakes, and source references. Exam questions are the active-recall and practice layer, including exercise-derived practice, exam-style prompts, common-mistake traps, and expected answers or solution outlines.
+Formula sheets use readable display LaTeX and include variable definitions, assumptions, intuition, common mistakes, and source references. Exam practice questions replace flashcards as the active-recall and practice layer, including exercise-derived practice, exam-style prompts, common-mistake traps, and expected answers or solution outlines.
+
+The reduced output scope is intentional: spend the saved effort on complete notes, display-LaTeX formulas, stronger question quality, source coverage, and visual coverage.
 
 If the batch has slides, PDFs, or images, Visual Coverage is required. If no essential visuals exist, the digest says so explicitly. Essential visuals include formulas in images, definitions in images, charts, tables, rankings, benchmark values, model diagrams, process diagrams, and summary visual slides.
 
@@ -171,7 +177,7 @@ Use after desired outputs exist and have acceptable validation status.
 - Does not export flashcards, cheat sheets, study plans, final review packs, `analysis/`, `review/`, validation, debug, or internal files by default.
 - Uses `python3 study-os/scripts/export_outputs.py --root .`.
 
-The exporter prefers PDF when `pandoc` and a LaTeX PDF engine are available. If PDF tooling is unavailable, it writes clean print-ready HTML in the same export folders and reports the fallback.
+The exporter writes unmerged and merged PDFs for notes, formulas, and exam practice questions. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If PDF tooling is unavailable, it writes clean print-ready HTML in the same export folders and reports the fallback.
 
 If merged outputs are missing, export only unmerged outputs and warn. If unmerged outputs are missing, export only merged outputs and warn. If no exportable outputs exist, stop and tell the user to run `studyos-batch`, `studyos-course`, or `studyos-merge` first.
 

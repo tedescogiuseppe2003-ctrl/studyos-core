@@ -30,19 +30,25 @@ There is no normal user workflow skill for installation and no master orchestrat
 
 ## Normal User Workflow
 
-After the setup proposal is approved and written to `subject.yaml`, use skills manually:
+The full workflow is:
 
-1. `studyos-import`
-2. `studyos-plan`
-3. `studyos-batch`
-4. `studyos-validate`
-5. `studyos-course`
-6. `studyos-merge`
-7. `studyos-export`
+1. Install StudyOS from the external core repo.
+2. Approve the setup proposal so the agent can write `subject.yaml`.
+3. `studyos-import`
+4. `studyos-plan`
+5. `studyos-batch`
+6. `studyos-validate`
+7. `studyos-course`
+8. `studyos-merge`
+9. `studyos-export`
+
+After setup approval, call the StudyOS skills manually one step at a time.
 
 `studyos-import` is the combined import and inventory skill. It first writes `analysis/inventory/import_plan.md` from a read-only scan of `raw_source.path`, stops for approval, copies approved files into `inputs/` without moving originals or overwriting destinations, then writes `analysis/inventory/course_inventory.md` and `analysis/inventory/batch_plan.md`.
 
 `studyos-plan` refines the first batch plan into conceptual batches. `studyos-batch` processes one selected batch. `studyos-validate` checks outputs and guides targeted repair. `studyos-course` processes remaining planned batches with validation after each batch. Visual screening is integrated into batch, course, and validation work; it is not a separate skill.
+
+The default student-facing output scope is intentionally reduced to notes, formula sheets, and exam practice questions. Flashcards, cheat sheets, study plans, and final review packs are not default outputs anymore. The smaller output set is deliberate: saved effort should go into complete notes, stronger formula handling, better source coverage, visual coverage, and exam-quality practice questions.
 
 `studyos-merge` reads validated batch learning cores and batch outputs, then writes the final full-course structure:
 
@@ -61,6 +67,8 @@ python3 study-os/scripts/export_outputs.py --root .
 ```
 
 PDF is preferred when `pandoc` and a LaTeX PDF engine are available. If PDF dependencies are unavailable, the exporter writes print-ready HTML and reports the fallback. Flashcards, cheat sheets, study plans, final review packs, internal `analysis/`, `review/`, validation, and debug files are not exported by default.
+
+Notes are complete study notes, not summaries. Formula sheets require readable display LaTeX. Exam practice questions replace flashcards as the active-recall and practice layer.
 
 ## Installed Course Folder
 

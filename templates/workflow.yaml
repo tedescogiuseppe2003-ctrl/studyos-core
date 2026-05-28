@@ -1,6 +1,32 @@
 # StudyOS workflow.
 
 workflow:
+  final_sequence:
+    - "install_studyos"
+    - "approve_setup"
+    - "studyos-import"
+    - "studyos-plan"
+    - "studyos-batch"
+    - "studyos-validate"
+    - "studyos-course"
+    - "studyos-merge"
+    - "studyos-export"
+  default_student_facing_outputs:
+    - "notes"
+    - "formulas"
+    - "exam_practice_questions"
+  removed_default_outputs:
+    - "flashcards"
+    - "cheat_sheets"
+    - "study_plans"
+    - "final_review_packs"
+  reduced_scope_policy:
+    - "notes_are_complete_study_notes_not_summaries"
+    - "formulas_require_display_latex"
+    - "exam_practice_questions_replace_flashcards_as_active_recall"
+    - "fewer_outputs_mean_higher_quality_and_better_focus"
+    - "internal_analysis_and_review_files_remain_quality_support_but_are_not_student_facing_outputs"
+
   setup:
     purpose: "Install StudyOS from the external core repo, propose setup, write subject.yaml after approval, and stop."
     sequence:
@@ -23,6 +49,7 @@ workflow:
       - "course_material_is_not_imported_or_processed_during_setup"
       - "only_final_skill_names_are_installed"
       - "original_raw_files_are_not_modified"
+      - "setup_proposal_lists_only_notes_formulas_and_exam_practice_questions_as_default_outputs"
 
   import:
     skill: "studyos-import"
@@ -124,6 +151,10 @@ workflow:
     checks:
       - "digest_created_before_learning_core"
       - "learning_core_created_before_outputs"
+      - "final_outputs_are_limited_to_notes_formulas_and_exam_practice_questions"
+      - "notes_are_complete_study_notes_not_summaries"
+      - "formula_sheets_use_display_latex"
+      - "exam_practice_questions_are_the_active_recall_layer"
       - "source_coverage_lists_every_assigned_source"
       - "visual_screening_is_integrated"
       - "visual_coverage_is_recorded_for_slide_pdf_image_sources"
@@ -143,6 +174,8 @@ workflow:
       - "analysis/validation/"
     checks:
       - "deterministic_checks_run"
+      - "only_notes_formulas_and_exam_practice_questions_are_required_as_final_outputs"
+      - "removed_outputs_are_not_required"
       - "visual_coverage_is_checked"
       - "repair_is_targeted_to_affected_sections"
       - "blocking_issues_stop_processing"
@@ -236,6 +269,7 @@ workflow:
       - "weak_points_are_prioritized"
       - "likely_exam_questions_are_included"
       - "exam_relevant_visual_findings_are_included"
+      - "removed_merged_outputs_are_not_created"
 
   export:
     skill: "studyos-export"
@@ -255,6 +289,8 @@ workflow:
     checks:
       - "unmerged_exports_preserve_batch_boundaries"
       - "merged_exports_use_full_course_outputs"
+      - "exports_include_unmerged_and_merged_pdfs_for_notes_formulas_and_questions"
+      - "removed_outputs_are_not_exported_by_default"
       - "internal_analysis_and_review_files_are_not_exported_by_default"
       - "content_and_source_references_are_preserved"
 

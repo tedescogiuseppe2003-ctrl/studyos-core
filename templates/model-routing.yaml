@@ -13,6 +13,7 @@ tiers:
       - "cross-source merging"
       - "validation"
       - "exam question design"
+      - "formula display LaTeX quality decisions"
 
   balanced:
     purpose: "Default course-material processing."
@@ -20,6 +21,7 @@ tiers:
       - "conceptual batch planning for normal courses"
       - "source digests"
       - "learning cores"
+      - "complete study notes for normal batches"
       - "standard question generation"
       - "standard explanations"
     avoid_for:
@@ -32,6 +34,7 @@ tiers:
       - "rigorous quality mode"
       - "difficult concepts"
       - "formula derivations"
+      - "display LaTeX formula sheets"
       - "essential visual analysis"
       - "exam questions"
       - "final merge"
@@ -62,6 +65,21 @@ defaults:
   exam_questions: "deep"
   validation: "audit"
   merge: "deep"
+
+output_scope:
+  student_facing_defaults:
+    - "notes"
+    - "formulas"
+    - "exam_practice_questions"
+  removed_defaults:
+    - "flashcards"
+    - "cheat_sheets"
+    - "study_plans"
+    - "final_review_packs"
+  routing_policy:
+    - "Do not spend model calls generating removed default outputs."
+    - "Use saved effort for complete study notes, display-LaTeX formulas, exam practice questions, source coverage, visual coverage, and validation."
+    - "Exam practice questions replace flashcards as the active-recall and practice layer."
 
 quality_mode_overrides:
   economy:

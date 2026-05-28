@@ -29,6 +29,8 @@ quality_modes:
       count_per_batch: "15-30 per batch if exam-heavy"
 
 final_outputs:
+  scope_summary: "Student-facing outputs are notes, formulas, and exam practice questions only."
+  reduced_scope_rationale: "Fewer outputs mean higher quality and better focus."
   generated_by_default:
     batch:
       - "batch_notes"
@@ -42,6 +44,11 @@ final_outputs:
     - "notes"
     - "formulas"
     - "exam_practice_questions"
+  not_generated_by_default:
+    - "flashcards"
+    - "cheat_sheets"
+    - "study_plans"
+    - "final_review_packs"
 
 outputs:
   import_plan:
@@ -209,6 +216,7 @@ outputs:
       - "common-trap questions"
       - "exam-style open questions"
     question_standards:
+      - "Exam practice questions replace flashcards as the active-recall and practice layer."
       - "Questions should be grouped by topic."
       - "Each question should have difficulty and exam relevance where useful."
       - "Expected answers must be precise enough to study from."
@@ -318,6 +326,18 @@ outputs:
     output_folder: "exports/pdf/merged/"
     format: "pdf preferred; print-ready html fallback"
 
+  removed_outputs:
+    role: "removed_default_outputs"
+    files_not_generated:
+      - "full_flashcards.md"
+      - "final_cheat_sheet.md"
+      - "full_course_study_plan.md"
+      - "final_review_pack.md"
+    standards:
+      - "Do not generate these files or substitutes as default outputs."
+      - "Do not require these files in validation."
+      - "Do not export these files by default."
+
   validation_report:
     file: "review/validation-report.md"
     role: "internal"
@@ -368,6 +388,7 @@ rules:
   formula_entries_require_variables_assumptions_use_interpretation_mistake_source: true
   formulas_must_not_be_inline_only_or_plain_ascii_only: true
   exam_questions_must_include_expected_answers: true
+  exam_practice_questions_replace_flashcards_as_active_recall: true
   exam_questions_must_be_grouped_by_topic: true
   exam_questions_must_include_difficulty_and_exam_relevance_where_useful: true
   exercises_and_exams_feed_primarily_into_questions: true
@@ -392,6 +413,7 @@ rules:
   export_review_or_debug_files_by_default: false
   export_preserve_content_and_source_references: true
   export_must_distinguish_unmerged_and_merged_outputs: true
+  exports_include_unmerged_and_merged_pdfs_for_notes_formulas_and_questions: true
   export_pdf_fallback_allowed: "clean html or print-ready markdown when PDF dependencies are unavailable"
   visual_screening_integrated_in_batch: true
   visual_coverage_required_for_slide_pdf_image_batches: true

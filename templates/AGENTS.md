@@ -14,6 +14,10 @@ You are working inside a StudyOS v1 course workspace.
 - Create source digests before learning cores.
 - Create learning cores before final outputs.
 - Base final outputs on learning cores.
+- Create only notes, formulas, and exam practice questions as default student-facing outputs.
+- Treat notes as complete study notes, not summaries.
+- Use display LaTeX for formulas.
+- Treat exam practice questions as the active-recall/practice layer instead of flashcards.
 - Use source references for course claims.
 - Track weak points and unresolved questions.
 - Validate outputs after each batch.
@@ -25,7 +29,7 @@ When installing StudyOS into a course folder, use the external core repo, usuall
 
 Essential setup fields are subject name, raw source folder path, course level, course-material language, exam type, the fixed default outputs, quality mode, visual handling depth, formula handling depth, validation depth, whether original files are read-only, and whether StudyOS should copy files into `inputs/`. Default to read-only originals and copy-only import into `inputs/`.
 
-The setup proposal should include only these default study-facing outputs: notes, formulas, and exam practice questions. Do not ask whether to generate flashcards, cheat sheets, study plans, or final review packs during setup; those are deprecated and disabled.
+The setup proposal should include only these default study-facing outputs: notes, formulas, and exam practice questions. Do not ask whether to generate flashcards, cheat sheets, study plans, or final review packs during setup; those are not default outputs anymore and are deprecated/disabled. The reduced scope is intentional because fewer outputs means higher quality and better focus.
 
 After installation, point the user to `STUDYOS_GUIDE.md` and continue only when the user chooses the next skill. Do not import, inventory, plan, process, validate, merge, or export during installation/setup.
 
@@ -33,7 +37,8 @@ After installation, point the user to `STUDYOS_GUIDE.md` and continue only when 
 
 - `inputs/` contains approved copied raw material and is read-only after import.
 - `analysis/` contains import plans, inventory, batch plans, digests, learning cores, visual notes, validation details, and state.
-- `outputs/` contains study-facing Markdown outputs.
+- `outputs/` contains study-facing Markdown outputs: notes, formula sheets, and exam practice questions.
+- `analysis/` and `review/` are important internal quality-support areas, but they are not student-facing outputs and are not exported by default.
 - `exports/pdf/unmerged/` contains batch-level exports.
 - `exports/pdf/merged/` contains consolidated full-course exports.
 - `review/` contains weak points, unresolved questions, source coverage, visual issues, validation reports, and progress tracking.
@@ -52,12 +57,14 @@ After installation, point the user to `STUDYOS_GUIDE.md` and continue only when 
 
 Use the v1 workflow in `templates/workflow.yaml`:
 
-1. `studyos-import`
-2. `studyos-plan`
-3. `studyos-batch`
-4. `studyos-validate`
-5. `studyos-course`
-6. `studyos-merge`
-7. `studyos-export`
+1. Install StudyOS.
+2. Approve setup.
+3. `studyos-import`
+4. `studyos-plan`
+5. `studyos-batch`
+6. `studyos-validate`
+7. `studyos-course`
+8. `studyos-merge`
+9. `studyos-export`
 
 Keep each change small and test the current step before moving forward.

@@ -18,7 +18,7 @@ Installation/setup does not import files, run inventory, create a batch plan, va
 
 The proposal includes subject name, course level, material language, exam type, raw source folder path, read-only original files, copy-into-inputs strategy, fixed default outputs, quality/depth mode, visual handling depth, formula handling depth, and validation depth.
 
-Default study-facing outputs are notes, formulas, and exam practice questions. Flashcards, cheat sheets, study plans, and final review packs are deprecated and disabled by default.
+Default study-facing outputs are notes, formulas, and exam practice questions. Flashcards, cheat sheets, study plans, and final review packs are not default outputs anymore; they are deprecated and disabled by default. Fewer outputs means higher quality and better focus on complete notes, display-LaTeX formulas, source coverage, visual coverage, and exam-quality practice questions.
 
 The agent asks:
 
@@ -58,17 +58,17 @@ Import is copy-only. It never moves raw files, never deletes raw files, never re
 
 ## Recommended Workflow
 
-1. Optionally run `python3 study-os/scripts/studyos.py status` or `python3 study-os/scripts/studyos.py doctor`.
-2. Run `studyos-import` proposal mode to create `analysis/inventory/import_plan.md`.
-3. Review and approve the import plan.
-4. Run `studyos-import` execute mode to copy approved files into `inputs/`.
-5. Run `studyos-import` inventory mode to create `analysis/inventory/course_inventory.md` and the first-pass `analysis/inventory/batch_plan.md`.
-6. Run `studyos-plan` to refine conceptual batches, source assignments, dependencies, and any `Unassigned / needs review` entries.
-7. Run `studyos-batch` for one selected conceptual batch.
-8. Run `studyos-validate`.
-9. Run `studyos-course` if you want remaining planned or unprocessed batches processed sequentially with validation after each batch.
-10. Run `studyos-merge` when batch outputs are processed and validated.
-11. Run `studyos-export`.
+1. Install StudyOS from the external core repo.
+2. Approve the setup proposal so the agent can write `subject.yaml`.
+3. Run `studyos-import` proposal mode to create `analysis/inventory/import_plan.md`, review and approve the import plan, then let import copy approved files into `inputs/`, create `analysis/inventory/course_inventory.md`, and create the first-pass `analysis/inventory/batch_plan.md`.
+4. Run `studyos-plan` to refine conceptual batches, source assignments, dependencies, and any `Unassigned / needs review` entries.
+5. Run `studyos-batch` for one selected conceptual batch.
+6. Run `studyos-validate`.
+7. Run `studyos-course` if you want remaining planned or unprocessed batches processed sequentially with validation after each batch.
+8. Run `studyos-merge` when batch outputs are processed and validated.
+9. Run `studyos-export`.
+
+You may optionally run `python3 study-os/scripts/studyos.py status` or `python3 study-os/scripts/studyos.py doctor` between steps.
 
 Review `analysis/inventory/import_plan.md` before import execute. Do not continue with execute mode unless the proposed copies are acceptable.
 
@@ -131,7 +131,7 @@ Merged full-course output files use these names:
 
 `studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
 
-Batch notes are complete study notes, not summaries. Each batch notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. Formula sheets use readable display LaTeX and include assumptions, intuition, common mistakes, and source references. Exam questions are the active-recall and practice layer, using exercises for practice prompts and weak-point discovery rather than fake theory summaries.
+Batch notes are complete study notes, not summaries. Each batch notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. Formula sheets require readable display LaTeX and include assumptions, intuition, common mistakes, and source references. Exam practice questions replace flashcards as the active-recall and practice layer, using exercises for practice prompts and weak-point discovery rather than fake theory summaries.
 
 `studyos-batch` does not create flashcards, cheat sheets, study plans, final review packs, or deprecated output folders for those formats. Fewer outputs should mean deeper attention to notes, formulas, questions, source coverage, and visual coverage.
 
@@ -199,7 +199,7 @@ Run:
 python3 study-os/scripts/export_outputs.py --root .
 ```
 
-The exporter preserves content and source references. It exports only notes, formulas, and exam practice questions; flashcards, cheat sheets, study plans, final review packs, internal analysis files, and review/debug files are skipped by default. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If those dependencies are unavailable, it writes print-ready HTML with MathJax support and reports the fallback in `study-os/state/export-log.md`.
+The exporter preserves content and source references. It exports unmerged and merged PDFs for notes, formulas, and exam practice questions only; flashcards, cheat sheets, study plans, final review packs, internal analysis files, and review/debug files are skipped by default. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If those dependencies are unavailable, it writes print-ready HTML with MathJax support and reports the fallback in `study-os/state/export-log.md`.
 
 ## Integrated Visual Screening
 
