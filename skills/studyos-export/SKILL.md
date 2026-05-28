@@ -39,7 +39,7 @@ Merged full-course outputs:
 
 - `outputs/notes/full_course_notes.md`
 - `outputs/formulas/full_formula_sheet.md`
-- `outputs/questions/full_question_bank.md`
+- `outputs/questions/full_exam_practice_questions.md`
 
 # Writes
 

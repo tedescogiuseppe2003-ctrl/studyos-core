@@ -48,7 +48,7 @@ After the setup proposal is approved and written to `subject.yaml`, use skills m
 
 - `outputs/notes/full_course_notes.md`
 - `outputs/formulas/full_formula_sheet.md`
-- `outputs/questions/full_question_bank.md`
+- `outputs/questions/full_exam_practice_questions.md`
 
 Merge does not mean concatenate: it consolidates duplicate concepts, harmonizes notation, deduplicates formulas, identifies dependencies, preserves source references, prioritizes weak points, includes unresolved questions, includes likely exam questions, and carries exam-relevant visual findings.
 

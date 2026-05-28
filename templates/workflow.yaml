@@ -211,15 +211,16 @@ workflow:
     inputs:
       - "analysis/batches/*_learning_core.md"
       - "outputs/notes/Batch_*.md"
-      - "outputs/formulas/Batch_*.md"
-      - "outputs/questions/Batch_*.md"
+      - "outputs/formulas/Batch_*_formulas.md"
+      - "outputs/questions/Batch_*_questions.md"
       - "review/weak-points.md"
       - "review/unresolved-questions.md"
+      - "review/visual-issues.md"
       - "review/validation-report.md"
     outputs:
       - "outputs/notes/full_course_notes.md"
       - "outputs/formulas/full_formula_sheet.md"
-      - "outputs/questions/full_question_bank.md"
+      - "outputs/questions/full_exam_practice_questions.md"
     checks:
       - "validated_batch_outputs_are_required"
       - "learning_cores_are_required"
@@ -245,7 +246,7 @@ workflow:
       - "outputs/questions/Batch_*.md"
       - "outputs/notes/full_course_notes.md"
       - "outputs/formulas/full_formula_sheet.md"
-      - "outputs/questions/full_question_bank.md"
+      - "outputs/questions/full_exam_practice_questions.md"
     outputs:
       - "exports/pdf/unmerged/notes/"
       - "exports/pdf/unmerged/formulas/"

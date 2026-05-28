@@ -304,7 +304,7 @@ def next_recommended_skill(root: Path, config: dict[str, Any]) -> str:
         for relative_path in (
             "outputs/notes/full_course_notes.md",
             "outputs/formulas/full_formula_sheet.md",
-            "outputs/questions/full_question_bank.md",
+            "outputs/questions/full_exam_practice_questions.md",
         )
     ):
         return "studyos-course, then studyos-merge"
@@ -366,7 +366,7 @@ def run_status(root: Path) -> int:
                 for relative_path in (
                     "outputs/notes/full_course_notes.md",
                     "outputs/formulas/full_formula_sheet.md",
-                    "outputs/questions/full_question_bank.md",
+                    "outputs/questions/full_exam_practice_questions.md",
                 )
             )
         ),

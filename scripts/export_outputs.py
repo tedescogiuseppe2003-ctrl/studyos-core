@@ -50,9 +50,9 @@ MERGED_OUTPUTS = (
         "Full Formula Sheet",
     ),
     (
-        Path("outputs/questions/full_question_bank.md"),
+        Path("outputs/questions/full_exam_practice_questions.md"),
         "questions",
-        "Full Question Bank",
+        "Full Exam Practice Questions",
     ),
 )
 
