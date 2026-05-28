@@ -16,7 +16,9 @@ Installation/setup does not import files, run inventory, create a batch plan, va
 
 ## Setup Proposal After Installation
 
-The proposal includes subject name, course level, material language, exam type, raw source folder path, read-only original files, copy-into-inputs strategy, desired outputs, quality/depth mode, visual handling depth, formula handling depth, and validation depth.
+The proposal includes subject name, course level, material language, exam type, raw source folder path, read-only original files, copy-into-inputs strategy, fixed default outputs, quality/depth mode, visual handling depth, formula handling depth, and validation depth.
+
+Default study-facing outputs are notes, formulas, and exam practice questions. Flashcards, cheat sheets, study plans, and final review packs are deprecated and disabled by default.
 
 The agent asks:
 

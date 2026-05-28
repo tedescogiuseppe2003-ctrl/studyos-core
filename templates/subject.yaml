@@ -38,9 +38,15 @@ analysis_depth:
   merge_depth: "standard" # concise | standard | rigorous
 
 outputs:
-  master_notes: true
-  formula_sheets: true
-  exam_questions: true
+  notes: true
+  formulas: true
+  exam_practice_questions: true
+
+deprecated_outputs:
+  flashcards: false
+  cheat_sheets: false
+  study_plan: false
+  final_review_pack: false
 
 multimodal:
   enabled: true
