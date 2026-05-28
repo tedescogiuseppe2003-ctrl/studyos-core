@@ -3,48 +3,70 @@
 quality_modes:
   economy:
     notes:
-      words_per_batch: "800-1200"
+      depth: "concise but complete"
+      words_per_batch: "no fixed minimum; complete coverage is required"
+    formula_sheet:
+      depth: "essential formulas only"
     exam_questions:
       count_per_batch: "5-10"
-    formula_sheet:
-      depth: "only essential formulas"
 
   standard:
     notes:
-      words_per_batch: "1200-2200"
-    exam_questions:
-      count_per_batch: "8-18"
+      depth: "complete study notes with preserved digest and learning-core depth"
+      words_per_batch: "1200-2200 per meaningful batch unless genuinely small"
     formula_sheet:
       depth: "all important formulas"
+    exam_questions:
+      count_per_batch: "8-18"
 
   rigorous:
     notes:
+      depth: "as long as needed for completeness"
       words_per_batch: "as long as needed for completeness"
-    exam_questions:
-      count_per_batch: "15-30"
     formula_sheet:
-      depth: "formulas, assumptions, derivations, common mistakes"
+      depth: "formulas plus assumptions, derivation intuition, and common mistakes"
+    exam_questions:
+      count_per_batch: "15-30 per batch if exam-heavy"
+
+final_outputs:
+  generated_by_default:
+    batch:
+      - "batch_notes"
+      - "formula_sheet"
+      - "exam_questions"
+    merged:
+      - "full_course_notes"
+      - "full_formula_sheet"
+      - "full_question_bank"
+  exportable_by_default:
+    - "notes"
+    - "formulas"
+    - "exam_practice_questions"
 
 outputs:
   import_plan:
     file: "analysis/inventory/import_plan.md"
+    role: "internal"
     required_sections:
       - "Summary"
       - "Plan"
 
   import_log:
     file: "analysis/inventory/import_log.md"
+    role: "internal"
     required_sections:
       - "Summary"
       - "Log"
 
   course_inventory:
     file: "analysis/inventory/course_inventory.md"
+    role: "internal"
     required_sections:
       - "Course Inventory"
 
   batch_plan:
     file: "analysis/inventory/batch_plan.md"
+    role: "internal"
     required_sections:
       - "Batch Plan"
     required_batch_fields:
@@ -60,6 +82,7 @@ outputs:
 
   batch_plan_repair_log:
     file: "analysis/inventory/batch_plan_repair_log.md"
+    role: "internal"
     required_sections:
       - "Summary"
       - "Changes"
@@ -69,6 +92,7 @@ outputs:
 
   digest:
     file: "analysis/batches/<batch>_digest.md"
+    role: "internal"
     required_sections:
       - "Batch Processing Plan"
       - "Source Coverage"
@@ -78,104 +102,190 @@ outputs:
       - "Formulas"
       - "Important tables/charts/diagrams"
       - "Examples"
+      - "Exercise and Exam Signals"
       - "Weak points"
       - "Unresolved questions"
       - "Source references"
+    standards:
+      - "Cover every assigned primary and supporting source."
+      - "Separate extracted source facts from interpretation."
+      - "Record visual findings, tables, charts, diagrams, and unresolved visual issues when present."
+      - "Capture exercise and exam material primarily as signals for the question output."
 
   learning_core:
     file: "analysis/batches/<batch>_learning_core.md"
+    role: "internal"
     required_sections:
       - "Learning Objectives"
       - "Core Concepts"
       - "Explanations"
       - "Connections Between Topics"
       - "Worked Examples"
+      - "Formula Intuition"
       - "Common Mistakes"
       - "Exam-Relevant Points"
       - "Weak Points"
       - "Unresolved Questions"
       - "Source References"
+    standards:
+      - "Preserve depth needed for complete notes, not only summary-level material."
+      - "Connect concepts to previous and future batches when useful."
+      - "Carry weak points and unresolved questions forward."
 
   visual_notes:
     file: "analysis/visual/<batch>_visual_notes.md"
+    role: "internal"
     condition: "required only when visual findings exist"
     required_sections:
       - "Visual Scope"
       - "Essential Visuals"
       - "Findings"
+      - "Exam Relevance"
       - "Unresolved Visual Issues"
       - "Source References"
 
   batch_notes:
     file: "outputs/notes/<batch>.md"
+    role: "final"
     required_sections:
       - "Scope"
       - "Core Notes"
       - "Definitions"
       - "Examples"
+      - "Formula Intuition"
+      - "Exam Relevance"
+      - "Common Mistakes"
       - "Weak Points"
       - "Source References"
+    standards:
+      - "Must be complete study notes, not summaries."
+      - "Must preserve depth from the digest and learning core."
+      - "Must cover all assigned primary and supporting sources."
+      - "Must include visual findings when exam-relevant."
+      - "Must connect to previous and future batches when useful."
+      - "Must keep unsupported or unresolved claims visible instead of smoothing them over."
 
   formula_sheet:
     file: "outputs/formulas/<batch>_formulas.md"
+    role: "final"
     condition: "required only when formulas exist"
     required_sections:
-      - "Notation"
       - "Formula Index"
-      - "Formulas"
-      - "Variable Definitions"
+      - "Notation"
+      - "Formula Entries"
+    required_formula_entry_fields:
+      - "Formula name"
+      - "Display LaTeX formula"
+      - "Variables"
       - "Assumptions"
-      - "When To Use"
-      - "Source References"
+      - "Use when"
+      - "Interpretation"
+      - "Common mistake"
+      - "Source"
+    latex_standards:
+      - "Use display math with $$ ... $$ or \\[ ... \\]."
+      - "Use aligned blocks for multi-line formulas."
+      - "No formula may exist only as inline code or plain ASCII."
+    standards:
+      - "Formula sources are required."
+      - "Notation must be consistent within the batch."
+      - "Assumptions and use conditions must be explicit enough for exam use."
 
   exam_questions:
     file: "outputs/questions/<batch>_questions.md"
+    role: "final"
     required_sections:
       - "Exam Scope"
-      - "Question Set"
-      - "Answer Key"
-      - "Worked Solutions"
-      - "Grading Notes"
-      - "Common Pitfalls"
+      - "Questions by Topic"
+      - "Expected Answers"
+      - "Common Traps"
       - "Source References"
+    required_question_types:
+      - "conceptual questions"
+      - "formula questions"
+      - "calculation questions when relevant"
+      - "interpretation questions"
+      - "true/false with explanation when useful"
+      - "common-trap questions"
+      - "exam-style open questions"
+    question_standards:
+      - "Questions should be grouped by topic."
+      - "Each question should have difficulty and exam relevance where useful."
+      - "Expected answers must be precise enough to study from."
+      - "Exercises and exams should feed primarily into this output."
+      - "Worked calculation answers should show the key steps needed to learn the method."
 
   full_course_notes:
     file: "outputs/notes/full_course_notes.md"
+    role: "final"
     required_sections:
       - "Scope"
       - "Dependency Map"
-      - "Consolidated Notes"
+      - "Consolidated Core Notes"
       - "Definitions"
       - "Examples"
+      - "Formula Intuition"
+      - "Exam Relevance"
+      - "Common Mistakes"
       - "Weak Points"
       - "Unresolved Questions"
       - "Exam-Relevant Visual Findings"
       - "Source References"
+    standards:
+      - "Merge validated batch notes into complete full-course study notes."
+      - "Consolidate duplicate concepts instead of concatenating batches."
+      - "Preserve important source coverage, dependencies, weak points, and visual findings."
 
   full_formula_sheet:
     file: "outputs/formulas/full_formula_sheet.md"
+    role: "final"
     required_sections:
-      - "Notation"
       - "Formula Index"
-      - "Formulas"
-      - "Variable Definitions"
-      - "Assumptions"
-      - "When To Use"
+      - "Notation"
+      - "Formula Entries"
       - "Dependencies"
-      - "Common Mistakes"
       - "Source References"
+    required_formula_entry_fields:
+      - "Formula name"
+      - "Display LaTeX formula"
+      - "Variables"
+      - "Assumptions"
+      - "Use when"
+      - "Interpretation"
+      - "Common mistake"
+      - "Source"
+    latex_standards:
+      - "Use display math with $$ ... $$ or \\[ ... \\]."
+      - "Use aligned blocks for multi-line formulas."
+      - "No formula may exist only as inline code or plain ASCII."
+    standards:
+      - "Deduplicate formulas across batches."
+      - "Harmonize notation across the full course."
+      - "Preserve assumptions, interpretation, common mistakes, and source provenance."
 
   full_question_bank:
     file: "outputs/questions/full_question_bank.md"
+    role: "final"
     required_sections:
       - "Exam Scope"
+      - "Questions by Topic"
+      - "Expected Answers"
+      - "Common Traps"
       - "Likely Exam Questions"
-      - "Question Set"
-      - "Answer Key"
-      - "Worked Solutions"
-      - "Grading Notes"
-      - "Common Pitfalls"
       - "Source References"
+    required_question_types:
+      - "conceptual questions"
+      - "formula questions"
+      - "calculation questions when relevant"
+      - "interpretation questions"
+      - "true/false with explanation when useful"
+      - "common-trap questions"
+      - "exam-style open questions"
+    question_standards:
+      - "Merge validated batch question sets into an exam-oriented full-course question bank."
+      - "Group questions by topic and preserve dependency order where useful."
+      - "Expected answers must be precise enough to study from."
+      - "Prioritize exercise and exam source material here."
 
   export_unmerged_notes:
     input_glob: "outputs/notes/Batch_*.md"
@@ -202,6 +312,7 @@ outputs:
 
   validation_report:
     file: "review/validation-report.md"
+    role: "internal"
     required_sections:
       - "Summary"
       - "Required Output Categories"
@@ -214,28 +325,44 @@ outputs:
 
   source_coverage:
     file: "review/source-coverage.md"
+    role: "internal"
     required_sections:
       - "Summary"
       - "File Coverage"
 
   validation_details:
     folder: "analysis/validation/"
+    role: "internal"
     required_for: "studyos-validate deterministic and LLM audit notes"
 
   visual_issues:
     file: "review/visual-issues.md"
+    role: "internal"
     condition: "required when essential visuals are unresolved or visually grounded claims need repair"
 
   unresolved_questions:
     file: "review/unresolved-questions.md"
+    role: "internal"
     condition: "required when validation leaves unanswered source, formula, or visual questions"
 
 rules:
   raw_source_files_are_protected: true
   import_is_copy_only: true
   imported_inputs_are_read_only_after_import: true
+  default_final_outputs_are_notes_formulas_and_exam_questions_only: true
   require_source_references: true
-  final_outputs_must_use_learning_cores: true
+  final_outputs_must_use_digests_and_learning_cores: true
+  batch_notes_must_be_complete_study_notes_not_summaries: true
+  batch_notes_must_cover_primary_and_supporting_sources: true
+  batch_notes_must_include_exam_relevant_visual_findings: true
+  batch_notes_should_connect_previous_and_future_batches_when_useful: true
+  formula_entries_require_display_latex: true
+  formula_entries_require_variables_assumptions_use_interpretation_mistake_source: true
+  formulas_must_not_be_inline_only_or_plain_ascii_only: true
+  exam_questions_must_include_expected_answers: true
+  exam_questions_must_be_grouped_by_topic: true
+  exam_questions_must_include_difficulty_and_exam_relevance_where_useful: true
+  exercises_and_exams_feed_primarily_into_questions: true
   unresolved_questions_must_be_flagged: true
   weak_points_must_be_carried_forward: true
   merge_does_not_mean_concatenate: true
@@ -253,8 +380,7 @@ rules:
   visual_screening_integrated_in_batch: true
   visual_coverage_required_for_slide_pdf_image_batches: true
   essential_visuals_must_be_analyzed_or_unresolved: true
-  exam_questions_must_include_expected_answers: true
-  exercises_must_be_integrated_as_practice: true
+  source_coverage_required_for_all_assigned_sources: true
   unsupported_claims_must_be_flagged: true
   validation_repair_policy: "targeted repair; preserve valid content; do not regenerate unrelated outputs; rerun validation after repair"
   separate_visual_skill_required: false
