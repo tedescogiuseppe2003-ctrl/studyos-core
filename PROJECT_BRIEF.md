@@ -52,7 +52,7 @@ The proposal must include:
 - raw/original course folder path
 - whether original files are read-only, default yes
 - whether StudyOS should copy files into `inputs/`, default yes
-- desired outputs:
+- fixed default outputs:
   - batch notes
   - batch formula sheets
   - batch exam practice questions
