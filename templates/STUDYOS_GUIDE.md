@@ -143,11 +143,13 @@ If no validated batch exists yet, the agent warns:
 
 > Recommended: process and validate one batch manually before full course processing.
 
-The skill identifies planned, unprocessed, stale, or previously failed batches and processes them one batch at a time using `studyos-batch` semantics. Each batch is validated with `studyos-validate` semantics before the next batch starts. Minor localized issues may be repaired and revalidated. Blocking validation issues, missing assigned sources, ambiguous ordering, or unresolved essential visual content stop processing.
+The skill identifies planned, unprocessed, stale, or previously failed batches and processes them one batch at a time using `studyos-batch` semantics. For each batch, final outputs are limited to notes, formula sheets when relevant, and exam practice questions. Digest, learning core, visual notes, validation files, and review files remain internal process evidence.
+
+Each batch is validated with `studyos-validate` semantics before the next batch starts. Minor localized issues may be repaired and revalidated. Blocking validation issues, missing assigned sources, ambiguous ordering, insufficient source coverage, insufficient formula quality, insufficient notes depth, or unresolved essential visual coverage stop processing.
 
 Default processing is sequential. Safe parallel processing is allowed only when configured in `subject.yaml`; dependent batches must not be parallelized, digest and learning-core work for the same batch must not be parallelized, and merged validation is required before downstream work continues.
 
-The completion report lists batches processed, batches skipped, stopped batch if any, validation status, unresolved issues, files written, and the recommended next skill: `studyos-merge`.
+The completion report lists batches processed, batches skipped, blocking issues and stopped batch if any, notes/formula sheets/exam practice questions created, validation status, unresolved issues, files written, and the recommended next skill: `studyos-merge`.
 
 ## Merge Outputs
 

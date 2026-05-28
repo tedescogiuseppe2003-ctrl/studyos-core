@@ -113,17 +113,19 @@ Use after import and planning when the user wants remaining planned or unprocess
 - Reads `analysis/batches/`, `outputs/`, and `review/` to identify planned, unprocessed, stale, failed, and already validated batches.
 - Processes remaining planned, unprocessed, stale, or repairable failed batches sequentially by default.
 - Uses `studyos-batch` semantics for each batch.
+- Creates only batch notes, batch formula sheets when relevant, and batch exam practice questions as final batch outputs.
+- Keeps digest, learning core, visual notes, validation files, and review files as internal process evidence.
 - Uses `studyos-validate` semantics before moving to the next batch and does not skip validation.
 - Repairs minor localized issues when appropriate, then revalidates before continuing.
-- Stops on blocking validation issues, missing assigned sources, unsafe batch ordering, or unresolved essential visual content.
+- Stops on blocking validation issues, missing assigned sources, unsafe batch ordering, insufficient source coverage, insufficient formula quality, insufficient notes depth, or unresolved essential visual coverage.
 - Writes to `analysis/batches/`, `analysis/visual/`, `analysis/validation/`, `outputs/notes/`, `outputs/formulas/`, `outputs/questions/`, `review/`, and optional processing state under `study-os/state/`.
 - Includes integrated visual screening; no separate visual skill is needed.
 
 Parallelism is off by default. Use safe parallelism only when configured in `subject.yaml`; do not parallelize dependent batches, do not parallelize digest and learning core for the same batch, and require merged validation before downstream work continues.
 
-Completion reports include batches processed, batches skipped, stopped batch if any, validation status, unresolved issues, and the recommended next skill: `studyos-merge`.
+Completion reports include batches processed, batches skipped, blocking issues and stopped batch if any, notes/formula sheets/exam practice questions created, validation status, unresolved issues, and the recommended next skill: `studyos-merge`.
 
-This skill does not process the whole course as one giant batch and does not create merged final outputs.
+This skill does not process the whole course as one giant batch, does not create removed output types, and does not create merged final outputs.
 
 ## studyos-merge
 
