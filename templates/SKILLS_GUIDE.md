@@ -65,15 +65,23 @@ Use to process one selected conceptual batch.
 - Writes `analysis/batches/<batch>_learning_core.md`.
 - Writes `analysis/visual/<batch>_visual_notes.md` when visual findings exist.
 - Writes `outputs/notes/<batch>.md`.
-- Writes `outputs/formulas/<batch>_formulas.md` when formulas exist.
+- Writes `outputs/formulas/<batch>_formulas.md` when formulas exist or are relevant.
 - Writes `outputs/questions/<batch>_questions.md`.
 - Updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
 
+It does not create flashcards, cheat sheets, study plans, final review packs, or deprecated output folders for those formats.
+
 Every digest includes Batch Processing Plan, Source Coverage, Visual Coverage, Core extracted content, Definitions, Formulas, Important tables/charts/diagrams, Examples, Weak points, Unresolved questions, and Source references.
+
+All assigned sources must be used or explicitly explained in Source Coverage. Slides supply theory, definitions, formulas, and visuals; notes supply emphasis, traps, and doubts; exercises supply exam practice questions and weak points; readings supply theory, assumptions, and definitions; exams supply exam style and expected answers; transcripts supply explanations and examples.
+
+Batch notes must be complete study notes, not summaries. Each notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. The learning core must preserve enough depth to support those complete notes and must not be over-compressed.
+
+Formula sheets use readable display LaTeX and include variable definitions, assumptions, intuition, common mistakes, and source references. Exam questions are the active-recall and practice layer, including exercise-derived practice, exam-style prompts, common-mistake traps, and expected answers or solution outlines.
 
 If the batch has slides, PDFs, or images, Visual Coverage is required. If no essential visuals exist, the digest says so explicitly. Essential visuals include formulas in images, definitions in images, charts, tables, rankings, benchmark values, model diagrams, process diagrams, and summary visual slides.
 
-Use model routing from `subject.yaml` and `study-os/config/model-routing.yaml` when available: balanced for normal batches, deep for formula-heavy batches, deep only for affected essential visuals, and balanced or deep for exam questions depending on difficulty. Repair affected sections before regenerating entire outputs.
+Use model routing from `subject.yaml` and `study-os/config/model-routing.yaml` when available: balanced for normal batches, deep for formula-heavy batches, deep only for affected essential visuals, and balanced or deep for exam questions depending on difficulty. Repair affected sections before regenerating entire outputs. Spend saved effort from the reduced output set on notes, formulas, questions, source coverage, and visual coverage; do not spend tokens on removed outputs.
 
 Run `studyos-validate` after each processed batch.
 

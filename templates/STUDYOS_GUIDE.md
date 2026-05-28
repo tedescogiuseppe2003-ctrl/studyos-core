@@ -50,7 +50,7 @@ Import is copy-only. It never moves raw files, never deletes raw files, never re
 - `python3 study-os/scripts/studyos.py doctor` checks local readiness without modifying files.
 - `studyos-import` proposes safe import, stops for approval, executes approved copy actions, then creates inventory and the first-pass batch plan from metadata.
 - `studyos-plan` refines that first-pass plan into conceptual lectures, topics, modules, or tutorials before processing.
-- `studyos-batch` processes one selected conceptual batch into digest, learning core, configured outputs, review updates, and integrated visual screening.
+- `studyos-batch` processes one selected conceptual batch into digest, learning core, complete notes, formula sheet when relevant, exam practice questions, review updates, and integrated visual screening.
 - `studyos-validate` validates batch, course, repaired, or merged outputs.
 - `studyos-course` processes remaining planned or unprocessed batches sequentially, validates each batch before continuing, and reports processed, skipped, and stopped batches.
 - `studyos-merge` merges validated batch outputs into consolidated full-course notes, formula sheet, and exam practice questions.
@@ -99,7 +99,7 @@ Use the deeper tier only for the affected section when repairing validation issu
 - Empty `inputs/`: run `studyos-import` proposal mode, approve the plan, then run execute mode.
 - Missing `batch_plan.md`: run `studyos-import` inventory mode, then `studyos-plan`.
 - Random file-level or exercise-only batches in `batch_plan.md`: run `studyos-plan` before processing.
-- Missing digest, learning core, or outputs: run `studyos-batch`.
+- Missing digest, learning core, notes, formulas when relevant, or questions: run `studyos-batch`.
 - Missing validation reports: run `studyos-validate`.
 - Missing merged outputs: run `studyos-merge`.
 
@@ -120,7 +120,7 @@ When a preflight warning appears, stop the current skill and do exactly the reco
 Batch output files use these names:
 
 - Notes: `outputs/notes/<batch>.md`
-- Formula sheets: `outputs/formulas/<batch>_formulas.md` when formulas exist
+- Formula sheets: `outputs/formulas/<batch>_formulas.md` when formulas exist or are relevant
 - Exam questions: `outputs/questions/<batch>_questions.md`
 
 Merged full-course output files use these names:
@@ -130,6 +130,10 @@ Merged full-course output files use these names:
 - Question bank: `outputs/questions/full_question_bank.md`
 
 `studyos-batch` updates `review/weak-points.md`, `review/unresolved-questions.md`, and `review/visual-issues.md` when visual issues exist.
+
+Batch notes are complete study notes, not summaries. Each batch notes file includes Scope, Core Notes, Definitions, Examples, Formula Intuition, Exam Relevance, Common Mistakes, Weak Points, and Source References. Formula sheets use readable display LaTeX and include assumptions, intuition, common mistakes, and source references. Exam questions are the active-recall and practice layer, using exercises for practice prompts and weak-point discovery rather than fake theory summaries.
+
+`studyos-batch` does not create flashcards, cheat sheets, study plans, final review packs, or deprecated output folders for those formats. Fewer outputs should mean deeper attention to notes, formulas, questions, source coverage, and visual coverage.
 
 ## Course Processing
 
