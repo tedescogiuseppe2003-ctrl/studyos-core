@@ -21,6 +21,7 @@ Use after the desired `studyos-batch`, `studyos-course`, or `studyos-merge` outp
 # Preflight checks
 
 - Confirm at least one exportable study-facing Markdown output exists.
+- If one unmerged category is missing, export the other available unmerged categories and warn.
 - If merged outputs are missing, export only unmerged outputs and warn.
 - If unmerged outputs are missing, export only merged outputs and warn.
 - If no exportable outputs exist, stop and tell the user to run `studyos-batch`, `studyos-course`, or `studyos-merge` first.
@@ -32,8 +33,8 @@ Use after the desired `studyos-batch`, `studyos-course`, or `studyos-merge` outp
 Unmerged batch-level outputs:
 
 - `outputs/notes/Batch_*.md`
-- `outputs/formulas/Batch_*.md`
-- `outputs/questions/Batch_*.md`
+- `outputs/formulas/Batch_*_formulas.md`
+- `outputs/questions/Batch_*_questions.md`
 
 Merged full-course outputs:
 
@@ -73,6 +74,7 @@ Export log:
 - Export only the explicit study-facing output paths listed in this skill.
 - Do not export internal analysis files.
 - Do not export review, validation, or debug files unless the user explicitly requests a custom export outside this default skill.
+- Do not export flashcards, cheat sheets, study plans, final review packs, or removed/deprecated output types by default.
 - Do not modify files under `outputs/`.
 - Preserve source references exactly as written.
 - Preserve LaTeX expressions; use PDF tooling when available and MathJax-backed HTML fallback when PDF tooling is unavailable.
@@ -84,8 +86,8 @@ Export log:
 The exporter applies output-specific presentation styling without changing content:
 
 - notes: readable sections, definitions, examples, exam angles
-- formulas: compact formula review, variables, assumptions, common mistakes
-- questions: grouped practice, difficulty cues, expected answers
+- formulas: clean LaTeX/math rendering, variables, assumptions, common mistakes
+- questions: grouped practice with questions and expected answers clearly visible
 
 # PDF dependency behavior
 

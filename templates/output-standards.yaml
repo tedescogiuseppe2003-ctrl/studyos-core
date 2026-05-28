@@ -301,12 +301,12 @@ outputs:
     format: "pdf preferred; print-ready html fallback"
 
   export_unmerged_formulas:
-    input_glob: "outputs/formulas/Batch_*.md"
+    input_glob: "outputs/formulas/Batch_*_formulas.md"
     output_folder: "exports/pdf/unmerged/formulas/"
     format: "pdf preferred; print-ready html fallback"
 
   export_unmerged_questions:
-    input_glob: "outputs/questions/Batch_*.md"
+    input_glob: "outputs/questions/Batch_*_questions.md"
     output_folder: "exports/pdf/unmerged/questions/"
     format: "pdf preferred; print-ready html fallback"
 

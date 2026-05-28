@@ -157,12 +157,12 @@ Merge does not mean concatenate. Run audit validation on the merged outputs when
 
 Use after desired outputs exist and have acceptable validation status.
 
-- Reads unmerged batch-level outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*.md`, and `outputs/questions/Batch_*.md`.
+- Reads unmerged batch-level outputs from `outputs/notes/Batch_*.md`, `outputs/formulas/Batch_*_formulas.md`, and `outputs/questions/Batch_*_questions.md`.
 - Writes unmerged exports to `exports/pdf/unmerged/notes/`, `exports/pdf/unmerged/formulas/`, and `exports/pdf/unmerged/questions/`.
 - Reads merged full-course outputs from `outputs/notes/full_course_notes.md`, `outputs/formulas/full_formula_sheet.md`, and `outputs/questions/full_exam_practice_questions.md`.
 - Writes merged exports to `exports/pdf/merged/`.
 - Preserves batch boundaries, content, LaTeX expressions, and source references.
-- Does not export `analysis/`, `review/`, validation, debug, or internal files by default.
+- Does not export flashcards, cheat sheets, study plans, final review packs, `analysis/`, `review/`, validation, debug, or internal files by default.
 - Uses `python3 study-os/scripts/export_outputs.py --root .`.
 
 The exporter prefers PDF when `pandoc` and a LaTeX PDF engine are available. If PDF tooling is unavailable, it writes clean print-ready HTML in the same export folders and reports the fallback.

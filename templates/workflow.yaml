@@ -242,8 +242,8 @@ workflow:
     purpose: "Export unmerged and merged study outputs to PDF or print-ready fallback."
     inputs:
       - "outputs/notes/Batch_*.md"
-      - "outputs/formulas/Batch_*.md"
-      - "outputs/questions/Batch_*.md"
+      - "outputs/formulas/Batch_*_formulas.md"
+      - "outputs/questions/Batch_*_questions.md"
       - "outputs/notes/full_course_notes.md"
       - "outputs/formulas/full_formula_sheet.md"
       - "outputs/questions/full_exam_practice_questions.md"

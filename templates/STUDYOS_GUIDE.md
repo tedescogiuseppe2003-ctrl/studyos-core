@@ -176,8 +176,8 @@ The completion report lists merged outputs created, unresolved issues included, 
 Unmerged batch-level inputs:
 
 - `outputs/notes/Batch_*.md`
-- `outputs/formulas/Batch_*.md`
-- `outputs/questions/Batch_*.md`
+- `outputs/formulas/Batch_*_formulas.md`
+- `outputs/questions/Batch_*_questions.md`
 
 Unmerged exports are written by category under:
 
@@ -199,7 +199,7 @@ Run:
 python3 study-os/scripts/export_outputs.py --root .
 ```
 
-The exporter preserves content and source references. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If those dependencies are unavailable, it writes print-ready HTML with MathJax support and reports the fallback in `study-os/state/export-log.md`.
+The exporter preserves content and source references. It exports only notes, formulas, and exam practice questions; flashcards, cheat sheets, study plans, final review packs, internal analysis files, and review/debug files are skipped by default. It prefers PDF when `pandoc` and a LaTeX PDF engine are available. If those dependencies are unavailable, it writes print-ready HTML with MathJax support and reports the fallback in `study-os/state/export-log.md`.
 
 ## Integrated Visual Screening
 

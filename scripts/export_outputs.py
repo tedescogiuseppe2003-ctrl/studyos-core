@@ -14,9 +14,28 @@ from datetime import datetime
 from pathlib import Path
 
 
-UNMERGED_CATEGORIES = ("notes", "formulas", "questions")
+UNMERGED_SOURCES = {
+    "notes": "Batch_*.md",
+    "formulas": "Batch_*_formulas.md",
+    "questions": "Batch_*_questions.md",
+}
+UNMERGED_CATEGORIES = tuple(UNMERGED_SOURCES)
 EXPORT_BASE = Path("exports/pdf")
 STATE_LOG = Path("study-os/state/export-log.md")
+
+REMOVED_OUTPUT_PATTERNS = (
+    "outputs/flashcards/**/*.md",
+    "outputs/cheat-sheets/**/*.md",
+    "outputs/cheatsheets/**/*.md",
+    "outputs/study-plan/**/*.md",
+    "outputs/study-plans/**/*.md",
+    "outputs/final-pack/**/*.md",
+    "outputs/review-packs/**/*.md",
+    "outputs/**/full_flashcards.md",
+    "outputs/**/final_cheat_sheet.md",
+    "outputs/**/full_course_study_plan.md",
+    "outputs/**/final_review_pack.md",
+)
 
 
 @dataclass(frozen=True)
@@ -261,10 +280,10 @@ def slug_title(path: Path) -> str:
 
 def collect_unmerged(root: Path) -> list[ExportSpec]:
     specs: list[ExportSpec] = []
-    for category in UNMERGED_CATEGORIES:
+    for category, pattern in UNMERGED_SOURCES.items():
         source_directory = root / "outputs" / category
         destination_directory = root / EXPORT_BASE / "unmerged" / category
-        for source in sorted(source_directory.glob("Batch_*.md")):
+        for source in sorted(source_directory.glob(pattern)):
             specs.append(
                 ExportSpec(
                     source=source,
@@ -275,6 +294,35 @@ def collect_unmerged(root: Path) -> list[ExportSpec]:
                 )
             )
     return specs
+
+
+def collect_skipped_non_default_outputs(root: Path) -> list[ExportResult]:
+    skipped_paths: set[Path] = set()
+
+    for pattern in REMOVED_OUTPUT_PATTERNS:
+        skipped_paths.update(path for path in root.glob(pattern) if path.is_file())
+
+    formula_directory = root / "outputs/formulas"
+    for path in formula_directory.glob("Batch_*.md"):
+        if path.is_file() and not path.match("Batch_*_formulas.md"):
+            skipped_paths.add(path)
+
+    question_directory = root / "outputs/questions"
+    for path in question_directory.glob("Batch_*.md"):
+        if path.is_file() and not path.match("Batch_*_questions.md"):
+            skipped_paths.add(path)
+
+    return [
+        ExportResult(
+            source=path,
+            destination=None,
+            output_type="skipped",
+            category="non_default",
+            status="skipped",
+            detail="not part of default StudyOS export set",
+        )
+        for path in sorted(skipped_paths)
+    ]
 
 
 def collect_merged(root: Path) -> list[ExportSpec]:
@@ -579,6 +627,18 @@ def skipped_missing_merged(root: Path) -> list[ExportResult]:
     return skipped
 
 
+def missing_unmerged_warnings(root: Path) -> list[str]:
+    warnings: list[str] = []
+    for category, pattern in UNMERGED_SOURCES.items():
+        if any((root / "outputs" / category).glob(pattern)):
+            continue
+        warnings.append(
+            f"No unmerged {category} outputs matching outputs/{category}/{pattern}; "
+            "exporting other available categories."
+        )
+    return warnings
+
+
 def write_log(
     root: Path,
     results: list[ExportResult],
@@ -679,8 +739,8 @@ def print_completion(
         print("Warnings:")
         for warning in warnings:
             print(f"  - {warning}")
-    print_rows("Exported unmerged files:", exported_unmerged)
-    print_rows("Exported merged files:", exported_merged)
+    print_rows("Exported unmerged notes/formulas/questions:", exported_unmerged)
+    print_rows("Exported merged notes/formulas/questions:", exported_merged)
     print_rows("Skipped files:", skipped)
     print_rows("Failed files:", failed)
 
@@ -696,8 +756,10 @@ def main() -> int:
     warnings: list[str] = []
     if not unmerged_specs:
         warnings.append(
-            "No unmerged Batch_*.md outputs found; exporting merged outputs only."
+            "No unmerged notes, formulas, or questions found; exporting merged outputs only."
         )
+    else:
+        warnings.extend(missing_unmerged_warnings(root))
     if not merged_specs:
         warnings.append(
             "No merged full-course outputs found; exporting unmerged outputs only."
@@ -726,11 +788,20 @@ def main() -> int:
     else:
         export_format = args.format
 
+    if args.format == "pdf" and not pdf_ready:
+        print(
+            f"PDF export requested but unavailable: {pdf_detail}. "
+            "Install pandoc and a LaTeX PDF engine, or rerun with --format auto/html.",
+            file=sys.stderr,
+        )
+        return 1
+
     results: list[ExportResult] = []
     for spec in [*unmerged_specs, *merged_specs]:
         results.append(export_one(spec, root, args.format, pdf_ready, pdf_detail))
 
     results.extend(skipped_missing_merged(root))
+    results.extend(collect_skipped_non_default_outputs(root))
 
     export_format = infer_export_format(results, export_format)
     log_path = write_log(root, results, warnings, export_format)
